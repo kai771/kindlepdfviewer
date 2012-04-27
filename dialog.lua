@@ -1,5 +1,6 @@
 require "widget"
 require "font"
+require "util"
 
 InfoMessage = {
 	face = Font:getFace("infofont", 25)

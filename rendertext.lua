@@ -1,3 +1,7 @@
+require "ft"
+require "util"
+require "blitbuffer"
+
 glyphcache_max_memsize = 256*1024 -- 256kB glyphcache
 glyphcache_current_memsize = 0
 glyphcache = {}

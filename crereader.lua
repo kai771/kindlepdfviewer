@@ -1,3 +1,5 @@
+require "cre"
+
 require "font"
 require "unireader"
 require "inputbox"

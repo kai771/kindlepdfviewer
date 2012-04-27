@@ -1,3 +1,7 @@
+require "blitbuffer"
+require "drawcontext"
+require "util"
+
 require "keys"
 require "settings"
 require "selectmenu"

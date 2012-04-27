@@ -1,3 +1,5 @@
+require "mupdf"
+
 require "unireader"
 require "inputbox"
 

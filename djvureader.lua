@@ -1,3 +1,5 @@
+require "djvu"
+
 require "unireader"
 
 DJVUReader = UniReader:new{}

@@ -17,6 +17,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
 
+require "util"
+require "einkfb"
+require "input"
+require "lfs"
+
 require "alt_getopt"
 require "pdfreader"
 require "djvureader"
@@ -86,6 +91,9 @@ function showusage()
 	return
 end
 
+if arg then
+	ARGV=arg -- for standalone lua interpreter
+end
 optarg, optind = alt_getopt.get_opts(ARGV, "p:g:G:hg:dg:", longopts)
 if optarg["h"] then
 	return showusage()

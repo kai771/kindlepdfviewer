@@ -1,3 +1,5 @@
+require "mupdf"
+
 require "rendertext"
 require "graphics"
 require "image"

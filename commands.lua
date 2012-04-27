@@ -1,4 +1,5 @@
 require "keys"
+require "util"
 
 Keydef = {
 	keycode = nil,
