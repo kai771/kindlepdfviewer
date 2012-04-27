@@ -57,6 +57,12 @@ else
 	CFLAGS+= $(ARM_CFLAGS)
 endif
 
+# build shared libraries for loading into a lua interpreter dynamically:
+ifdef LUALIBS
+	CFLAGS+=-fPIC
+	CXXFLAGS+=-fPIC
+endif
+
 # standard includes
 KPDFREADER_CFLAGS=$(CFLAGS) -I$(LUADIR)/src -I$(MUPDFDIR)/
 
@@ -83,8 +89,45 @@ THIRDPARTYLIBS := $(MUPDFLIBDIR)/libfreetype.a \
 			#$(CRENGINEDIR)/thirdparty/libjpeg/libjpeg.a \
 
 LUALIB := $(LUADIR)/src/liblua.a
+LUA := $(LUADIR)/src/lua
 
 all:kpdfview
+
+libraries: einkfb.so mupdf.so blitbuffer.so drawcontext.so input.so util.so ft.so lfs.so djvu.so cre.so
+
+ft.so: ft.o blitbuffer.o $(MUPDFLIBDIR)/libfreetype.a
+	$(CC) -shared $^ -o $@
+
+pdf.so: pdf.o blitbuffer.o drawcontext.o
+	$(CC) -shared $^ -o $@
+
+mupdf.so: mupdf.o blitbuffer.o drawcontext.o pdf.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS)
+	$(CC) -shared $^ -o $@
+
+cre.so: cre.o $(CRENGINELIBS) $(MUPDFLIBDIR)/libjpeg.a $(MUPDFLIBDIR)/libfreetype.a $(MUPDFLIBDIR)/libz.a
+	$(CC) -shared $(DYNAMICLIBSTDCPP) $^ $(STATICLIBSTDCPP) -o $@
+
+djvu.so: djvu.o $(DJVULIBS) $(MUPDFLIBDIR)/libjpeg.a
+	$(CC) -shared $(DYNAMICLIBSTDCPP) -lpthread $^ $(STATICLIBSTDCPP) -o $@
+
+# in fact einkfb doesn't really use blitbuffer.o yet...
+einkfb.so: einkfb.o blitbuffer.o
+	$(CC) -shared $(EMU_LDFLAGS) $^ -o $@
+
+input.so: input.o
+	$(CC) -shared $(EMU_LDFLAGS) $^ -o $@
+
+blitbuffer.so: blitbuffer.o
+	$(CC) -shared $^ -o $@
+
+drawcontext.so: drawcontext.o
+	$(CC) -shared $^ -o $@
+
+util.so: util.o
+	$(CC) -shared $^ -o $@
+
+lfs.so: lfs.o
+	$(CC) -shared $^ -o $@
 
 kpdfview: kpdfview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft.o lfs.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) djvu.o $(DJVULIBS) cre.o $(CRENGINELIBS)
 	$(CC) -lm -ldl -lpthread $(EMU_LDFLAGS) $(DYNAMICLIBSTDCPP) \
@@ -114,14 +157,14 @@ slider_watcher: slider_watcher.c
 ft.o: %.o: %.c
 	$(CC) -c $(KPDFREADER_CFLAGS) -I$(FREETYPEDIR)/include -I$(MUPDFDIR)/fitz $< -o $@
 
-kpdfview.o pdf.o blitbuffer.o util.o drawcontext.o einkfb.o input.o mupdfimg.o: %.o: %.c
+mupdf.o kpdfview.o pdf.o blitbuffer.o util.o drawcontext.o einkfb.o input.o mupdfimg.o: %.o: %.c
 	$(CC) -c $(KPDFREADER_CFLAGS) $(EMU_CFLAGS) -I$(LFSDIR)/src $< -o $@
 
 djvu.o: %.o: %.c
 	$(CC) -c $(KPDFREADER_CFLAGS) -I$(DJVUDIR)/ $< -o $@
 
 cre.o: %.o: %.cpp
-	$(CC) -c -I$(CRENGINEDIR)/crengine/include/ -Ilua/src $< -o $@ -lstdc++
+	$(CC) -c $(CXXFLAGS) -I$(CRENGINEDIR)/crengine/include/ -Ilua/src $< -o $@ -lstdc++
 
 lfs.o: $(LFSDIR)/src/lfs.c
 	$(CC) -c $(CFLAGS) -I$(LUADIR)/src -I$(LFSDIR)/src $(LFSDIR)/src/lfs.c -o $@
@@ -152,7 +195,7 @@ fetchthirdparty:
 	tar xvzf lua-5.1.4.tar.gz && ln -s lua-5.1.4 lua
 
 clean:
-	-rm -f *.o kpdfview slider_watcher
+	-rm -f *.o *.so kpdfview slider_watcher
 
 cleanthirdparty:
 	make -C $(LUADIR) clean
@@ -178,24 +221,27 @@ $(MUPDFDIR)/cmapdump.host:
 
 $(MUPDFLIBS) $(THIRDPARTYLIBS): $(MUPDFDIR)/cmapdump.host $(MUPDFDIR)/fontdump.host
 	# build only thirdparty libs, libfitz and pdf utils, which will care for libmupdf.a being built
-	CFLAGS="$(CFLAGS) -DNOBUILTINFONT" make -C mupdf CC="$(CC)" CMAPDUMP=cmapdump.host FONTDUMP=fontdump.host MUPDF= MU_APPS= BUSY_APP= XPS_APPS= verbose=1
+	CFLAGS="$(CFLAGS) -DNOBUILTINFONT -fPIC" make -C mupdf CC="$(CC)" CMAPDUMP=cmapdump.host FONTDUMP=fontdump.host MUPDF= MU_APPS= BUSY_APP= XPS_APPS= verbose=1
 
 $(DJVULIBS):
 	-mkdir $(DJVUDIR)/build
 ifdef EMULATE_READER
-	cd $(DJVUDIR)/build && ../configure --disable-desktopfiles --disable-shared --enable-static
+	cd $(DJVUDIR)/build && CXXFLAGS="$(CXXFLAGS)" ../configure --disable-desktopfiles --disable-shared --enable-static
 else
-	cd $(DJVUDIR)/build && ../configure --disable-desktopfiles --disable-shared --enable-static --host=$(HOST) --disable-xmltools --disable-desktopfiles
+	cd $(DJVUDIR)/build && CXXFLAGS="$(CXXFLAGS)" ../configure --disable-desktopfiles --disable-shared --enable-static --host=$(HOST) --disable-xmltools --disable-desktopfiles
 endif
 	make -C $(DJVUDIR)/build
 
 $(CRENGINELIBS):
 	cd $(KPVCRLIGDIR) && rm -rf CMakeCache.txt CMakeFiles && \
-		CFLAGS="$(CFLAGS)" CC="$(CC)" CXX="$(CXX)" cmake . && \
+		CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CC="$(CC)" CXX="$(CXX)" cmake . && \
 		make
 
 $(LUALIB):
-	make -C lua/src CC="$(CC)" CFLAGS="$(CFLAGS)" MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-Wl,-E" liblua.a
+	make -C lua/src CC="$(CC)" MYCFLAGS="$(CFLAGS) -DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -ldl" liblua.a
+
+$(LUA):
+	make -C lua/src CC="$(CC)" MYCFLAGS="$(CFLAGS) -DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -ldl" lua
 
 thirdparty: $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) $(DJVULIBS) $(CRENGINELIBS)
 
