@@ -584,29 +584,14 @@ function FileChooser:changeFileChooserMode()
 		}
 	local m = modes_menu:choose(0, G_height)
 	if m and m ~= self.filemanager_expert_mode then
-		--[[ TODO: to allow multiline-rendering for info messages & to include detailed description of the selected mode
-		local msg = "Press 'Y' to accept new mode..."
-		if m==self.BEGINNERS_MODE then
-			msg = "You have selected safe mode for beginners: the filemanager shows only files with the reader-related extentions (*.pdf, *.djvu, etc.); "..
-			"safe renaming (no extentions); unstable or dangerous functions are NOT included. "..msg
-		elseif m==self.ADVANCED_MODE then
-			msg = "You have selected advanced mode for experienced users: the filemanager shows all files; "..
-			"you may rename not only their names, but also the extentions; the files with unknown extentions would be sent to CREReader "..
-			"and could crash the reader. Please, use it in your own risk. "..msg
-		else -- ROOT_MODE
-			msg = "You have selected the most advanced and dangerous mode. I hope You know what you are doing. God bless You. "..msg
-		end 
-		InfoMessage:show(msg, 1)
-		if self:ReturnKey() == KEY_Y then ]]
-			if (self.filemanager_expert_mode == self.BEGINNERS_MODE and m > self.BEGINNERS_MODE)
-			or (m == self.BEGINNERS_MODE and self.filemanager_expert_mode > self.BEGINNERS_MODE) then
-				self.filemanager_expert_mode = m	-- make sure that new mode is set before...
-				self:setPath(self.path)		-- refreshing the folder content
-			else
-				self.filemanager_expert_mode = m
-			end
-			G_reader_settings:saveSetting("filemanager_expert_mode", self.filemanager_expert_mode)
-		-- end
+		if (self.filemanager_expert_mode == self.BEGINNERS_MODE and m > self.BEGINNERS_MODE)
+		or (m == self.BEGINNERS_MODE and self.filemanager_expert_mode > self.BEGINNERS_MODE) then
+			self.filemanager_expert_mode = m	-- make sure that new mode is set before...
+			self:setPath(self.path)		-- refreshing the folder content
+		else
+			self.filemanager_expert_mode = m
+		end
+		G_reader_settings:saveSetting("filemanager_expert_mode", self.filemanager_expert_mode)
 	end
 	self.pagedirty = true
 end
