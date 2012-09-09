@@ -46,7 +46,8 @@ function FileInfo:init(path, fname)
 	info_entry = {dir = "Size", name = FileInfo:FileSize(lfs.attributes(self.pathfile, "size"))}
 	table.insert(self.result, info_entry)
 	-- size & filename of unzipped entry for zips 
-	if string.lower(string.match(fname, ".+%.([^.]+)")) == "zip" then
+	local match = string.match(fname, ".+%.([^.]+)")
+	if match and string.lower(match) == "zip" then
 		local outfile = "./data/zip_content"
 		local l, s = 1
 		os.execute("unzip -l \""..self.pathfile.."\" > "..outfile)
