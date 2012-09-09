@@ -146,15 +146,10 @@ function FileChooser:readDir()
 	self.dirs = {}
 	self.files = {}
 	for f in lfs.dir(self.path) do
-		if lfs.attributes(self.path.."/"..f, "mode") == "directory" and f ~= "." and f~=".."
-			and not string.match(f, "^%.[^.]") then
-				table.insert(self.dirs, f)
-		elseif lfs.attributes(self.path.."/"..f, "mode") == "file"
-			and not string.match(f, "^%.[^.]") then
-			local file_type = string.lower(string.match(f, ".+%.([^.]+)") or "")
-			if ext:getReader(file_type) then
-				table.insert(self.files, f)
-			end
+		if lfs.attributes(self.path.."/"..f, "mode") == "directory" and f ~= "." and f~=".." then
+			table.insert(self.dirs, f)
+		elseif lfs.attributes(self.path.."/"..f, "mode") == "file" then
+			table.insert(self.files, f)
 		end
 	end
 	table.sort(self.dirs)
