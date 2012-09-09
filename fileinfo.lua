@@ -80,13 +80,10 @@ function FileInfo:init(path, fname)
 	else
 		info_entry = {dir = "Last Read", name = FileInfo:FileCreated(history, "change")}
 		table.insert(self.result, info_entry)
-		local file_type = string.lower(string.match(self.pathfile, ".+%.([^.]+)"))
 		local to_search, add, factor = "[\"last_percent\"]", "%", 100
-		if ext:getReader(file_type) ~= CREReader then
-			to_search = "[\"last_page\"]"
-			add = " pages"
-			factor = 1
-		end
+		to_search = "[\"last_page\"]"
+		add = " pages"
+		factor = 1
 		for line in io.lines(history) do
 			if string.match(line, "%b[]") == to_search then
 				local cdc = tonumber(string.match(line, "%d+")) / factor
