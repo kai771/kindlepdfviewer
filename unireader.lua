@@ -984,21 +984,17 @@ function UniReader:loadSettings(filename)
 		self.rcountmax = self.settings:readSetting("rcountmax") or self.rcountmax
 
 		-- other parameters are reader-specific --> @TODO: move to proper place, like loadSpecialSettings()
-		-- since DJVUReader still has no loadSpecialSettings(), just a quick solution is
-		local ftype = string.lower(string.match(filename, ".+%.([^.]+)") or "")
-		if ext:getReader(ftype) ~= CREReader then
-			self.globalgamma = self.settings:readSetting("gamma") or self.globalgamma
-			local bbox = self.settings:readSetting("bbox")
-			Debug("bbox loaded ", bbox)
-			self.bbox = bbox
+		self.globalgamma = self.settings:readSetting("gamma") or self.globalgamma
+		local bbox = self.settings:readSetting("bbox")
+		Debug("bbox loaded ", bbox)
+		self.bbox = bbox
 
-			self.globalzoom = self.settings:readSetting("globalzoom") or 1.0
-			self.globalzoom_mode = self.settings:readSetting("globalzoom_mode") or -1
-			self.render_mode = self.settings:readSetting("render_mode") or 0
-			self.shift_x = self.settings:readSetting("shift_x") or self.shift_x
-			self.shift_y = self.settings:readSetting("shift_y") or self.shift_y
-			self.step_manual_zoom = self.settings:readSetting("step_manual_zoom") or self.step_manual_zoom
-		end
+		self.globalzoom = self.settings:readSetting("globalzoom") or 1.0
+		self.globalzoom_mode = self.settings:readSetting("globalzoom_mode") or -1
+		self.render_mode = self.settings:readSetting("render_mode") or 0
+		self.shift_x = self.settings:readSetting("shift_x") or self.shift_x
+		self.shift_y = self.settings:readSetting("shift_y") or self.shift_y
+		self.step_manual_zoom = self.settings:readSetting("step_manual_zoom") or self.step_manual_zoom
 
 		self:loadSpecialSettings()
 		return true
@@ -1407,7 +1403,6 @@ end
 --[[
 	@ pageno is the page you want to add to jump_history, this will
 	  clear the forward stack since pageno is the new head.
-	  NOTE: for CREReader, pageno refers to xpointer
 --]]
 function UniReader:addJump(pageno)
 	-- build notes from TOC
