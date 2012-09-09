@@ -1,4 +1,4 @@
-#!./kpdfview
+#!./kpdfview.emulator
 --[[
     KindlePDFViewer: a reader implementation
     Copyright (C) 2011 Hans-Werner Hilse <hilse@web.de>
@@ -19,7 +19,6 @@
 require "alt_getopt"
 require "pdfreader"
 require "djvureader"
-require "crereader"
 require "filechooser"
 require "settings"
 require "screen"
@@ -141,7 +140,6 @@ UniReader:initGlobalSettings(G_reader_settings)
 -- initialize specific readers
 PDFReader:init()
 DJVUReader:init()
-CREReader:init()
 
 -- display directory or open file
 local patharg = G_reader_settings:readSetting("lastfile")

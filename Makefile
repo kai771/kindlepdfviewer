@@ -5,8 +5,6 @@ MUPDFDIR=mupdf
 MUPDFTARGET=build/debug
 MUPDFLIBDIR=$(MUPDFDIR)/$(MUPDFTARGET)
 DJVUDIR=djvulibre
-KPVCRLIGDIR=kpvcrlib
-CRENGINEDIR=$(KPVCRLIGDIR)/crengine
 
 FREETYPEDIR=$(MUPDFDIR)/thirdparty/freetype-2.4.10
 LFSDIR=luafilesystem
@@ -71,25 +69,17 @@ KPDFREADER_CFLAGS=$(CFLAGS) -I$(LUADIR)/src -I$(MUPDFDIR)/
 
 MUPDFLIBS := $(MUPDFLIBDIR)/libfitz.a
 DJVULIBS := $(DJVUDIR)/build/libdjvu/.libs/libdjvulibre.a
-CRENGINELIBS := $(CRENGINEDIR)/crengine/libcrengine.a \
-			$(CRENGINEDIR)/thirdparty/chmlib/libchmlib.a \
-			$(CRENGINEDIR)/thirdparty/libpng/libpng.a \
-			$(CRENGINEDIR)/thirdparty/antiword/libantiword.a
 THIRDPARTYLIBS := $(MUPDFLIBDIR)/libfreetype.a \
 			$(MUPDFLIBDIR)/libopenjpeg.a \
 			$(MUPDFLIBDIR)/libjbig2dec.a \
 			$(MUPDFLIBDIR)/libjpeg.a \
 			$(MUPDFLIBDIR)/libz.a
 
-#@TODO patch crengine to use the latest libjpeg  04.04 2012 (houqp)
-			#$(MUPDFLIBDIR)/libjpeg.a \
-			#$(CRENGINEDIR)/thirdparty/libjpeg/libjpeg.a \
-
 LUALIB := $(LUADIR)/src/libluajit.a
 
 all:kpdfview
 
-kpdfview: kpdfview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft.o lfs.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) djvu.o $(DJVULIBS) cre.o $(CRENGINELIBS)
+kpdfview: kpdfview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft.o lfs.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) djvu.o $(DJVULIBS)
 	$(CC) -lm -ldl -lpthread $(EMU_LDFLAGS) $(DYNAMICLIBSTDCPP) \
 		kpdfview.o \
 		einkfb.o \
@@ -106,8 +96,6 @@ kpdfview: kpdfview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft
 		$(LUALIB) \
 		djvu.o \
 		$(DJVULIBS) \
-		cre.o \
-		$(CRENGINELIBS) \
 		$(STATICLIBSTDCPP) \
 		-o kpdfview
 
@@ -123,9 +111,6 @@ kpdfview.o pdf.o blitbuffer.o util.o drawcontext.o einkfb.o input.o mupdfimg.o: 
 djvu.o: %.o: %.c
 	$(CC) -c $(KPDFREADER_CFLAGS) -I$(DJVUDIR)/ $< -o $@
 
-cre.o: %.o: %.cpp
-	$(CC) -c -I$(CRENGINEDIR)/crengine/include/ -I$(LUADIR)/src $< -o $@ -lstdc++
-
 lfs.o: $(LFSDIR)/src/lfs.c
 	$(CC) -c $(CFLAGS) -I$(LUADIR)/src -I$(LFSDIR)/src $(LFSDIR)/src/lfs.c -o $@
 
@@ -135,22 +120,8 @@ fetchthirdparty:
 	test -d $(LUADIR) && (cd $(LUADIR); git checkout .)  || echo warn: $(LUADIR) folder not found
 	git submodule init
 	git submodule update
-	ln -sf kpvcrlib/crengine/cr3gui/data data
-	test -e data/cr3.css || ln kpvcrlib/cr3.css data/
 	test -d fonts || ln -sf $(TTF_FONTS_DIR) fonts
-	# CREngine patch: disable fontconfig
-	grep USE_FONTCONFIG $(CRENGINEDIR)/crengine/include/crsetup.h && grep -v USE_FONTCONFIG $(CRENGINEDIR)/crengine/include/crsetup.h > /tmp/new && mv /tmp/new $(CRENGINEDIR)/crengine/include/crsetup.h || echo "USE_FONTCONFIG already disabled"
-	test -f mupdf-thirdparty.zip || wget http://www.mupdf.com/download/mupdf-thirdparty.zip
-	# CREngine patch: change child nodes' type face
-	# @TODO replace this dirty hack  24.04 2012 (houqp)
-	cd kpvcrlib/crengine/crengine/src && \
-		patch -N -p0 < ../../../lvrend_node_type_face.patch || true
 	unzip mupdf-thirdparty.zip -d mupdf
-	# dirty patch in MuPDF's thirdparty liby for CREngine
-	cd mupdf/thirdparty/jpeg-*/ && \
-		patch -N -p0 < ../../../kpvcrlib/jpeg_compress_struct_size.patch &&\
-		patch -N -p0 < ../../../kpvcrlib/jpeg_decompress_struct_size.patch
-	# MuPDF patch: use external fonts
 	cd mupdf && patch -N -p1 < ../mupdf.patch
 
 clean:
@@ -159,11 +130,6 @@ clean:
 cleanthirdparty:
 	-make -C $(LUADIR) clean
 	-make -C $(MUPDFDIR) clean
-	-make -C $(CRENGINEDIR)/thirdparty/antiword clean
-	test -d $(CRENGINEDIR)/thirdparty/chmlib && make -C $(CRENGINEDIR)/thirdparty/chmlib clean || echo warn: chmlib folder not found
-	test -d $(CRENGINEDIR)/thirdparty/libpng && (make -C $(CRENGINEDIR)/thirdparty/libpng clean) || echo warn: chmlib folder not found
-	test -d $(CRENGINEDIR)/crengine && (make -C $(CRENGINEDIR)/crengine clean) || echo warn: chmlib folder not found
-	test -d $(KPVCRLIGDIR) && (make -C $(KPVCRLIGDIR) clean) || echo warn: chmlib folder not found
 	-rm -rf $(DJVUDIR)/build
 	-rm -f $(MUPDFDIR)/fontdump.host
 	-rm -f $(MUPDFDIR)/cmapdump.host
@@ -191,11 +157,6 @@ else
 endif
 	make -C $(DJVUDIR)/build
 
-$(CRENGINELIBS):
-	cd $(KPVCRLIGDIR) && rm -rf CMakeCache.txt CMakeFiles && \
-		CFLAGS="$(CFLAGS)" CC="$(CC)" CXX="$(CXX)" cmake . && \
-		make
-
 $(LUALIB):
 ifdef EMULATE_READER
 	make -C $(LUADIR)
@@ -207,7 +168,7 @@ thirdparty: $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) $(DJVULIBS) $(CRENGINELIBS)
 
 INSTALL_DIR=kindlepdfviewer
 
-LUA_FILES=alt_getopt.lua commands.lua crereader.lua dialog.lua djvureader.lua extentions.lua filechooser.lua filehistory.lua fileinfo.lua filesearcher.lua font.lua graphics.lua helppage.lua image.lua inputbox.lua keys.lua pdfreader.lua reader.lua rendertext.lua screen.lua selectmenu.lua settings.lua unireader.lua widget.lua
+LUA_FILES=alt_getopt.lua commands.lua dialog.lua djvureader.lua extentions.lua filechooser.lua filehistory.lua fileinfo.lua filesearcher.lua font.lua graphics.lua helppage.lua image.lua inputbox.lua keys.lua pdfreader.lua reader.lua rendertext.lua screen.lua selectmenu.lua settings.lua unireader.lua widget.lua
 
 VERSION?=$(shell git rev-parse --short HEAD)
 customupdate: all
