@@ -77,9 +77,9 @@ THIRDPARTYLIBS := $(MUPDFLIBDIR)/libfreetype.a \
 
 LUALIB := $(LUADIR)/src/libluajit.a
 
-all:kpdfdjview
+all:kpdfdjview.bin
 
-kpdfdjview: kpdfdjview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft.o lfs.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) djvu.o $(DJVULIBS)
+kpdfdjview.bin: kpdfdjview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft.o lfs.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) djvu.o $(DJVULIBS)
 	$(CC) -lm -ldl -lpthread $(EMU_LDFLAGS) $(DYNAMICLIBSTDCPP) \
 		kpdfdjview.o \
 		einkfb.o \
@@ -97,7 +97,7 @@ kpdfdjview: kpdfdjview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.
 		djvu.o \
 		$(DJVULIBS) \
 		$(STATICLIBSTDCPP) \
-		-o kpdfdjview
+		-o kpdfdjview.bin
 
 slider_watcher: slider_watcher.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -125,7 +125,7 @@ fetchthirdparty:
 	cd mupdf && patch -N -p1 < ../mupdf.patch
 
 clean:
-	-rm -f *.o kpdfdjview slider_watcher
+	-rm -f *.o kpdfdjview.bin slider_watcher
 
 cleanthirdparty:
 	-make -C $(LUADIR) clean
@@ -173,17 +173,14 @@ LUA_FILES=alt_getopt.lua commands.lua dialog.lua djvureader.lua extentions.lua f
 VERSION?=$(shell git rev-parse --short HEAD)
 customupdate: all
 	# ensure that build binary is for ARM
-	file kpdfdjview | grep ARM || exit 1
-	$(STRIP) --strip-unneeded kpdfdjview
+	file kpdfdjview.bin | grep ARM || exit 1
+	$(STRIP) --strip-unneeded kpdfdjview.bin
 	-rm kpdfdjview-$(VERSION).zip
 	rm -Rf $(INSTALL_DIR)
-	mkdir $(INSTALL_DIR)
-	cp -p README.TXT COPYING kpdfdjview $(LUA_FILES) $(INSTALL_DIR)
-	mkdir $(INSTALL_DIR)/data
-	cp -rpL data/*.css $(INSTALL_DIR)/data
+	mkdir -p $(INSTALL_DIR)/fonts/host
+	cp -p README.TXT COPYING kpdfdjview.bin $(LUA_FILES) $(INSTALL_DIR)
 	cp -rpL fonts $(INSTALL_DIR)
 	cp -r resources $(INSTALL_DIR)
-	mkdir $(INSTALL_DIR)/fonts/host
 	zip -9 -r kpdfdjview-$(VERSION).zip $(INSTALL_DIR) launchpad/ kite/
 	rm -Rf $(INSTALL_DIR)
 	@echo "copy kpdfdjview-$(VERSION).zip to /mnt/us/customupdates and install with shift+shift+I"
