@@ -1,5 +1,6 @@
-#!./kpdfview
+#!./kpdfdjview
 --[[
+    Kindle PDF and DjVu Viewer, based on:
     KindlePDFViewer: a reader implementation
     Copyright (C) 2011 Hans-Werner Hilse <hilse@web.de>
 

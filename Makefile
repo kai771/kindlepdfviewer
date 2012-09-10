@@ -77,11 +77,11 @@ THIRDPARTYLIBS := $(MUPDFLIBDIR)/libfreetype.a \
 
 LUALIB := $(LUADIR)/src/libluajit.a
 
-all:kpdfview
+all:kpdfdjview
 
-kpdfview: kpdfview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft.o lfs.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) djvu.o $(DJVULIBS)
+kpdfdjview: kpdfdjview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft.o lfs.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) djvu.o $(DJVULIBS)
 	$(CC) -lm -ldl -lpthread $(EMU_LDFLAGS) $(DYNAMICLIBSTDCPP) \
-		kpdfview.o \
+		kpdfdjview.o \
 		einkfb.o \
 		pdf.o \
 		blitbuffer.o \
@@ -97,7 +97,7 @@ kpdfview: kpdfview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft
 		djvu.o \
 		$(DJVULIBS) \
 		$(STATICLIBSTDCPP) \
-		-o kpdfview
+		-o kpdfdjview
 
 slider_watcher: slider_watcher.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -105,7 +105,7 @@ slider_watcher: slider_watcher.c
 ft.o: %.o: %.c $(THIRDPARTYLIBS)
 	$(CC) -c $(KPDFREADER_CFLAGS) -I$(FREETYPEDIR)/include -I$(MUPDFDIR)/fitz $< -o $@
 
-kpdfview.o pdf.o blitbuffer.o util.o drawcontext.o einkfb.o input.o mupdfimg.o: %.o: %.c
+kpdfdjview.o pdf.o blitbuffer.o util.o drawcontext.o einkfb.o input.o mupdfimg.o: %.o: %.c
 	$(CC) -c $(KPDFREADER_CFLAGS) $(EMU_CFLAGS) -I$(LFSDIR)/src $< -o $@
 
 djvu.o: %.o: %.c
@@ -125,7 +125,7 @@ fetchthirdparty:
 	cd mupdf && patch -N -p1 < ../mupdf.patch
 
 clean:
-	-rm -f *.o kpdfview slider_watcher
+	-rm -f *.o kpdfdjview slider_watcher
 
 cleanthirdparty:
 	-make -C $(LUADIR) clean
@@ -166,24 +166,24 @@ endif
 
 thirdparty: $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) $(DJVULIBS) $(CRENGINELIBS)
 
-INSTALL_DIR=kindlepdfviewer
+INSTALL_DIR=kpdfdjview
 
 LUA_FILES=alt_getopt.lua commands.lua dialog.lua djvureader.lua extentions.lua filechooser.lua filehistory.lua fileinfo.lua filesearcher.lua font.lua graphics.lua helppage.lua image.lua inputbox.lua keys.lua pdfreader.lua reader.lua rendertext.lua screen.lua selectmenu.lua settings.lua unireader.lua widget.lua
 
 VERSION?=$(shell git rev-parse --short HEAD)
 customupdate: all
 	# ensure that build binary is for ARM
-	file kpdfview | grep ARM || exit 1
-	$(STRIP) --strip-unneeded kpdfview
-	-rm kindlepdfviewer-$(VERSION).zip
+	file kpdfdjview | grep ARM || exit 1
+	$(STRIP) --strip-unneeded kpdfdjview
+	-rm kpdfdjview-$(VERSION).zip
 	rm -Rf $(INSTALL_DIR)
 	mkdir $(INSTALL_DIR)
-	cp -p README.TXT COPYING kpdfview $(LUA_FILES) $(INSTALL_DIR)
+	cp -p README.TXT COPYING kpdfdjview $(LUA_FILES) $(INSTALL_DIR)
 	mkdir $(INSTALL_DIR)/data
 	cp -rpL data/*.css $(INSTALL_DIR)/data
 	cp -rpL fonts $(INSTALL_DIR)
 	cp -r resources $(INSTALL_DIR)
 	mkdir $(INSTALL_DIR)/fonts/host
-	zip -9 -r kindlepdfviewer-$(VERSION).zip $(INSTALL_DIR) launchpad/ kite/
+	zip -9 -r kpdfdjview-$(VERSION).zip $(INSTALL_DIR) launchpad/ kite/
 	rm -Rf $(INSTALL_DIR)
-	@echo "copy kindlepdfviewer-$(VERSION).zip to /mnt/us/customupdates and install with shift+shift+I"
+	@echo "copy kpdfdjview-$(VERSION).zip to /mnt/us/customupdates and install with shift+shift+I"
