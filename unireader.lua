@@ -20,10 +20,6 @@ UniReader = {
 
 	GAMMA_NO_GAMMA = 1.0,
 
-	-- framebuffer update policy state:
-	rcount = 5,
-	rcountmax = 5,
-
 	-- zoom state:
 	globalzoom = 1.0,
 	globalzoom_orig = 1.0,
@@ -938,7 +934,6 @@ function UniReader:initGlobalSettings(settings)
 	self.pan_overlap_vertical = settings:readSetting("pan_overlap_vertical") or self.pan_overlap_vertical
 	self.cache_max_memsize = settings:readSetting("cache_max_memsize") or self.cache_max_memsize
 	self.cache_max_ttl = settings:readSetting("cache_max_ttl") or self.cache_max_ttl
-	self.rcountmax = settings:readSetting("rcountmax") or self.rcountmax
 end
 
 -- Method to load settings before document open
@@ -980,8 +975,6 @@ function UniReader:loadSettings(filename)
 			Debug(self.highlight)
 			self.highlight.to_fix = nil
 		end
-
-		self.rcountmax = self.settings:readSetting("rcountmax") or self.rcountmax
 
 		-- other parameters are reader-specific --> @TODO: move to proper place, like loadSpecialSettings()
 		self.globalgamma = self.settings:readSetting("gamma") or self.globalgamma
@@ -1384,15 +1377,7 @@ function UniReader:show(no)
 		self:toggleTextHighLight(self.highlight[no])
 	end
 
-	if self.rcount >= self.rcountmax then
-		Debug("full refresh")
-		self.rcount = 0
-		fb:refresh(0)
-	else
-		Debug("partial refresh")
-		self.rcount = self.rcount + 1
-		fb:refresh(1)
-	end
+	fb:refresh(0)
 	self.slot_visible = slot;
 end
 
@@ -2092,8 +2077,7 @@ function UniReader:inputLoop()
 			Debug("E: T="..ev.type, " V="..ev.value, " C="..ev.code, " DUR=", dur)
 
 			if ev.value == EVENT_VALUE_KEY_REPEAT then
-				self.rcount = 0
-				Debug("prevent full screen refresh", self.rcount)
+				Debug("prevent full screen refresh")
 			end
 		else
 			Debug("ignored ev ",ev)
@@ -2127,7 +2111,6 @@ function UniReader:inputLoop()
 		self.settings:saveSetting("shift_x", self.shift_x)
 		self.settings:saveSetting("shift_y", self.shift_y)
 		self.settings:saveSetting("step_manual_zoom", self.step_manual_zoom)
-		self.settings:saveSetting("rcountmax", self.rcountmax)
 		]]
 		self:saveSpecialSettings()
 		self.settings:close()
@@ -2373,30 +2356,10 @@ function UniReader:addAllCommands()
 			end
 		end)
 
-	self.commands:add(KEY_R, MOD_SHIFT, "R",
+	self.commands:add(KEY_SPACE, nil, " ",
 		"full screen refresh",
 		function(unireader)
-			local count = NumInputBox:input(G_height-100, 100,
-				"Full refresh after:", self.rcountmax, true)
-			-- convert string to number
-			if pcall(function () count = count + 0 end) then
-				-- restrict self.rcountmax in reasonable range
-				self.rcountmax = math.max(count, 0)
-				self.rcountmax = math.min(count, 10)
-				-- storing this parameter in both global and local settings
-				G_reader_settings:saveSetting("rcountmax", self.rcountmax)
-				self.settings:saveSetting("rcountmax", self.rcountmax)
-			end
-			-- now, perform full screen refresh
-			self.rcount = self.rcountmax
 			self:redrawCurrentPage()
-			--[[ eink will not refresh if nothing is changed on the screen
-			-- so we fake a change here.
-			fb.bb:invertRect(0, 0, 1, 1)
-			fb:refresh(1)
-			fb.bb:invertRect(0, 0, 1, 1)
-			fb:refresh(0)
-			unireader.rcount = 0 ]]
 		end)
 
 	self.commands:add(KEY_Z,nil,"Z",
@@ -2612,10 +2575,6 @@ function UniReader:addAllCommands()
 			--fb.bb:invertRect( x+1,y+1, w-2,h-2 ) -- just border?
 			showInfoMsgWithDelay("new page bbox", 2000, 1);
 			self:redrawCurrentPage()
-
-			self.rcount = self.rcountmax -- force next full refresh
-
-			--unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_CONTENT)
 		end)
 	self.commands:add(KEY_MENU,nil,"Menu",
 		"toggle info box",
