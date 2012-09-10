@@ -30,15 +30,6 @@ FileChooser = {
 	markerdirty = false,
 	perpage,
 	clipboard = lfs.currentdir() .. "/clipboard", -- NO finishing slash
-
-	-- NuPogodi, 04.09.2012: introduced modes that configures the filechoser 
-	-- for users with various purposes & skills
-	filemanager_expert_mode, -- default value is defined in reader.lua
-	-- the definitions
-	BEGINNERS_MODE = 1, -- the filemanager content is restricted by files with reader-related extentions; safe renaming (no extention)
-	ADVANCED_MODE = 2, -- no extention-based filtering; renaming with extentions; appreciable danger to crash crengine by improper docs
-	ROOT_MODE = 3, -- TODO: all functions (including non-stable and dangerous)
-
 }
 
 function getProperTitleLength(txt,font_face,max_width)
@@ -389,38 +380,23 @@ function FileChooser:addAllCommands()
 			self.pagedirty = true
 		end -- function
 	)
-	-- make renaming flexible: it either keeps old extention (BEGINNERS_MODE) or
-	-- allows to rename the whole filename including the extention
+	-- make renaming flexible: it either keeps old extension (BEGINNERS_MODE) or
+	-- allows to rename the whole filename including the extension
 	self.commands:add(KEY_R, MOD_SHIFT, "R",
 		"rename file",
 		function(self)
 			local oldname = self:FullFileName()
 			if oldname then
-				-- NuPogodi, 04.09.2012: safe mode (keep old extentions)
-				-- Tigran, 18/08/12: corrected the rename operation to include extension.)
-				local oldname = self:FullFileName()
 				local name_we = self.files[self.perpage*(self.page-1)+self.current-#self.dirs]
-				local ext = ""
-				if self.filemanager_expert_mode <= self.BEGINNERS_MODE then
-					ext = "."..string.lower(string.match(oldname, ".+%.([^.]+)") or "")
-					name_we = string.sub(name_we, 1, -1-string.len(ext))
-				end
 				local newname = InputBox:input(0, 0, "New filename:", name_we)
 				if newname then
-					newname = self.path.."/"..newname..ext
+					newname = self.path.."/"..newname
 					os.rename(oldname, newname)
 					os.rename(DocToHistory(oldname), DocToHistory(newname))
 					self:setPath(self.path)
 				end
 				self.pagedirty = true
 			end
-		end
-	)
-	-- NuPogodi, 04.09.12: menu to switch the filechooser mode
-	self.commands:add(KEY_M, MOD_ALT, "M",
-		"set mode for filemanager",
-		function(self)
-			self:changeFileChooserMode()
 		end
 	)
 	self.commands:add({KEY_F, KEY_AA}, nil, "F",
@@ -568,31 +544,3 @@ end
 function FileChooser:InQuotes(text)
 	return "\""..text.."\""
 end
-
---[[ NuPogodi, 04.09.2012: to make it more easy for users with various purposes and skills.
-ATM, one may leave only silent toggling between BEGINNERS_MODE <> ADVANCED_MODE
--- But, in future, one more (the so called ROOT_MODE) might also be rather useful.
-Shitch this mode on should allow developers & beta-testers to use some unstable 
-and/or dangerous functions able to crash the reader. ]]
-
-function FileChooser:changeFileChooserMode()
-	local face_list = { "safe mode for beginners", "advanced mode for experienced users", "expert mode for beta-testers & developers" }
-	local modes_menu = SelectMenu:new{
-		menu_title = "Select proper mode to manage files",
-		item_array = face_list,
-		current_entry = self.filemanager_expert_mode - 1,
-		}
-	local m = modes_menu:choose(0, G_height)
-	if m and m ~= self.filemanager_expert_mode then
-		if (self.filemanager_expert_mode == self.BEGINNERS_MODE and m > self.BEGINNERS_MODE)
-		or (m == self.BEGINNERS_MODE and self.filemanager_expert_mode > self.BEGINNERS_MODE) then
-			self.filemanager_expert_mode = m	-- make sure that new mode is set before...
-			self:setPath(self.path)		-- refreshing the folder content
-		else
-			self.filemanager_expert_mode = m
-		end
-		G_reader_settings:saveSetting("filemanager_expert_mode", self.filemanager_expert_mode)
-	end
-	self.pagedirty = true
-end
-
