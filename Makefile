@@ -177,9 +177,9 @@ customupdate: all
 	$(STRIP) --strip-unneeded kpdfdjview.bin
 	-rm kpdfdjview-$(VERSION).zip
 	rm -Rf $(INSTALL_DIR)
-	mkdir -p $(INSTALL_DIR)/fonts/host
+	mkdir -p $(INSTALL_DIR)/fonts/droid
 	cp -p README.TXT COPYING kpdfdjview.bin $(LUA_FILES) $(INSTALL_DIR)
-	cp -rpL fonts $(INSTALL_DIR)
+	cp -rpL fonts/droid/* $(INSTALL_DIR)/fonts/droid
 	cp -r resources $(INSTALL_DIR)
 	zip -9 -r kpdfdjview-$(VERSION).zip $(INSTALL_DIR) launchpad/ kite/
 	rm -Rf $(INSTALL_DIR)
