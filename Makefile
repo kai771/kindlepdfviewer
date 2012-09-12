@@ -121,6 +121,7 @@ fetchthirdparty:
 	git submodule init
 	git submodule update
 	test -d fonts || ln -sf $(TTF_FONTS_DIR) fonts
+	test -f mupdf-thirdparty.zip || wget http://www.mupdf.com/download/mupdf-thirdparty.zip
 	unzip mupdf-thirdparty.zip -d mupdf
 	cd mupdf && patch -N -p1 < ../mupdf.patch
 
