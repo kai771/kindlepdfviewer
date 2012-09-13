@@ -38,25 +38,27 @@ longopts = {
 }
 
 function openFile(filename)
-	local file_type = string.lower(string.match(filename, ".+%.([^.]+)"))
-	local reader = nil
+	local match = string.match(filename, ".+%.([^.]+)")
 
-	reader = ext:getReader(file_type)
-	if reader then
-		InfoMessage:show("Opening document... ", 0)
-		reader:preLoadSettings(filename)
-		local ok, err = reader:open(filename)
-		if ok then
-			reader:loadSettings(filename)
-			page_num = reader:getLastPageOrPos()
-			reader:goto(tonumber(page_num), true)
-			G_reader_settings:saveSetting("lastfile", filename)
-			return reader:inputLoop()
-		else
-			InfoMessage:show(err or "Error opening document.", 0)
-			util.sleep(2)
-		end
-	end
+	if match then
+		local file_type = string.lower(match)
+		local reader = ext:getReader(file_type)
+		if reader then
+			InfoMessage:show("Opening document... ", 0)
+			reader:preLoadSettings(filename)
+			local ok, err = reader:open(filename)
+			if ok then
+				reader:loadSettings(filename)
+				page_num = reader:getLastPageOrPos()
+				reader:goto(tonumber(page_num), true)
+				G_reader_settings:saveSetting("lastfile", filename)
+				return reader:inputLoop()
+			else
+				InfoMessage:show(err or "Error opening document.", 0)
+				util.sleep(2)
+			end
+		end -- if reader
+	end -- if match
 	return true -- on failed attempts, we signal to keep running
 end
 
