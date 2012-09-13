@@ -274,7 +274,7 @@ function FileHistory:choose(keywords)
 					local i = (self.page - 1) * self.perpage + c
 					if i <= self.items then
 						y = self.title_H + (self.spacing * c) + 4
-						local ftype = string.lower(string.match(self.result[i].name, ".+%.([^.]+)") or "")
+						local ftype = string.lower(string.match(self.result[i].name, ".*%.([^.]+)") or "")
 						DrawFileItem(self.result[i].name,self.margin_H,y,ftype)
 					end
 				end

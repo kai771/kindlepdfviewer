@@ -187,7 +187,8 @@ function FileChooser:choose(ypos, height)
 				if i <= #self.dirs then
 					DrawFileItem(self.dirs[i],self.margin_H,ypos+self.title_H+self.spacing*c,"folder")
 				elseif i <= self.items then
-					local file_type = string.lower(string.match(self.files[i-#self.dirs], ".+%.([^.]+)") or "")
+					local file_type = string.lower(string.match(self.files[i-#self.dirs], ".*%.([^.]+)") or "")
+					Debug("FileChooser:choose(), file_type="..file_type)
 					DrawFileItem(self.files[i-#self.dirs],self.margin_H,ypos+self.title_H+self.spacing*c,file_type)
 				end
 			end
