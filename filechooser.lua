@@ -380,8 +380,6 @@ function FileChooser:addAllCommands()
 			self.pagedirty = true
 		end -- function
 	)
-	-- make renaming flexible: it either keeps old extension (BEGINNERS_MODE) or
-	-- allows to rename the whole filename including the extension
 	self.commands:add(KEY_R, MOD_SHIFT, "R",
 		"rename file",
 		function(self)
