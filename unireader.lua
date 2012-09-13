@@ -2360,7 +2360,7 @@ function UniReader:addAllCommands()
 			end
 		end)
 
-	self.commands:add(KEY_SPACE, nil, " ",
+	self.commands:add(KEY_SPACE, nil, "Space",
 		"full screen refresh",
 		function(unireader)
 			self:redrawCurrentPage()
