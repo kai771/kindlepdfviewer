@@ -2,8 +2,6 @@ require "unireader"
 
 DJVUReader = UniReader:new{}
 
--- open a DJVU file and its settings store
--- DJVU does not support password yet
 function DJVUReader:open(filename)
 	local ok
 	ok, self.doc = pcall(djvu.openDocument, filename)
@@ -69,13 +67,14 @@ function DJVUReader:invertTextYAxel(pageno, text_table)
 	end
 	return text_table
 end
---
+
 -- used in DJVUReader:showMenu()
 function DJVUReader:_drawReadingInfo()
 	local width, height = G_width, G_height
 	local load_percent = (self.pageno / self.doc:getPages())
 	-- changed to be the same font group as originaly intended
 	local face = Font:getFace("rifont", 20)
+	local page_width, page_height = self.doc:getOriginalPageSize(self.pageno)
 
 	-- display memory on top of page
 	fb.bb:paintRect(0, 0, width, 15+6*2, 0)
@@ -83,6 +82,7 @@ function DJVUReader:_drawReadingInfo()
 		"M: "..
 		math.ceil(self.cache_current_memsize/1024).."/"..
 		math.ceil(self.cache_max_memsize/1024).."K "..
+		tostring(page_width).."x"..tostring(page_height).." "..
 		os.date("%a %d %b %Y %T").." ["..BatteryLevel().."]",
 	true)
 
@@ -117,5 +117,3 @@ function DJVUReader:showMenu()
 		end
 	end
 end
-
-

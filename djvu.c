@@ -16,18 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <math.h>
+#include <string.h>
 #include <libdjvu/miniexp.h>
 #include <libdjvu/ddjvuapi.h>
 
-#include "string.h"
 #include "blitbuffer.h"
 #include "drawcontext.h"
 #include "djvu.h"
 
 #define MIN(a, b)      ((a) < (b) ? (a) : (b))
 #define MAX(a, b)      ((a) > (b) ? (a) : (b))
-
-/*@TODO check all the close method, ensure memories are freed  03.03 2012*/
 
 typedef struct DjvuDocument {
 	ddjvu_context_t *context;
@@ -41,7 +39,6 @@ typedef struct DjvuPage {
 	ddjvu_pageinfo_t info;
 	DjvuDocument *doc;
 } DjvuPage;
-
 
 static int handle(lua_State *L, ddjvu_context_t *ctx, int wait)
 {
@@ -166,7 +163,6 @@ static int walkTableOfContent(lua_State *L, miniexp_t r, int *count, int depth) 
 	}
 	return 0;
 }
-
 
 static int getTableOfContent(lua_State *L) {
 	DjvuDocument *doc = (DjvuDocument*) luaL_checkudata(L, 1, "djvudocument");
