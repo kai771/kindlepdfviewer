@@ -1,10 +1,11 @@
-KindlePDFViewer
-===============
+kpdfdjview
+==========
 
-This is a PDF viewer application, created for usage on the Kindle e-ink reader.
-It is currently restricted to 4bpp inverse grayscale displays. It's using the
-muPDF library (see http://mupdf.com/) and its UI is scripted using Lua (see
-http://www.lua.org/).
+kpdfdjview is a PDF and DjVu viewer application, created for the Kindle e-Ink readers.
+It is currently restricted to 4bpp inverse grayscale displays and runs on
+Kindle 3 and Kindle DXG devices.
+It is using the muPDF library (see http://mupdf.com/) and its UI is scripted
+in Lua (see http://www.lua.org/).
 
 The application is licensed under the GPLv3 (see COPYING file).
 
@@ -14,24 +15,9 @@ Building
 
 Follow these steps:
 
-- install muPDF sources into subfolder "mupdf"
-- install muPDF third-party sources (see muPDF homepage) into a new subfolder
-  "mupdf/thirdparty"
-
-- install libDjvuLibre sources into subfolder "djvulibre"
-- install CREngine sources into subfolder "kpvcrlib/crengine"
-
-- install LuaJit sources into subfolder "luajit-2.0"
-
-=> note that there's a make target to do all the above. You need wget, unzip and git
-   installed. Then just run "make fetchthirdparty".
-
-- adapt Makefile to your needs
-
-- run "make thirdparty". This will build MuPDF (plus the libraries it depends
-  on) and Lua.
-
-- run "make". This will build the kpdfview application
+- make fetchthirdparty
+- make thirdparty
+- make
 
 
 Running
@@ -66,5 +52,4 @@ And run the emulator like this:
 By default emulation will provide DXG resolution of 824*1200. It can be
 specified at compile time, this is example for Kindle 3:
 
-	EMULATE_READER_W=600 EMULATE_READER_H=800 EMULATE_READER=1 make kpdfview
-
+	EMULATE_READER_W=600 EMULATE_READER_H=800 EMULATE_READER=1 make kpdfdjview
