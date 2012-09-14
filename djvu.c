@@ -78,7 +78,7 @@ static int openDocument(lua_State *L) {
 	luaL_getmetatable(L, "djvudocument");
 	lua_setmetatable(L, -2);
 
-	doc->context = ddjvu_context_create("kindlepdfviewer");
+	doc->context = ddjvu_context_create("kpdfdjview");
 	if (! doc->context) {
 		return luaL_error(L, "cannot create context");
 	}
