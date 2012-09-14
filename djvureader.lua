@@ -6,7 +6,7 @@ DJVUReader = UniReader:new{}
 -- DJVU does not support password yet
 function DJVUReader:open(filename)
 	local ok
-	ok, self.doc = pcall(djvu.openDocument, filename, self.cache_document_size)
+	ok, self.doc = pcall(djvu.openDocument, filename)
 	if not ok then
 		return ok, self.doc -- this will be the error message instead
 	end
@@ -69,3 +69,53 @@ function DJVUReader:invertTextYAxel(pageno, text_table)
 	end
 	return text_table
 end
+--
+-- used in DJVUReader:showMenu()
+function DJVUReader:_drawReadingInfo()
+	local width, height = G_width, G_height
+	local load_percent = (self.pageno / self.doc:getPages())
+	-- changed to be the same font group as originaly intended
+	local face = Font:getFace("rifont", 20)
+
+	-- display memory on top of page
+	fb.bb:paintRect(0, 0, width, 15+6*2, 0)
+	renderUtf8Text(fb.bb, 10, 15+6, face,
+		"M: "..
+		math.ceil(self.cache_current_memsize/1024).."/"..
+		math.ceil(self.cache_max_memsize/1024).."K "..
+		os.date("%a %d %b %Y %T").." ["..BatteryLevel().."]",
+	true)
+
+	-- display reading progress on bottom of page
+	local ypos = height - 50
+	fb.bb:paintRect(0, ypos, width, 50, 0)
+	ypos = ypos + 15
+	local cur_section = self:getTocTitleOfCurrentPage()
+	if cur_section ~= "" then
+		cur_section = "Sec: "..cur_section
+	end
+	renderUtf8Text(fb.bb, 10, ypos+6, face,
+		"Page: "..self.pageno.."/"..self.doc:getPages()..
+		"    "..cur_section, true)
+
+	ypos = ypos + 15
+	blitbuffer.progressBar(fb.bb, 10, ypos, width-20, 15,
+							5, 4, load_percent, 8)
+end
+
+function DJVUReader:showMenu()
+	self:_drawReadingInfo()
+
+	fb:refresh(1)
+	while 1 do
+		local ev = input.saveWaitForEvent()
+		ev.code = adjustKeyEvents(ev)
+		if ev.type == EV_KEY and ev.value == EVENT_VALUE_KEY_PRESS then
+			if ev.code == KEY_BACK or ev.code == KEY_MENU then
+				return
+			end
+		end
+	end
+end
+
+
