@@ -183,7 +183,7 @@ customupdate: all
 	mv kpdfdjview $(TMP_DIR)
 	cp -rpL fonts $(TMP_DIR)
 	cp -r resources $(TMP_DIR)
-	mv tmp kpdfdjview
+	mv $(TMP_DIR) kpdfdjview
 	zip -9 -r kpdfdjview-$(VERSION).zip kpdfdjview/ launchpad/ kite/
-	rm -Rf $(TMP_DIR)
+	rm -Rf kpdfdjview
 	@echo "copy kpdfdjview-$(VERSION).zip to /mnt/us/customupdates and install with shift+shift+I"
