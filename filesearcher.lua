@@ -177,7 +177,7 @@ function FileSearcher:addAllCommands()
 		function(self)
 			old_keywords = self.keywords
 			self.keywords = InputBox:input(G_height - 100, 100,
-				"Search:", old_keywords)
+				"Find:", old_keywords)
 			if self.keywords then
 				self:setSearchResult(self.keywords)
 			else
@@ -276,9 +276,9 @@ function FileSearcher:choose(keywords)
 			if self.items == 0 then -- nothing found
 				y = self.title_H + self.spacing * 2
 				renderUtf8Text(fb.bb, self.margin_H, y, cface,
-					"Sorry, no match found.", true)
+					"No matches found.", true)
 				renderUtf8Text(fb.bb, self.margin_H, y + self.spacing, cface,
-					"Please try a different keyword.", true)
+					"Try a different pattern", true)
 				self.markerdirty = false
 			else -- found something, draw it
 				for c = 1, self.perpage do

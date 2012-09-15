@@ -422,9 +422,9 @@ function FileChooser:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_S, nil, "S",
-		"search among files",
+		"find files by pattern",
 		function(self)
-			local keywords = InputBox:input(0, 0, "Search:")
+			local keywords = InputBox:input(0, 0, "Find:")
 			if keywords then
 				InfoMessage:show("Searching... ",0)
 				FileSearcher:init( self.path )
