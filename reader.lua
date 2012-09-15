@@ -1,4 +1,4 @@
-#!./kpdfdjview.bin
+#!./kpdfdjview
 --[[
     Kindle PDF and DjVu Viewer, based on:
     KindlePDFViewer: a reader implementation

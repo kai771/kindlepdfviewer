@@ -77,9 +77,9 @@ THIRDPARTYLIBS := $(MUPDFLIBDIR)/libfreetype.a \
 
 LUALIB := $(LUADIR)/src/libluajit.a
 
-all:kpdfdjview.bin
+all:kpdfdjview
 
-kpdfdjview.bin: kpdfdjview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft.o lfs.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) djvu.o $(DJVULIBS)
+kpdfdjview: kpdfdjview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.o ft.o lfs.o mupdfimg.o $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) djvu.o $(DJVULIBS)
 	$(CC) -lm -ldl -lpthread $(EMU_LDFLAGS) $(DYNAMICLIBSTDCPP) \
 		kpdfdjview.o \
 		einkfb.o \
@@ -97,7 +97,7 @@ kpdfdjview.bin: kpdfdjview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o u
 		djvu.o \
 		$(DJVULIBS) \
 		$(STATICLIBSTDCPP) \
-		-o kpdfdjview.bin
+		-o kpdfdjview
 
 slider_watcher: slider_watcher.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -126,7 +126,7 @@ fetchthirdparty:
 	cd mupdf && patch -N -p1 < ../mupdf.patch
 
 clean:
-	-rm -f *.o kpdfdjview.bin slider_watcher
+	-rm -f *.o kpdfdjview slider_watcher
 
 cleanthirdparty:
 	-make -C $(LUADIR) clean
@@ -167,21 +167,23 @@ endif
 
 thirdparty: $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) $(DJVULIBS) $(CRENGINELIBS)
 
-INSTALL_DIR=kpdfdjview
+TMP_DIR=tmp
 
 LUA_FILES=alt_getopt.lua commands.lua dialog.lua djvureader.lua extentions.lua filechooser.lua filehistory.lua fileinfo.lua filesearcher.lua font.lua graphics.lua helppage.lua image.lua inputbox.lua keys.lua pdfreader.lua reader.lua rendertext.lua screen.lua selectmenu.lua settings.lua unireader.lua widget.lua
 
 VERSION?=$(shell git rev-parse --short HEAD)
 customupdate: all
 	# ensure that build binary is for ARM
-	file kpdfdjview.bin | grep ARM || exit 1
-	$(STRIP) --strip-unneeded kpdfdjview.bin
+	file kpdfdjview | grep ARM || exit 1
+	$(STRIP) --strip-unneeded kpdfdjview
 	-rm kpdfdjview-$(VERSION).zip
-	rm -Rf $(INSTALL_DIR)
-	mkdir -p $(INSTALL_DIR)/fonts/droid
-	cp -p README.TXT COPYING kpdfdjview.bin $(LUA_FILES) $(INSTALL_DIR)
-	cp -rpL fonts/droid/* $(INSTALL_DIR)/fonts/droid
-	cp -r resources $(INSTALL_DIR)
-	zip -9 -r kpdfdjview-$(VERSION).zip $(INSTALL_DIR) launchpad/ kite/
-	rm -Rf $(INSTALL_DIR)
+	rm -Rf $(TMP_DIR)
+	mkdir -p $(TMP_DIR)
+	cp -p README.TXT COPYING $(LUA_FILES) $(TMP_DIR)
+	mv kpdfdjview $(TMP_DIR)
+	cp -rpL fonts $(TMP_DIR)
+	cp -r resources $(TMP_DIR)
+	mv tmp kpdfdjview
+	zip -9 -r kpdfdjview-$(VERSION).zip kpdfdjview/ launchpad/ kite/
+	rm -Rf $(TMP_DIR)
 	@echo "copy kpdfdjview-$(VERSION).zip to /mnt/us/customupdates and install with shift+shift+I"
