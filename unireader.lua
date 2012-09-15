@@ -1463,6 +1463,8 @@ end
 -- change current page and cache next page after rendering
 function UniReader:goto(no, is_ignore_jump)
 	if no < 1 or no > self.doc:getPages() then
+		-- may be reached by following TOC entry pointing to external file.
+		self:redrawCurrentPage()
 		return
 	end
 
