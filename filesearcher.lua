@@ -4,7 +4,6 @@ require "graphics"
 require "font"
 require "inputbox"
 require "dialog"
-require "extentions"
 
 FileSearcher = {
 	title_H = 40,	-- title height
@@ -31,14 +30,14 @@ function FileSearcher:readDir()
 		for __, d in pairs(self.dirs) do
 			-- handle files in d
 			for f in lfs.dir(d) do
-				local file_type = string.lower(string.match(f, ".+%.([^.]+)") or "")
-				if lfs.attributes(d.."/"..f, "mode") == "directory" and f ~= "." and f~= ".." then
-					table.insert(new_dirs, d.."/"..f)
-				elseif ext:getReader(file_type) then
-					file_entry = {dir=d, name=f,}
-					table.insert(self.files, file_entry)
-					--Debug("file:"..d.."/"..f)
-				end
+				if f ~= "." and f~= ".." then
+					if lfs.attributes(d.."/"..f, "mode") == "directory" then
+						table.insert(new_dirs, d.."/"..f)
+					else
+						file_entry = {dir=d, name=f,}
+						table.insert(self.files, file_entry)
+					end
+				end -- not . or ..
 			end
 		end
 		self.dirs = new_dirs
@@ -76,11 +75,7 @@ function FileSearcher:setSearchResult(keywords)
 end
 
 function FileSearcher:init(search_path)
-	if search_path then
-		self:setPath(search_path)
-	else
-		self:setPath("/mnt/us/documents")
-	end
+	self:setPath(search_path or "/mnt/us/documents")
 	self:addAllCommands()
 end
 
@@ -230,7 +225,7 @@ function FileSearcher:addAllCommands()
 						-- and its history file, if any
 						os.remove(DocToHistory(file_to_del))
 						 -- to avoid showing just deleted file
-						self:init( self.path )
+						self:init(self.path)
 						self:choose(self.keywords)
 					end
 					self.pagedirty = true
@@ -290,7 +285,7 @@ function FileSearcher:choose(keywords)
 					local i = (self.page - 1) * self.perpage + c
 					if i <= self.items then
 						y = self.title_H + (self.spacing * c) + 4
-						local ftype = string.lower(string.match(self.result[i].name, ".+%.([^.]+)") or "")
+						local ftype = string.lower(string.match(self.result[i].name, ".*%.([^.]+)") or "")
 						DrawFileItem(self.result[i].name,self.margin_H,y,ftype)
 					end
 				end
