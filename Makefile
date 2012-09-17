@@ -179,7 +179,7 @@ customupdate: all
 	-rm kpdfdjview-$(VERSION).zip
 	rm -Rf $(TMP_DIR)
 	mkdir -p $(TMP_DIR)
-	cp -p README.TXT COPYING $(LUA_FILES) $(TMP_DIR)
+	cp -p README.md COPYING $(LUA_FILES) $(TMP_DIR)
 	mv kpdfdjview $(TMP_DIR)
 	cp -rpL fonts $(TMP_DIR)
 	cp -r resources $(TMP_DIR)
