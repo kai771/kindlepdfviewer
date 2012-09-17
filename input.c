@@ -109,7 +109,7 @@ static int openInputDevice(lua_State *L) {
 				} else if(std_out[0] == 'n') {
 					ev.code = CODE_NOT_CHARGING;
 				} else {
-					printf("Unrecognized event.\n");
+					//printf("Unrecognized event.\n");
 				}
 				/* fill event struct */
 				gettimeofday(&ev.time, NULL);
