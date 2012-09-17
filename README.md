@@ -26,7 +26,7 @@ Running
 The user interface (or what's there yet) is scripted in Lua. See "reader.lua".
 It uses the Linux feature to run scripts by using a corresponding line at its
 start.
-So you might just call that script. Note that the script and the kpdfview
+So you might just call that script. Note that the script and the kpdfdjview
 binary currently must be in the same directory.
 You would then just call reader.lua, giving the document file path as its first
 argument. Run reader.lua without arguments to see usage notes.
@@ -46,7 +46,7 @@ To build in "emulation mode", you need to run make like this:
 
 ```
 make clean cleanthirdparty
-EMULATE_READER=1 make thirdparty kpdfview
+EMULATE_READER=1 make thirdparty kpdfdjview
 ```
 
 And run the emulator like this:
