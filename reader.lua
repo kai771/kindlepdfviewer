@@ -83,9 +83,8 @@ function showusage()
 	return
 end
 
--- to enable debug messages comment out the following four lines
+-- to enable debug messages comment out the following three lines
 function nodebug()
-	return
 end
 Debug = nodebug
 
