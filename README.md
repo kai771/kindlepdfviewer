@@ -47,7 +47,7 @@ To build in "emulation mode", you need to run make like this:
 ```
 make clean cleanthirdparty
 EMULATE_READER=1 make thirdparty kpdfview
-``
+```
 
 And run the emulator like this:
 ```
