@@ -1591,7 +1591,6 @@ end
 function UniReader:fillToc()
 	InfoMessage:show("Retrieving TOC...", 1)
 	self.toc = self.doc:getToc()
-	self.toc_expandable = false
 	self.toc_children = {}
 	self.toc_xview = {}
 	self.toc_cview = {}
