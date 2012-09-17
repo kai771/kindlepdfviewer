@@ -1632,6 +1632,9 @@ function UniReader:fillToc()
 		prev = k
 		prev_depth = self.toc[prev].depth
 	end -- for k,v in ipairs(self.toc)
+
+	-- initial TOC state is fully collapsed,
+	-- so only the children of parent 0 are shown
 	if (self.toc_children[0]) then
 		self.toc_curidx_to_x = self.toc_children[0]
 		for i=1,#self.toc_children[0] do
