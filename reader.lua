@@ -83,6 +83,12 @@ function showusage()
 	return
 end
 
+-- to enable debug messages comment out the following four lines
+function nodebug()
+	return
+end
+Debug = nodebug
+
 optarg, optind = alt_getopt.get_opts(ARGV, "p:g:G:hg:dg:", longopts)
 if optarg["h"] then
 	return showusage()

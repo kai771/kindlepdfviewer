@@ -78,7 +78,7 @@ static void resetMsize(){
 
 static void showMsize(){
 	char buf[15],buf2[15],buf3[15],buf4[15];
-	printf("§§§ now: %s was: %s - min: %s - max: %s\n",readable_fs(msize,buf),readable_fs(msize_iniz,buf2),readable_fs(msize_min,buf3),readable_fs(msize_max,buf4));
+	/* printf("§§§ now: %s was: %s - min: %s - max: %s\n",readable_fs(msize,buf),readable_fs(msize_iniz,buf2),readable_fs(msize_min,buf3),readable_fs(msize_max,buf4)); */
 	resetMsize();
 }
 
