@@ -8,7 +8,6 @@ require "fileinfo"
 require "inputbox"
 require "selectmenu"
 require "dialog"
-require "extentions"
 
 FileChooser = {
 	title_H = 40,	-- title height
