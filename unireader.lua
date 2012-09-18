@@ -1040,7 +1040,6 @@ function UniReader:drawOrCache(no, preCache)
 	local page_indicator = function() 
 		fb.bb:invertRect( pg_w*(no-1),0, pg_w,10)
 		fb:refresh(1,     pg_w*(no-1),0, pg_w,10)
-		Debug('page_indicator',no)
 	end
 	page_indicator()
 
@@ -1142,7 +1141,6 @@ function UniReader:drawOrCache(no, preCache)
 	}
 	--debug ("# new biltbuffer:"..dump(self.cache[pagehash]))
 	dc:setOffset(-tile.x, -tile.y)
-	Debug("rendering page", no)
 	page:draw(dc, self.cache[pagehash].bb, 0, 0, self.render_mode)
 	page:close()
 
@@ -1548,7 +1546,6 @@ end
 
 -- adjust global gamma setting
 function UniReader:modifyGamma(factor)
-	Debug("modifyGamma, gamma=", self.globalgamma, " factor=", factor)
 	self.globalgamma = self.globalgamma * factor;
 	InfoMessage:show("New gamma = "..self.globalgamma, 1) -- we don't want delay here
 	self:redrawCurrentPage()
@@ -2105,15 +2102,14 @@ function UniReader:inputLoop()
 				Debug("command not found:", tostring(command))
 			end
 
-			local nsecs, nusecs = util.gettime()
-			local dur = (nsecs - secs) * 1000000 + nusecs - usecs
-			Debug("E: T="..ev.type, " V="..ev.value, " C="..ev.code, " DUR=", dur)
-
-			if ev.value == EVENT_VALUE_KEY_REPEAT then
-				Debug("prevent full screen refresh")
-			end
-		else
-			Debug("ignored ev ",ev)
+			--local nsecs, nusecs = util.gettime()
+			--local dur = (nsecs - secs) * 1000000 + nusecs - usecs
+			--Debug("E: T="..ev.type, " V="..ev.value, " C="..ev.code, " DUR=", dur)
+			--if ev.value == EVENT_VALUE_KEY_REPEAT then
+			--	Debug("prevent full screen refresh")
+			--end
+		--else
+		--	Debug("ignored ev ",ev)
 		end
 	end
 
@@ -2239,7 +2235,7 @@ function UniReader:addAllCommands()
 	self.commands:addGroup("[1, 2 .. 9, 0]",numeric_keydefs,
 		"jump to 10%, 20% .. 90%, 100% of document",
 		function(unireader,keydef)
-			Debug('jump to page:', math.max(math.floor(unireader.doc:getPages()*(keydef.keycode-KEY_1)/9),1), '/', unireader.doc:getPages())
+			--Debug('jump to page:', math.max(math.floor(unireader.doc:getPages()*(keydef.keycode-KEY_1)/9),1), '/', unireader.doc:getPages())
 			unireader:goto(math.max(math.floor(unireader.doc:getPages()*(keydef.keycode-KEY_1)/9),1))
 		end)
 	-- end numeric keys
@@ -2395,7 +2391,7 @@ function UniReader:addAllCommands()
 		end)
 
 	self.commands:add(KEY_Z,nil,"Z",
-		"set crop mode",
+		"set page bbox",
 		function(unireader)
 			local bbox = {}
 			bbox["x0"] = - unireader.offset_x / unireader.globalzoom
@@ -2407,35 +2403,35 @@ function UniReader:addAllCommands()
 			unireader.bbox[unireader.pageno] = bbox
 			unireader.bbox[unireader:oddEven(unireader.pageno)] = bbox
 			unireader.bbox.enabled = true
-			Debug("bbox", unireader.pageno, unireader.bbox)
+			--Debug("bbox", unireader.pageno, unireader.bbox)
 			unireader.globalzoom_mode = unireader.ZOOM_FIT_TO_CONTENT -- use bbox
-			showInfoMsgWithDelay("Manual crop setting saved.", 2000, 1)
+			showInfoMsgWithDelay("Page bbox saved", 1000, 1)
 		end)
 	self.commands:add(KEY_Z,MOD_SHIFT,"Z",
-		"reset crop",
+		"reset page bbox",
 		function(unireader)
 			unireader.bbox[unireader.pageno] = nil;
-			showInfoMsgWithDelay("Manual crop setting removed.", 2000, 1)
-			Debug("bbox remove", unireader.pageno, unireader.bbox);
+			showInfoMsgWithDelay("Page bbox removed", 1000, 1)
+			--Debug("bbox remove", unireader.pageno, unireader.bbox);
 		end)
 	self.commands:add(KEY_Z,MOD_ALT,"Z",
-		"toggle crop mode",
+		"toggle page bbox",
 		function(unireader)
 			unireader.bbox.enabled = not unireader.bbox.enabled;
 			if unireader.bbox.enabled then
-				showInfoMsgWithDelay("Manual crop enabled.", 2000, 1)
+				showInfoMsgWithDelay("Page bbox enabled", 1000, 1)
 			else
-				showInfoMsgWithDelay("Manual crop disabled.", 2000, 1)
+				showInfoMsgWithDelay("Page bbox disabled", 1000, 1)
 			end
-			Debug("bbox override", unireader.bbox.enabled);
+			--Debug("bbox override", unireader.bbox.enabled);
 		end)
 	self.commands:add(KEY_X,nil,"X",
 		"invert page bbox",
 		function(unireader)
 			local bbox = unireader.cur_bbox
-			Debug("bbox", bbox)
+			--Debug("bbox", bbox)
 			x,y,w,h = unireader:getRectInScreen( bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"] )
-			Debug("inxertRect",x,y,w,h)
+			--Debug("inxertRect",x,y,w,h)
 			fb.bb:invertRect( x,y, w,h )
 			fb:refresh(1)
 		end)
@@ -2443,9 +2439,9 @@ function UniReader:addAllCommands()
 		"modify page bbox",
 		function(unireader)
 			local bbox = unireader.cur_bbox
-			Debug("bbox", bbox)
+			--Debug("bbox", bbox)
 			x,y,w,h = unireader:getRectInScreen( bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"] )
-			Debug("getRectInScreen",x,y,w,h)
+			--Debug("getRectInScreen",x,y,w,h)
 
 			local new_bbox = bbox
 			local x_s, y_s = x,y
@@ -2599,13 +2595,13 @@ function UniReader:addAllCommands()
 			unireader.bbox[unireader.pageno] = new_bbox
 			unireader.bbox[unireader:oddEven(unireader.pageno)] = new_bbox
 			unireader.bbox.enabled = true
-			Debug("crop bbox", bbox, "to", new_bbox)
+			Debug("page bbox", bbox, "to", new_bbox)
 
 			Screen:restoreFromSavedBB()
 			x,y,w,h = unireader:getRectInScreen( new_bbox["x0"], new_bbox["y0"], new_bbox["x1"], new_bbox["y1"] )
 			fb.bb:invertRect( x,y, w,h )
 			--fb.bb:invertRect( x+1,y+1, w-2,h-2 ) -- just border?
-			showInfoMsgWithDelay("new page bbox", 2000, 1);
+			showInfoMsgWithDelay("new page bbox", 1000, 1);
 			self:redrawCurrentPage()
 		end)
 	self.commands:add(KEY_MENU,nil,"Menu",

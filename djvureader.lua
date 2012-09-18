@@ -114,10 +114,8 @@ function DJVUReader:showMenu()
 			if ev.code == KEY_BACK or ev.code == KEY_MENU then
 				return
 			elseif ev.code == KEY_C then
-				Debug("showMenu(), clearing internal cache")
 				self:clearCache()
 			elseif ev.code == KEY_D then
-				Debug("showMenu(), clearing DjVu cache")
 				self.doc:cleanCache()
 			end
 		end
