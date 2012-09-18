@@ -83,16 +83,13 @@ function showusage()
 	return
 end
 
--- to enable debug messages comment out the following line
-Debug = function()end
-
 optarg, optind = alt_getopt.get_opts(ARGV, "p:g:G:hg:dg:", longopts)
 if optarg["h"] then
 	return showusage()
 end
 
 if not optarg["d"] then
-	debug = function() end
+	Debug = function() end
 end
 
 if optarg["G"] ~= nil then
