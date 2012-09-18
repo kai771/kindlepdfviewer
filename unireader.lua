@@ -2069,7 +2069,7 @@ function UniReader:showMenu()
 			if ev.code == KEY_BACK or ev.code == KEY_MENU then
 				return
 			elseif ev.code == KEY_C then
-				self.doc:cleanCache()
+				self:clearCache()
 			end
 		end
 	end
