@@ -84,10 +84,10 @@ function FileInfo:init(path, fname)
 	local history = DocToHistory(self.pathfile)
 	local file, msg = io.open(history, "r")
 	if not file then 
-		info_entry = {dir = "Last Read", name = "Never"}
+		info_entry = {dir = "Last read", name = "Never"}
 		table.insert(self.result, info_entry)
 	else
-		info_entry = {dir = "Last Read", name = FileInfo:FileCreated(history, "change")}
+		info_entry = {dir = "Last read", name = FileInfo:FileCreated(history, "change")}
 		table.insert(self.result, info_entry)
 		local to_search, add, factor = "[\"last_percent\"]", "%", 100
 		to_search = "[\"last_page\"]"
