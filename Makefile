@@ -176,7 +176,7 @@ customupdate: all
 	# ensure that build binary is for ARM
 	file kpdfdjview | grep ARM || exit 1
 	$(STRIP) --strip-unneeded kpdfdjview
-	-rm kpdfdjview-$(VERSION).zip
+	-rm kpdfdjview-$(VERSION).zip > /dev/null 2>&1
 	rm -Rf $(TMP_DIR)
 	mkdir -p $(TMP_DIR)
 	cp -p README.md COPYING $(LUA_FILES) $(TMP_DIR)
