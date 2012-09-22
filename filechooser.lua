@@ -19,7 +19,7 @@ FileChooser = {
 	dirs = nil,
 	files = nil,
 	items = 0,
-	path = "",
+	path = ".",
 	page = 1,
 	current = 1,
 	oldcurrent = 0,
@@ -46,9 +46,8 @@ end
 
 function BatteryLevel()
 	-- NuPogodi, 18.05.12: This command seems to work even without Amazon Kindle framework 
-	local cmd="gasgauge-info -s 2> /dev/null"
-	local p = assert(io.popen(cmd, "r"))
-	local battery = assert(p:read("*a"))
+	local p = io.popen("gasgauge-info -s 2> /dev/null", "r")
+	local battery = p:read("*a")
 	p:close()
 	return string.gsub(battery, "[\n\r]+", "")
 end
@@ -315,7 +314,7 @@ function FileChooser:addAllCommands()
 		end
 	)
 	self.commands:add({KEY_FW_RIGHT, KEY_I}, nil, "joypad right",
-		"show document information",
+		"show file information",
 		function(self)
 			if self:FullFileName() then
 				FileInfo:show(self.path,self.files[self.perpage*(self.page-1)+self.current - #self.dirs])
@@ -324,7 +323,7 @@ function FileChooser:addAllCommands()
 		end
 	)
 	self.commands:add({KEY_ENTER, KEY_FW_PRESS}, nil, "Enter",
-		"open document / goto folder",
+		"open document / change directory",
 		function(self)
 			local newdir = self.dirs[self.perpage*(self.page-1)+self.current]
 			if newdir == ".." then
@@ -481,9 +480,9 @@ function FileChooser:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_N, MOD_SHIFT, "N",
-		"make new folder",
+		"make new directory",
 		function(self)
-			local folder = InputBox:input(0, 0, "New Folder:")
+			local folder = InputBox:input(0, 0, "New Dir:")
 			if folder then
 				if lfs.mkdir(self.path.."/"..folder) then
 					self:setPath(self.path)

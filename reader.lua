@@ -17,7 +17,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]--
-require "alt_getopt"
 require "pdfreader"
 require "djvureader"
 require "filechooser"
@@ -27,15 +26,6 @@ require "keys"
 require "commands"
 require "dialog"
 require "extentions"
-
--- option parsing:
-longopts = {
-	password = "p",
-	goto = "g",
-	gamma = "G",
-	debug = "d",
-	help = "h"
-}
 
 function openFile(filename)
 	local match = string.match(filename, ".+%.([^.]+)")
@@ -62,38 +52,8 @@ function openFile(filename)
 	return true -- on failed attempts, we signal to keep running
 end
 
-function showusage()
-	print("usage: ./reader.lua [OPTION] ... path")
-	print("Read PDFs and DJVUs on your E-Ink reader")
-	print("")
-	print("-p, --password=PASSWORD   set password for reading PDF document")
-	print("-g, --goto=page           start reading on page")
-	print("-G, --gamma=GAMMA         set gamma correction")
-	print("-d, --debug               start in debug mode")
-	print("                          (floating point notation, e.g. \"1.5\")")
-	print("-h, --help                show this usage help")
-	print("")
-	print("If you give the name of a directory instead of a file path, a file")
-	print("chooser will show up and let you select a PDF|DJVU file")
-	print("")
-	print("If you don't pass any path, the last viewed document will be opened")
-	print("")
-	print("This software is licensed under the GPLv3.")
-	print("See http://github.com/hwhw/kindlepdfviewer for more info.")
-	return
-end
-
-optarg, optind = alt_getopt.get_opts(ARGV, "p:g:G:hg:dg:", longopts)
-if optarg["h"] then
-	return showusage()
-end
-
-if not optarg["d"] then
+if ARGV[1] ~= "-d" then
 	Debug = function() end
-end
-
-if optarg["G"] ~= nil then
-	globalgamma = optarg["G"]
 end
 
 if util.isEmulated()==1 then
@@ -143,32 +103,21 @@ UniReader:initGlobalSettings(G_reader_settings)
 PDFReader:init()
 DJVUReader:init()
 
--- display directory or open file
-local patharg = G_reader_settings:readSetting("lastfile")
-if ARGV[optind] and lfs.attributes(ARGV[optind], "mode") == "directory" then
-	local running = true
-	FileChooser:setPath(ARGV[optind])
-	while running do
-		local file, callback = FileChooser:choose(0, G_height)
-		if callback then
-			callback()
+local running = true
+FileChooser:setPath("/mnt/us/documents")
+while running do
+	local file, callback = FileChooser:choose(0, G_height)
+	if callback then
+		callback()
+	else
+		if file ~= nil then
+			running = openFile(file)
+			print(file)
 		else
-			if file ~= nil then
-				running = openFile(file)
-				print(file)
-			else
-				running = false
-			end
+			running = false
 		end
 	end
-elseif ARGV[optind] and lfs.attributes(ARGV[optind], "mode") == "file" then
-	openFile(ARGV[optind], optarg["p"])
-elseif patharg and lfs.attributes(patharg, "mode") == "file" then
-	openFile(patharg, optarg["p"])
-else
-	return showusage()
 end
-
 
 -- save reader settings
 G_reader_settings:saveSetting("fontmap", Font.fontmap)

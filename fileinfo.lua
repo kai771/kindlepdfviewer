@@ -37,8 +37,8 @@ end
 
 function getUnpackedZipSize(zipfile)
 	local cmd='unzip -l '..zipfile..' | tail -1 | sed -e "s/^ *\\([0-9][0-9]*\\) *.*/\\1/"'
-	local p = assert(io.popen(cmd, "r"))
-	local res = assert(p:read("*a"))
+	local p = io.popen(cmd, "r")
+	local res = p:read("*a")
 	p:close()
 	res = string.gsub(res, "[\n\r]+", "")
 	return tonumber(res)

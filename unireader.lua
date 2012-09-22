@@ -1674,10 +1674,6 @@ function UniReader:getTocTitleOfCurrentPage()
 	return self:getTocTitleByPage(self.pageno)
 end
 
-function UniReader:gotoTocEntry(entry)
-	self:goto(entry.page)
-end
-
 -- expand TOC item to one level down
 function UniReader:expandTOCItem(xidx, item_no)
 	if string.find(self.toc_cview[item_no], "^+ ") then
@@ -1762,11 +1758,12 @@ function UniReader:showToc()
 	end
 
 	if #self.toc == 0 then
-		showInfoMsgWithDelay("No Table of Contents", 1500, 1)
+		showInfoMsgWithDelay("No Table of Contents ", 1500, 1)
 		return self:redrawCurrentPage()
 	end
 
 	self.toc_curitem = self:findTOCpos()
+	local numpages = self.doc:getPages();
 
 	while true do
 		toc_menu = SelectMenu:new{
@@ -1779,8 +1776,8 @@ function UniReader:showToc()
 		if ret_code then -- normal item selection
 			-- check to make sure the destination is local
 			local pagenum = self.toc[self.toc_curidx_to_x[ret_code]].page
-			if pagenum < 1 or pagenum > self.doc:getPages() then
-				showInfoMsgWithDelay("External links unsupported", 1500, 1)
+			if pagenum < 1 or pagenum > numpages then
+				showInfoMsgWithDelay("External links unsupported ", 1500, 1)
 				self.toc_curitem = ret_code
 			else
 				return self:goto(pagenum)
@@ -2075,9 +2072,8 @@ end
 
 function UniReader:showMenu()
 	self:_drawReadingInfo()
-
 	fb:refresh(1)
-	while 1 do
+	while true do
 		local ev = input.saveWaitForEvent()
 		ev.code = adjustKeyEvents(ev)
 		if ev.type == EV_KEY and ev.value == EVENT_VALUE_KEY_PRESS then
@@ -2091,7 +2087,6 @@ function UniReader:showMenu()
 end
 
 function UniReader:oddEven(number)
-	Debug("oddEven", number)
 	if number % 2 == 1 then
 		return "odd"
 	else

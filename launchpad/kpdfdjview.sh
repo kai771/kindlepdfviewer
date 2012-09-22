@@ -17,7 +17,7 @@ fi
 killall -stop cvm
 
 # finally call reader
-./reader.lua "$1" > /mnt/us/kpdfdjview/crash.log 2>&1 || cat /mnt/us/kpdfdjview/crash.log
+./reader.lua  > /mnt/us/kpdfdjview/crash.log 2>&1
 
 # always try to continue cvm
 killall -cont cvm || /etc/init.d/framework start
