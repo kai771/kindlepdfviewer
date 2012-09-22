@@ -99,9 +99,6 @@ kpdfdjview: kpdfdjview.o einkfb.o pdf.o blitbuffer.o drawcontext.o input.o util.
 		$(STATICLIBSTDCPP) \
 		-o kpdfdjview -lm -ldl -lpthread $(EMU_LDFLAGS) $(DYNAMICLIBSTDCPP)
 
-slider_watcher: slider_watcher.c
-	$(CC) $(CFLAGS) $< -o $@
-
 ft.o: %.o: %.c $(THIRDPARTYLIBS)
 	$(CC) -c $(KPDFREADER_CFLAGS) -I$(FREETYPEDIR)/include -I$(MUPDFDIR)/fitz $< -o $@
 
@@ -126,7 +123,7 @@ fetchthirdparty:
 	cd mupdf && patch -N -p1 < ../mupdf.patch
 
 clean:
-	-rm -f *.o kpdfdjview slider_watcher
+	-rm -f *.o kpdfdjview
 
 cleanthirdparty:
 	-make -C $(LUADIR) clean
