@@ -109,7 +109,6 @@ end
 
 
 function Screen:screenshot()
-	lfs.mkdir("./screenshots")
 	self:fb2bmp("/dev/fb0", lfs.currentdir().."/screenshots/"..os.date("%Y-%m-%d-%H%M%S")..".bmp", true)
 end
 

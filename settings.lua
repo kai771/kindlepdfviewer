@@ -30,43 +30,9 @@ end
 
 function DocSettings:open(docfile)
 	-- history feature moves configuration files into history directory
-	lfs.mkdir("./history")
 	local new = { file = DocToHistory(docfile), data = {} }
 	local ok, stored = pcall(dofile,new.file)
-	if not ok then
-		ok, stored = pcall(dofile,docfile..".kpdfview.lua")
-	end
 	if ok then
-		if stored.version == nil then
-			stored.version = 0
-		end
-
-		if stored.version < 2012.05 then
-			Debug("settings", docfile, stored)
-			if stored.jumpstack ~= nil then
-				stored.jump_history = stored.jumpstack
-				stored.jumpstack = nil
-				if not stored.jump_history.cur then
-					-- set up new history head
-					stored.jump_history.cur = #stored.jump_history + 1
-				end
-			end
-			-- update variable name
-			if stored.globalzoommode ~= nil then
-				stored.globalzoom_mode = stored.globalzoommode
-				stored.globalzoommode = nil
-			end
-
-			if stored.highlight ~= nil then
-				local file_type = string.lower(string.match(docfile, ".+%.([^.]+)"))
-				if file_type == "djvu" then
-					stored.highlight.to_fix = {"djvu invert y axle"}
-				end
-			end
-			stored.version = 2012.05
-			Debug("upgraded", stored)
-		end
-
 		new.data = stored
 	end
 	return setmetatable(new, { __index = DocSettings})

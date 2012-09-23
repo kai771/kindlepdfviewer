@@ -25,28 +25,32 @@ require "screen"
 require "keys"
 require "commands"
 require "dialog"
-require "extentions"
 
 function openFile(filename)
-	local match = string.match(filename, ".+%.([^.]+)")
+	local ext = string.match(filename, ".+%.([^.]+)")
 
-	if match then
-		local file_type = string.lower(match)
-		local reader = ext:getReader(file_type)
+	if ext then
+		ext = string.lower(ext)
+		local reader
+		if ext == "djvu" then
+			reader = DJVUReader
+		elseif string.find(";pdf;xps;cbz;", ";"..ext..";") then	
+			reader = PDFReader
+		end
 		if reader then
-			InfoMessage:show("Opening document... ", 0)
+			InfoMessage:show("Opening "..ext.." document ", 0)
 			reader:preLoadSettings(filename)
 			local ok, err = reader:open(filename)
 			if ok then
 				reader:loadSettings(filename)
 				page_num = reader:getLastPageOrPos()
 				reader:goto(tonumber(page_num), true)
-				G_reader_settings:saveSetting("lastfile", filename)
 				return reader:inputLoop()
 			else
-				InfoMessage:show(err or "Error opening document.", 0)
-				util.sleep(2)
+				showInfoMsgWithDelay(err or "Error opening document", 1500, 1)
 			end
+		else
+				showInfoMsgWithDelay(ext.." format not supported", 1500, 1)
 		end -- if reader
 	end -- if match
 	return true -- on failed attempts, we signal to keep running
@@ -58,7 +62,6 @@ end
 
 if util.isEmulated()==1 then
 	input.open("")
-	-- SDL key codes
 	setEmuKeycodes()
 else
 	input.open("slider")
@@ -81,25 +84,9 @@ G_width, G_height = fb:getSize()
 Screen:updateRotationMode()
 Screen.native_rotation_mode = Screen.cur_rotation_mode
 
--- set up reader's setting: font
 G_reader_settings = DocSettings:open(".reader")
 fontmap = G_reader_settings:readSetting("fontmap")
-if fontmap ~= nil then
-	-- we need to iterate over all fonts used in reader to support upgrade from older configuration
-	for name,path in pairs(fontmap) do
-		if Font.fontmap[name] then
-			Font.fontmap[name] = path
-		else
-			Debug("missing "..name.." in user configuration, using default font "..path)
-		end
-	end
-end
-
--- set up the mode to manage files
-FileChooser.filemanager_expert_mode = G_reader_settings:readSetting("filemanager_expert_mode") or 1
--- initialize global settings shared among all readers
 UniReader:initGlobalSettings(G_reader_settings)
--- initialize specific readers
 PDFReader:init()
 DJVUReader:init()
 
@@ -110,9 +97,8 @@ while running do
 	if callback then
 		callback()
 	else
-		if file ~= nil then
+		if file then
 			running = openFile(file)
-			print(file)
 		else
 			running = false
 		end
