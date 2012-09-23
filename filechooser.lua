@@ -408,7 +408,6 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_L, nil, "L",
 		"show last documents",
 		function(self)
-			lfs.mkdir("./history/")
 			FileHistory:init()
 			FileHistory:choose("")
 			self.pagedirty = true
@@ -432,7 +431,6 @@ function FileChooser:addAllCommands()
 		function(self)
 			local file = self:FullFileName()
 			if file then
-				lfs.mkdir(self.clipboard)
 				os.execute("cp "..self:InQuotes(file).." "..self.clipboard)
 				local fn = self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
 				os.execute("cp "..self:InQuotes(DocToHistory(file)).." "
@@ -446,7 +444,6 @@ function FileChooser:addAllCommands()
 		function(self)
 			local file = self:FullFileName()
 			if file then
-				lfs.mkdir(self.clipboard)
 				local fn = self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
 				os.rename(file, self.clipboard.."/"..fn)
 				os.rename(DocToHistory(file), DocToHistory(self.clipboard.."/"..fn))
@@ -473,7 +470,6 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_B, MOD_SHIFT, "B",
 		"show content of \'clipboard\'",
 		function(self)
-			lfs.mkdir(self.clipboard)
 			self:setPath(self.clipboard)
 			-- TODO: exit back from clipboard to last folder - Redefine Exit on FW_Right?
 			self.pagedirty = true

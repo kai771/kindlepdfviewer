@@ -47,10 +47,10 @@ function openFile(filename)
 				reader:goto(tonumber(page_num), true)
 				return reader:inputLoop()
 			else
-				showInfoMsgWithDelay(err or "Error opening document", 1500, 1)
+				showInfoMsgWithDelay(err or "Error opening document ", 1500, 1)
 			end
 		else
-				showInfoMsgWithDelay(ext.." format not supported", 1500, 1)
+				showInfoMsgWithDelay(ext.." format not supported ", 1500, 1)
 		end -- if reader
 	end -- if match
 	return true -- on failed attempts, we signal to keep running

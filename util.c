@@ -22,6 +22,7 @@
 
 #include "util.h"
 
+#if 0
 static int gettime(lua_State *L) {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -29,6 +30,7 @@ static int gettime(lua_State *L) {
 	lua_pushinteger(L, tv.tv_usec);
 	return 2;
 }
+#endif
 
 static int util_sleep(lua_State *L) {
 	unsigned int seconds = luaL_optint(L, 1, 0);
@@ -79,7 +81,7 @@ static int isEmulated(lua_State *L) {
 }
 
 static const struct luaL_Reg util_func[] = {
-	{"gettime", gettime},
+//	{"gettime", gettime},
 	{"sleep", util_sleep},
 	{"usleep", util_usleep},
 	{"utf8charcode", utf8charcode},
