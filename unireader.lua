@@ -996,11 +996,11 @@ function UniReader:loadSettings(filename)
 	return false
 end
 
-function UniReader:getLastPageOrPos()
+function UniReader:getLastPage()
 	return self.settings:readSetting("last_page") or 1
 end
 
-function UniReader:saveLastPageOrPos()
+function UniReader:saveLastPage()
 	self.settings:saveSetting("last_page", self.pageno)
 end
 
@@ -2138,7 +2138,7 @@ function UniReader:inputLoop()
 		self.doc:close()
 	end
 	if self.settings ~= nil then
-		self:saveLastPageOrPos()
+		self:saveLastPage()
 		self.settings:saveSetting("jump_history", self.jump_history)
 		self.settings:saveSetting("bookmarks", self.bookmarks)
 		self.settings:saveSetting("highlight", self.highlight)

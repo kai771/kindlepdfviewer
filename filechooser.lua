@@ -60,12 +60,12 @@ function DrawTitle(text,lmargin,y,height,color,font_face)
 	blitbuffer.paintBorder(fb.bb, 1, height/2, fb.bb:getWidth() - 2, height/2, height/2, color, r)
 	-- to have a horisontal gap between text & background rectangle
 	t = BatteryLevel() .. os.date(" %H:%M")
-	local tw = TextWidget:new({ text = t, face = font_face})
+	local tw = TextWidget:new({text = t, face = font_face})
 	twidth = tw:getSize().w
 	renderUtf8Text(fb.bb, fb.bb:getWidth()-twidth-lmargin, height-10, font_face, t, true)
 	tw:free()
 
-	tw = TextWidget:new({ text = text, face = font_face})
+	tw = TextWidget:new({text = text, face = font_face})
 	local max_width = fb.bb:getWidth() - 2*lmargin - twidth
 	if tw:getSize().w < max_width then
 		renderUtf8Text(fb.bb, lmargin, height-10, font_face, text, true)
@@ -478,10 +478,12 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_N, MOD_SHIFT, "N",
 		"make new directory",
 		function(self)
-			local folder = InputBox:input(0, 0, "New Dir:")
-			if folder then
-				if lfs.mkdir(self.path.."/"..folder) then
+			local dir = InputBox:input(0, 0, "New Dir:")
+			if dir then
+				if lfs.mkdir(self.path.."/"..dir) then
 					self:setPath(self.path)
+				else
+					showInfoMsgWithDelay("can't create "..dir.." dir",1000,1)
 				end
 			end
 			self.pagedirty = true
@@ -503,13 +505,13 @@ function FileChooser:addAllCommands()
 	)
 end
 
--- returns full filename or nil (if folder)
+-- returns full filename or nil (if directory)
 function FileChooser:FullFileName()
 	local file
-	local folder = self.dirs[self.perpage*(self.page-1)+self.current]
-	if folder == ".." then
+	local dir = self.dirs[self.perpage*(self.page-1)+self.current]
+	if dir == ".." then
 		showInfoMsgWithDelay("<UP-DIR> ",1000,1)
-	elseif folder then
+	elseif dir then
 		showInfoMsgWithDelay("<DIR> ",1000,1)
 	else
 		file=self.path.."/"..self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
@@ -525,7 +527,7 @@ function FileChooser:ReturnKey(debug)
 			break
 		end
 	end
-	if debug then showInfoMsgWithDelay("Keycode = "..ev.code,1000,1) end
+	--if debug then showInfoMsgWithDelay("Keycode = "..ev.code,1000,1) end
 	return ev.code
 end
 

@@ -43,19 +43,23 @@ function openFile(filename)
 			local ok, err = reader:open(filename)
 			if ok then
 				reader:loadSettings(filename)
-				page_num = reader:getLastPageOrPos()
+				page_num = reader:getLastPage()
 				reader:goto(tonumber(page_num), true)
 				return reader:inputLoop()
 			else
-				showInfoMsgWithDelay(err or "Error opening document ", 1500, 1)
+				Debug("openFile(): Error opening document: "..err)
+				showInfoMsgWithDelay("Error opening document ", 1500, 1)
 			end
 		else
-				showInfoMsgWithDelay(ext.." format not supported ", 1500, 1)
+			showInfoMsgWithDelay(ext.." format not supported ", 1500, 1)
 		end -- if reader
-	end -- if match
+	else
+		showInfoMsgWithDelay("Unknown format ", 1500, 1)
+	end -- if ext
 	return true -- on failed attempts, we signal to keep running
 end
 
+Mydebug=Debug
 if ARGV[1] ~= "-d" then
 	Debug = function() end
 end
@@ -69,8 +73,7 @@ else
 	input.open("/dev/input/event1")
 
 	-- check if we are running on Kindle 3 (additional volume input)
-	local f=lfs.attributes("/dev/input/event2")
-	if f then
+	if FileExists("/dev/input/event2") then
 		input.open("/dev/input/event2")
 		setK3Keycodes()
 	end

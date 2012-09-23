@@ -44,6 +44,16 @@ function getUnpackedZipSize(zipfile)
 	return tonumber(res)
 end
 
+function FileExists(path)
+	local f = io.open(path, "r")
+	if f then
+		f:close()
+		return true
+	else
+		return false
+	end
+end
+
 function FileInfo:init(path, fname)
 	self.pathfile = path.."/"..fname
 	self.result = {}
@@ -80,23 +90,17 @@ function FileInfo:init(path, fname)
 	info_entry = {dir = "Accessed", name = FileInfo:FileCreated(self.pathfile, "access")}
 	table.insert(self.result, info_entry)
 
-	-- if the document was already opened
 	local history = DocToHistory(self.pathfile)
-	local file, msg = io.open(history, "r")
-	if not file then 
+	if not FileExists(history) then
 		info_entry = {dir = "Last read", name = "Never"}
 		table.insert(self.result, info_entry)
 	else
 		info_entry = {dir = "Last read", name = FileInfo:FileCreated(history, "change")}
 		table.insert(self.result, info_entry)
-		local to_search, add, factor = "[\"last_percent\"]", "%", 100
-		to_search = "[\"last_page\"]"
-		add = " pages"
-		factor = 1
 		for line in io.lines(history) do
-			if string.match(line, "%b[]") == to_search then
-				local cdc = tonumber(string.match(line, "%d+")) / factor
-				info_entry = {dir = "Completed", name = string.format("%d", cdc)..add }
+			if string.match(line, "%b[]") == "[\"last_page\"]" then
+				local cdc = tonumber(string.match(line, "%d+"))
+				info_entry = {dir = "Completed", name = string.format("%d", cdc).." pages" }
 				table.insert(self.result, info_entry)
 			end
 		end
@@ -106,10 +110,9 @@ end
 
 function FileInfo:show(path, name)
 	-- at first, one has to test whether the file still exists or not: necessary for last documents
-	if not io.open(path.."/"..name,"r") then return nil end
-	-- then goto main functions
+	if not FileExists(path.."/"..name) then return nil end
+
 	FileInfo:init(path,name)
-	-- local variables
 	local cface, lface, tface, fface, width, xrcol, c, dy, ev, keydef, ret_code
 	while true do
 		if self.pagedirty then
@@ -118,9 +121,8 @@ function FileInfo:show(path, name)
 			lface = Font:getFace("tfont", 22)
 			tface = Font:getFace("tfont", 25)
 			fface = Font:getFace("ffont", 16)
-			-- drawing
 			fb.bb:paintRect(0, 0, G_width, G_height, 0)
-			DrawTitle("Document Information", self.margin_H, 0, self.title_H, 3, tface)
+			DrawTitle("File Information", self.margin_H, 0, self.title_H, 3, tface)
 			-- now calculating xrcol-position for the right column
 			width = 0
 			for c = 1, self.items do
@@ -137,7 +139,6 @@ function FileInfo:show(path, name)
 			fb:refresh(0)
 			self.pagedirty = false
 		end
-		-- waiting for user's commands
 		ev = input.saveWaitForEvent()
 		ev.code = adjustKeyEvents(ev)
 		if ev.type == EV_KEY and ev.value ~= EVENT_VALUE_KEY_RELEASE then
