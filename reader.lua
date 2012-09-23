@@ -87,6 +87,14 @@ Screen.native_rotation_mode = Screen.cur_rotation_mode
 
 G_reader_settings = DocSettings:open(".reader")
 fontmap = G_reader_settings:readSetting("fontmap")
+if fontmap then
+	for name,path in pairs(fontmap) do
+		if Font.fontmap[name] then
+			Font.fontmap[name] = path
+		end
+	end
+end
+
 UniReader:initGlobalSettings(G_reader_settings)
 PDFReader:init()
 DJVUReader:init()
