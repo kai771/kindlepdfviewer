@@ -124,8 +124,6 @@ function UniReader:open(filename, cache_size)
 end
 
 function UniReader:init()
-	-- initialize commands
-	InfoMessage:show("Registering fonts...", 1)
 	self:addAllCommands()
 end
 
