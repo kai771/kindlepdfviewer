@@ -4,8 +4,8 @@ require "font"
 InfoMessage = {
 }
 
-function InfoMessage:show(text,refresh_mode)
-	Debug("# InfoMessage ", text, refresh_mode)
+function InfoMessage:show(text)
+	Debug("# InfoMessage ", text)
 	local dialog = CenterContainer:new({
 		dimen = { w = G_width, h = G_height },
 		FrameContainer:new({
@@ -28,29 +28,26 @@ function InfoMessage:show(text,refresh_mode)
 	})
 	dialog:paintTo(fb.bb, 0, 0)
 	dialog:free()
-	if refresh_mode ~= nil then
-		fb:refresh(refresh_mode)
-	end
+	fb:refresh(0)
 end
 
-function showInfoMsgWithDelay(text, msec, refresh_mode)
-	if not refresh_mode then refresh_mode = 0 end
+function showInfoMsgWithDelay(text, msec)
+	local delayms = msec or 1000
 	Screen:saveCurrentBB()
 
 	InfoMessage:show(text)
-	fb:refresh(refresh_mode)
-	-- util.usleep(msec*1000)
-	
+	fb:refresh(1)
+
 	-- eat the first key release event
 	local ev = input.waitForEvent()
 	adjustKeyEvents(ev)
 	repeat
 		ok = pcall( function()
-			ev = input.waitForEvent(msec*1000)
+			ev = input.waitForEvent(delayms*1000)
 			adjustKeyEvents(ev)
 		end)
 	until not ok or ev.value == EVENT_VALUE_KEY_PRESS
 
 	Screen:restoreFromSavedBB()
-	fb:refresh(refresh_mode)
+	fb:refresh(1)
 end

@@ -601,7 +601,7 @@ function InputBox:ModeDependentCommands()
 			"calculate the result",
 			function(self)
 				if #self.input_string == 0 then
-					showInfoMsgWithDelay("No input ", 1000, 1)
+					showInfoMsgWithDelay("No input ")
 				else
 					local s = self:PrepareStringToCalc()
 					if pcall(function () f = assert(loadstring("r = tostring("..s..")")) end) and pcall(f) then
@@ -618,7 +618,7 @@ function InputBox:ModeDependentCommands()
 						self.cursor:draw()
 						fb:refresh(1, self.input_start_x-5, self.input_start_y-25, self.input_slot_w, self.h-25)
 					else
-						showInfoMsgWithDelay("Invalid input ", 1000, 1)
+						showInfoMsgWithDelay("Invalid input ")
 					end -- if pcall
 				end
 			end -- function

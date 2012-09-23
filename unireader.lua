@@ -165,8 +165,8 @@ end
 function UniReader:screenToPageTransform(x, y)
 	local x_o,y_o = self:screenOffset()
 	local x_p,y_p =
-		( x - x_o ) / self.globalzoom,
-		( y - y_o ) / self.globalzoom
+		(x - x_o) / self.globalzoom,
+		(y - y_o) / self.globalzoom
 	Debug("screenToPage", x,y, "offset", x_o,y_o, "page", x_p,y_p)
 	return x_p, y_p
 end
@@ -380,7 +380,7 @@ end
 function UniReader:startHighLightMode()
 	local t = self:getText(self.pageno)
 	if not t or #t == 0 then
-		showInfoMsgWithDelay("No text available", 1000, 1);
+		showInfoMsgWithDelay("No text available ");
 		return nil
 	end
 
@@ -391,7 +391,7 @@ function UniReader:startHighLightMode()
 			end
 		end
 
-		showInfoMsgWithDelay("No visible text", 1000, 1);
+		showInfoMsgWithDelay("No visible text ");
 		Debug("_findFirstWordInView none found in", t)
 
 		return nil
@@ -1034,13 +1034,6 @@ function UniReader:drawOrCache(no, preCache)
 	-- #3 goal: we render the full page
 	-- #4 goal: we render next page, too. (TODO)
 
-	local pg_w = G_width / ( self.doc:getPages() )
-	local page_indicator = function() 
-		fb.bb:invertRect( pg_w*(no-1),0, pg_w,10)
-		fb:refresh(1,     pg_w*(no-1),0, pg_w,10)
-	end
-	page_indicator()
-
 	-- ideally, this should be factored out and only be called when needed (TODO)
 	local ok, page = pcall(self.doc.openPage, self.doc, no)
 	local width, height = G_width, G_height
@@ -1078,8 +1071,6 @@ function UniReader:drawOrCache(no, preCache)
 				self.cache[pagehash].ttl = self.cache_max_ttl
 			end
 			-- ...and return blitbuffer plus offset into it
-
-			page_indicator()
 
 			return pagehash,
 				offset_x_in_page - self.cache[pagehash].x,
@@ -1141,8 +1132,6 @@ function UniReader:drawOrCache(no, preCache)
 	dc:setOffset(-tile.x, -tile.y)
 	page:draw(dc, self.cache[pagehash].bb, 0, 0, self.render_mode)
 	page:close()
-
-	page_indicator()
 
 	-- return hash and offset within blitbuffer
 	return pagehash,
@@ -1547,7 +1536,7 @@ end
 -- adjust global gamma setting
 function UniReader:modifyGamma(factor)
 	self.globalgamma = self.globalgamma * factor;
-	InfoMessage:show("New gamma = "..self.globalgamma, 1) -- we don't want delay here
+	InfoMessage:show("New gamma = "..self.globalgamma)
 	self:redrawCurrentPage()
 end
 
@@ -1586,7 +1575,7 @@ function UniReader:cleanUpTocTitle(title)
 end
 
 function UniReader:fillToc()
-	InfoMessage:show("Retrieving TOC...", 1)
+	InfoMessage:show("Retrieving TOC... ")
 	self.toc = self.doc:getToc()
 	self.toc_children = {}
 	self.toc_xview = {}
@@ -1756,7 +1745,7 @@ function UniReader:showToc()
 	end
 
 	if #self.toc == 0 then
-		showInfoMsgWithDelay("No Table of Contents ", 1500, 1)
+		showInfoMsgWithDelay("No Table of Contents ")
 		return self:redrawCurrentPage()
 	end
 
@@ -1775,7 +1764,7 @@ function UniReader:showToc()
 			-- check to make sure the destination is local
 			local pagenum = self.toc[self.toc_curidx_to_x[ret_code]].page
 			if pagenum < 1 or pagenum > numpages then
-				showInfoMsgWithDelay("External links unsupported ", 1500, 1)
+				showInfoMsgWithDelay("External links unsupported ")
 				self.toc_curitem = ret_code
 			else
 				return self:goto(pagenum)
@@ -1814,7 +1803,7 @@ function UniReader:showJumpHist()
 	end
 
 	if #menu_items == 0 then
-		showInfoMsgWithDelay("No jump history found.", 2000, 1)
+		showInfoMsgWithDelay("No jump history found ")
 	else
 		-- if cur points to head, draw entry for current page
 		if self.jump_history.cur > #self.jump_history then
@@ -1851,7 +1840,7 @@ function UniReader:showBookMarks()
 			"Page "..v.page.." "..v.notes.." @ "..v.datetime)
 	end
 	if #menu_items == 0 then
-		return showInfoMsgWithDelay("No bookmarks found", 1500, 1)
+		return showInfoMsgWithDelay("No bookmarks found ")
 	end
 	while true do
 		bm_menu = SelectMenu:new{
@@ -1914,7 +1903,7 @@ function UniReader:showHighLight()
 	end
 
 	if #menu_items == 0 then
-		return showInfoMsgWithDelay("No HighLights found", 1000, 1)
+		return showInfoMsgWithDelay("No HighLights found ")
 	end
 
 	while true do
@@ -1977,7 +1966,7 @@ function UniReader:searchHighLight(search)
 				for j = 1, #t[i], 1 do
 					local e = t[i][j]
 					if e.word ~= nil then
-						if string.match( string.lower(e.word), search ) then
+						if string.match(string.lower(e.word), search) then
 
 							if not self.highlight[pageno] then
 								self.highlight[pageno] = {}
@@ -2008,7 +1997,7 @@ function UniReader:searchHighLight(search)
 			Debug("self.highlight", self.highlight);
 			self.pageno = pageno
 		else
-			pageno = math.mod( pageno + 1, max_pageno + 1 )
+			pageno = math.mod(pageno + 1, max_pageno + 1)
 			Debug("next page", pageno, max_pageno)
 			if pageno == self.pageno then -- wrap around, stop
 				found = -1
@@ -2021,14 +2010,14 @@ function UniReader:searchHighLight(search)
 
 	self:goto(self.pageno) -- show highlights, remove input
 	if found > 0 then
-		showInfoMsgWithDelay( found.." hits '"..search.."' page "..self.pageno, 2000, 1)
+		showInfoMsgWithDelay(found.." hits '"..search.."' page "..self.pageno)
 		self.last_search = {
 			pageno = self.pageno,
 			search = search,
 			hits = found,
 		}
 	else
-		showInfoMsgWithDelay( "'"..search.."' not found in document", 2000, 1)
+		showInfoMsgWithDelay("'"..search.."' not found ")
 	end
 
 	self.highlight = old_highlight -- will not remove search highlights until page refresh
@@ -2047,8 +2036,8 @@ function UniReader:_drawReadingInfo()
 	fb.bb:paintRect(0, 0, width, 15+6*2, 0)
 	renderUtf8Text(fb.bb, 10, 15+6, face,
 		"M: "..
-		math.ceil( self.cache_current_memsize / 1024 ).."/"..math.ceil( self.cache_max_memsize / 1024 )..
-		" "..math.ceil( self.doc:getCacheSize() / 1024 ).."/"..math.ceil( self.cache_document_size / 1024 ).."k "..os.date("%a %d %b %Y %T").." ["..BatteryLevel().."]",
+		math.ceil(self.cache_current_memsize / 1024).."/"..math.ceil(self.cache_max_memsize / 1024)..
+		" "..math.ceil(self.doc:getCacheSize() / 1024).."/"..math.ceil(self.cache_document_size / 1024).."k "..os.date("%a %d %b %Y %T").." ["..BatteryLevel().."]",
 	true)
 
 	-- display reading progress on bottom of page
@@ -2187,15 +2176,15 @@ function UniReader:addAllCommands()
 			if keydef.keycode == KEY_PGFWD or keydef.keycode == KEY_LPGFWD then
 				unireader.step_manual_zoom = unireader.step_manual_zoom * 2
 				self.settings:saveSetting("step_manual_zoom", self.step_manual_zoom)
-				--showInfoMsgWithDelay("New zoom step is "..unireader.step_manual_zoom.."%. ", 2000, 1)
+				--showInfoMsgWithDelay("New zoom step is "..unireader.step_manual_zoom.."%. ")
 			else
 				local minstep = 1
 				if unireader.step_manual_zoom > 2*minstep then
 					unireader.step_manual_zoom = unireader.step_manual_zoom / 2
 					self.settings:saveSetting("step_manual_zoom", self.step_manual_zoom)
-					--showInfoMsgWithDelay("New zoom step is "..unireader.step_manual_zoom.."%. ", 2000, 1)
+					--showInfoMsgWithDelay("New zoom step is "..unireader.step_manual_zoom.."%. ")
 				else
-					showInfoMsgWithDelay("Minimum zoom step is "..minstep.."%. ", 2000, 1)
+					showInfoMsgWithDelay("Minimum zoom step is "..minstep.."%. ")
 				end
 			end
 		end)
@@ -2215,7 +2204,7 @@ function UniReader:addAllCommands()
 				unireader.jump_history.cur = prev_jump_no
 				unireader:goto(unireader.jump_history[prev_jump_no].page, true)
 			else
-				showInfoMsgWithDelay("Already first jump!", 2000, 1)
+				showInfoMsgWithDelay("Already first jump ")
 			end
 		end)
 	self.commands:add(KEY_BACK,MOD_SHIFT,"Back",
@@ -2230,7 +2219,7 @@ function UniReader:addAllCommands()
 					unireader.jump_history.cur = unireader.jump_history.cur + 1
 				end
 			else
-				showInfoMsgWithDelay("Already last jump!", 2000, 1)
+				showInfoMsgWithDelay("Already last jump ")
 			end
 		end)
 	-- NuPogodi, 03.09.12 : moved the exit commands from here to the end of hotkey list 
@@ -2353,9 +2342,9 @@ function UniReader:addAllCommands()
 		function(unireader)
 			ok = unireader:addBookmark(self.pageno)
 			if not ok then
-				showInfoMsgWithDelay("Page already marked!", 1500, 1)
+				showInfoMsgWithDelay("Page already marked ")
 			else
-				showInfoMsgWithDelay("Page marked", 1500, 1)
+				showInfoMsgWithDelay("Page marked ")
 			end
 		end)
 	self.commands:add(KEY_B,MOD_SHIFT,"B",
@@ -2366,7 +2355,7 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_J,MOD_SHIFT,"J",
 		"rotate 10° clockwise",
 		function(unireader)
-			unireader:setRotate( unireader.globalrotate + 10 )
+			unireader:setRotate(unireader.globalrotate + 10)
 		end)
 	self.commands:add(KEY_J,nil,"J",
 		"rotate screen 90° clockwise",
@@ -2381,7 +2370,7 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_K,MOD_SHIFT,"K",
 		"rotate 10° counterclockwise",
 		function(unireader)
-			unireader:setRotate( unireader.globalrotate - 10 )
+			unireader:setRotate(unireader.globalrotate - 10)
 		end)
 	self.commands:add(KEY_K,nil,"K",
 		"rotate screen 90° counterclockwise",
@@ -2415,13 +2404,13 @@ function UniReader:addAllCommands()
 			unireader.bbox.enabled = true
 			--Debug("bbox", unireader.pageno, unireader.bbox)
 			unireader.globalzoom_mode = unireader.ZOOM_FIT_TO_CONTENT -- use bbox
-			showInfoMsgWithDelay("Page bbox saved", 1000, 1)
+			showInfoMsgWithDelay("Page bbox saved ")
 		end)
 	self.commands:add(KEY_Z,MOD_SHIFT,"Z",
 		"reset page bbox",
 		function(unireader)
 			unireader.bbox[unireader.pageno] = nil;
-			showInfoMsgWithDelay("Page bbox removed", 1000, 1)
+			showInfoMsgWithDelay("Page bbox removed ")
 			--Debug("bbox remove", unireader.pageno, unireader.bbox);
 		end)
 	self.commands:add(KEY_Z,MOD_ALT,"Z",
@@ -2429,9 +2418,9 @@ function UniReader:addAllCommands()
 		function(unireader)
 			unireader.bbox.enabled = not unireader.bbox.enabled;
 			if unireader.bbox.enabled then
-				showInfoMsgWithDelay("Page bbox enabled", 1000, 1)
+				showInfoMsgWithDelay("Page bbox enabled ")
 			else
-				showInfoMsgWithDelay("Page bbox disabled", 1000, 1)
+				showInfoMsgWithDelay("Page bbox disabled ")
 			end
 			--Debug("bbox override", unireader.bbox.enabled);
 		end)
@@ -2440,9 +2429,9 @@ function UniReader:addAllCommands()
 		function(unireader)
 			local bbox = unireader.cur_bbox
 			--Debug("bbox", bbox)
-			x,y,w,h = unireader:getRectInScreen( bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"] )
+			x,y,w,h = unireader:getRectInScreen(bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"])
 			--Debug("inxertRect",x,y,w,h)
-			fb.bb:invertRect( x,y, w,h )
+			fb.bb:invertRect(x,y, w,h)
 			fb:refresh(1)
 		end)
 	self.commands:add(KEY_X,MOD_SHIFT,"X",
@@ -2450,7 +2439,7 @@ function UniReader:addAllCommands()
 		function(unireader)
 			local bbox = unireader.cur_bbox
 			--Debug("bbox", bbox)
-			x,y,w,h = unireader:getRectInScreen( bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"] )
+			x,y,w,h = unireader:getRectInScreen(bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"])
 			--Debug("getRectInScreen",x,y,w,h)
 
 			local new_bbox = bbox
@@ -2459,8 +2448,8 @@ function UniReader:addAllCommands()
 
 			Screen:saveCurrentBB()
 
-			fb.bb:invertRect( 0,y_s, G_width,1 )
-			fb.bb:invertRect( x_s,0, 1,G_height )
+			fb.bb:invertRect(0,y_s, G_width,1)
+			fb.bb:invertRect(x_s,0, 1,G_height)
 			InfoMessage:show(running_corner.." bbox");
 			fb:refresh(1)
 
@@ -2473,8 +2462,8 @@ function UniReader:addAllCommands()
 
 				if ev.type == EV_KEY and ev.value ~= EVENT_VALUE_KEY_RELEASE then
 
-					fb.bb:invertRect( 0,y_s, G_width,1 )
-					fb.bb:invertRect( x_s,0, 1,G_height )
+					fb.bb:invertRect(0,y_s, G_width,1)
+					fb.bb:invertRect(x_s,0, 1,G_height)
 
 					local step   = 10
 					local factor = 1
@@ -2535,8 +2524,8 @@ function UniReader:addAllCommands()
 							Screen:restoreFromSavedBB()
 						end
 
-						fb.bb:invertRect( 0,y_s, G_width,1 )
-						fb.bb:invertRect( x_s,0, 1,G_height )
+						fb.bb:invertRect(0,y_s, G_width,1)
+						fb.bb:invertRect(x_s,0, 1,G_height)
 
 						if x_direction or y_direction then
 							last_direction = { x = x_direction, y = y_direction }
@@ -2608,10 +2597,10 @@ function UniReader:addAllCommands()
 			Debug("page bbox", bbox, "to", new_bbox)
 
 			Screen:restoreFromSavedBB()
-			x,y,w,h = unireader:getRectInScreen( new_bbox["x0"], new_bbox["y0"], new_bbox["x1"], new_bbox["y1"] )
-			fb.bb:invertRect( x,y, w,h )
-			--fb.bb:invertRect( x+1,y+1, w-2,h-2 ) -- just border?
-			showInfoMsgWithDelay("new page bbox", 1000, 1);
+			x,y,w,h = unireader:getRectInScreen(new_bbox["x0"], new_bbox["y0"], new_bbox["x1"], new_bbox["y1"])
+			fb.bb:invertRect(x,y, w,h)
+			--fb.bb:invertRect(x+1,y+1, w-2,h-2) -- just border?
+			showInfoMsgWithDelay("new page bbox ");
 			self:redrawCurrentPage()
 		end)
 	self.commands:add(KEY_MENU,nil,"Menu",
@@ -2729,17 +2718,17 @@ function UniReader:addAllCommands()
 				unireader.shift_x = unireader.shift_x * 2
 				if unireader.shift_x >= G_width then
 					unireader.shift_x = G_width
-					showInfoMsgWithDelay("Maximum X-panning step is "..G_width..". ", 2000, 1)
+					showInfoMsgWithDelay("Max X-panning step is "..G_width)
 				end
 				self.settings:saveSetting("shift_x", self.shift_x)
-				--showInfoMsgWithDelay("New X-panning step is "..unireader.shift_x..". ", 2000, 1)
+				--showInfoMsgWithDelay("New X-panning step is "..unireader.shift_x)
 			else
 				if unireader.shift_x >= 2*minstep then
 					unireader.shift_x = math.ceil(unireader.shift_x / 2)
 					self.settings:saveSetting("shift_x", self.shift_x)
-					--showInfoMsgWithDelay("New X-panning step is "..unireader.shift_x..". ", 2000, 1)
+					--showInfoMsgWithDelay("New X-panning step is "..unireader.shift_x)
 				else
-					showInfoMsgWithDelay("Minimum X-panning step is "..minstep..". ", 2000, 1)
+					showInfoMsgWithDelay("Min X-panning step is "..minstep)
 				end
 			end
 		end)
@@ -2752,17 +2741,17 @@ function UniReader:addAllCommands()
 				unireader.shift_y = unireader.shift_y * 2
 				if unireader.shift_y >= G_height then
 					unireader.shift_y = G_height
-					showInfoMsgWithDelay("Maximum Y-panning step is "..G_height..". ", 2000, 1)
+					showInfoMsgWithDelay("Max Y-panning step is "..G_height)
 				end
 				self.settings:saveSetting("shift_y", self.shift_y)
-				--showInfoMsgWithDelay("New Y-panning step is "..unireader.shift_y..". ", 2000, 1)
+				--showInfoMsgWithDelay("New Y-panning step is "..unireader.shift_y)
 			else
 				if unireader.shift_y >= 2*minstep then
 					unireader.shift_y = math.ceil(unireader.shift_y / 2)
 					self.settings:saveSetting("shift_y", self.shift_y)
-					--showInfoMsgWithDelay("New Y-panning step is "..unireader.shift_y..". ", 2000, 1)
+					--showInfoMsgWithDelay("New Y-panning step is "..unireader.shift_y)
 				else
-					showInfoMsgWithDelay("Minimum Y-panning step is "..minstep..". ", 2000, 1)
+					showInfoMsgWithDelay("Min Y-panning step is "..minstep)
 				end
 			end
 		end)
@@ -2787,11 +2776,10 @@ function UniReader:addAllCommands()
 		"search and highlight text",
 		function(unireader)
 			Screen:saveCurrentBB()
-			local search = InputBox:input(G_height - 100, 100,
-				"Search:", self.last_search.search )
+			local search = InputBox:input(G_height - 100, 100, "Search:", self.last_search.search)
 			Screen:restoreFromSavedBB()
 
-			if search ~= nil and string.len( search ) > 0 then
+			if search ~= nil and string.len(search) > 0 then
 				unireader:searchHighLight(search)
 			else
 				unireader:goto(unireader.pageno)

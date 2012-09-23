@@ -22,8 +22,6 @@ require "djvureader"
 require "filechooser"
 require "settings"
 require "screen"
-require "keys"
-require "commands"
 require "dialog"
 
 function openFile(filename)
@@ -38,7 +36,7 @@ function openFile(filename)
 			reader = PDFReader
 		end
 		if reader then
-			InfoMessage:show("Opening "..ext.." document ", 0)
+			InfoMessage:show("Opening "..ext.." document ")
 			reader:preLoadSettings(filename)
 			local ok, err = reader:open(filename)
 			if ok then
@@ -48,18 +46,19 @@ function openFile(filename)
 				return reader:inputLoop()
 			else
 				Debug("openFile(): Error opening document: "..err)
-				showInfoMsgWithDelay("Error opening document ", 1500, 1)
+				showInfoMsgWithDelay("Error opening document ")
 			end
 		else
-			showInfoMsgWithDelay(ext.." format not supported ", 1500, 1)
+			showInfoMsgWithDelay(ext.." format not supported ")
 		end -- if reader
 	else
-		showInfoMsgWithDelay("Unknown format ", 1500, 1)
+		showInfoMsgWithDelay("Unknown format ")
 	end -- if ext
 	return true -- on failed attempts, we signal to keep running
 end
 
 if ARGV[1] ~= "-d" then
+	dump = function() end
 	Debug = function() end
 end
 

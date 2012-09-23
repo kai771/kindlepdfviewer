@@ -345,19 +345,19 @@ function FileChooser:addAllCommands()
 			local pos = self.perpage*(self.page-1)+self.current
 			local folder = self.dirs[pos]
 			if folder == ".." then
-				showInfoMsgWithDelay(".. cannot be deleted! ",1500,1)
+				showInfoMsgWithDelay(".. cannot be deleted ")
 			elseif folder then
-				InfoMessage:show("Press \'Y\' to confirm",0)
+				InfoMessage:show("Press \'Y\' to confirm ")
 				if self:ReturnKey() == KEY_Y then
 					if lfs.rmdir(self.path.."/"..folder) then
 						table.remove(self.dirs, offset)
 						self:setPath(self.path)
 					else
-						showInfoMsgWithDelay("Cannot be deleted!",1500,1)
+						showInfoMsgWithDelay("Cannot be deleted ")
 					end
 				end
 			else
-				InfoMessage:show("Press \'Y\' to confirm",0)
+				InfoMessage:show("Press \'Y\' to confirm ")
 				if self:ReturnKey() == KEY_Y then
 					pos = pos - #self.dirs
 					local fullpath = self.path.."/"..self.files[pos]
@@ -419,7 +419,7 @@ function FileChooser:addAllCommands()
 		function(self)
 			local keywords = InputBox:input(0, 0, "Find:")
 			if keywords then
-				InfoMessage:show("Searching... ",0)
+				InfoMessage:show("Searching... ")
 				FileSearcher:init( self.path )
 				FileSearcher:choose(keywords)
 			end
@@ -435,7 +435,7 @@ function FileChooser:addAllCommands()
 				local fn = self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
 				os.execute("cp "..self:InQuotes(DocToHistory(file)).." "
 					..self:InQuotes(DocToHistory(self.clipboard.."/"..fn)) )
-				showInfoMsgWithDelay("File copied to clipboard ", 1000, 1)
+				showInfoMsgWithDelay("File copied to clipboard ")
 			end
 		end
 	) 
@@ -447,7 +447,7 @@ function FileChooser:addAllCommands()
 				local fn = self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
 				os.rename(file, self.clipboard.."/"..fn)
 				os.rename(DocToHistory(file), DocToHistory(self.clipboard.."/"..fn))
-				InfoMessage:show("File moved to clipboard ", 0)
+				InfoMessage:show("File moved to clipboard ")
 				self:setPath(self.path)
 				self.pagedirty = true
 			end
@@ -456,7 +456,7 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_V, MOD_SHIFT, "V",
 		"paste file(s) from \'clipboard\'",
 		function(self)
-			InfoMessage:show("moving file(s) from clipboard ", 0)
+			InfoMessage:show("moving file(s) from clipboard ")
 			for f in lfs.dir(self.clipboard) do
 				if lfs.attributes(self.clipboard.."/"..f, "mode") == "file" then
 					os.rename(self.clipboard.."/"..f, self.path.."/"..f)
@@ -483,7 +483,7 @@ function FileChooser:addAllCommands()
 				if lfs.mkdir(self.path.."/"..dir) then
 					self:setPath(self.path)
 				else
-					showInfoMsgWithDelay("can't create "..dir.." dir",1000,1)
+					showInfoMsgWithDelay("can't create "..dir.." dir")
 				end
 			end
 			self.pagedirty = true
@@ -510,9 +510,9 @@ function FileChooser:FullFileName()
 	local file
 	local dir = self.dirs[self.perpage*(self.page-1)+self.current]
 	if dir == ".." then
-		showInfoMsgWithDelay("<UP-DIR> ",1000,1)
+		showInfoMsgWithDelay("<UP-DIR> ")
 	elseif dir then
-		showInfoMsgWithDelay("<DIR> ",1000,1)
+		showInfoMsgWithDelay("<DIR> ")
 	else
 		file=self.path.."/"..self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
 	end
@@ -527,7 +527,7 @@ function FileChooser:ReturnKey(debug)
 			break
 		end
 	end
-	--if debug then showInfoMsgWithDelay("Keycode = "..ev.code,1000,1) end
+	--if debug then showInfoMsgWithDelay("Keycode = "..ev.code) end
 	return ev.code
 end
 

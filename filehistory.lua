@@ -200,7 +200,7 @@ function FileHistory:addAllCommands()
 		"open selected item",
 		function(self)
 			if #self.result == 0 then
-				showInfoMsgWithDelay("No files to open ", 1500, 1)
+				showInfoMsgWithDelay("No files to open ")
 				return
 			end
 			file_entry = self.result[self.perpage*(self.page-1)+self.current]
