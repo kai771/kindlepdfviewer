@@ -102,7 +102,7 @@ static int openDocument(lua_State *L) {
 static int closeDocument(lua_State *L) {
 	DjvuDocument *doc = (DjvuDocument*) luaL_checkudata(L, 1, "djvudocument");
 
-	// should be save if called twice
+	// should be safe if called twice
 	if (doc->doc_ref != NULL) {
 		ddjvu_document_release(doc->doc_ref);
 		doc->doc_ref = NULL;
