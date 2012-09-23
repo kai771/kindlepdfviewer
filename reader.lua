@@ -59,7 +59,6 @@ function openFile(filename)
 	return true -- on failed attempts, we signal to keep running
 end
 
-Mydebug=Debug
 if ARGV[1] ~= "-d" then
 	Debug = function() end
 end
@@ -96,15 +95,11 @@ DJVUReader:init()
 local running = true
 FileChooser:setPath("/mnt/us/documents")
 while running do
-	local file, callback = FileChooser:choose(0, G_height)
-	if callback then
-		callback()
+	local file = FileChooser:choose(0, G_height)
+	if file then
+		running = openFile(file)
 	else
-		if file then
-			running = openFile(file)
-		else
-			running = false
-		end
+		running = false
 	end
 end
 
