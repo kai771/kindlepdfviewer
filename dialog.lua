@@ -116,12 +116,8 @@ function InfoMessage:inform(text, delay, refresh_mode, msgtype, tts_text)
 	self.ImageFile = self.Images[msgtype]
 	if delay == DINFO_NODELAY then
 		InfoMessage:show(text, refresh_mode)
-		if util.isEmulated() == 1 then util.usleep(500000) end
-	elseif delay == DINFO_DELAY then
-		showInfoMsgWithDelay(text, delay, refresh_mode)
-	else
-		Debug("InfoMessage:inform(), unrecognized delay=", delay)
-	end
+		if util.isEmulated() == 1 then util.usleep(300000) end
+	end	
 end
 
 function InfoMessage:getMethodForEvent(event)
