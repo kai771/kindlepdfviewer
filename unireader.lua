@@ -2874,6 +2874,7 @@ function UniReader:addAllCommands()
 		"toggle showing page overlap areas",
 		function(unireader)
 			unireader.show_overlap_enable = not unireader.show_overlap_enable
+--      InfoMessage:inform("Turning overlap "..(unireader.show_overlap_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
 			self.settings:saveSetting("show_overlap_enable", unireader.show_overlap_enable)
 			self:redrawCurrentPage()
 		end)
@@ -2882,7 +2883,7 @@ function UniReader:addAllCommands()
 		"toggle page-keys mode: viewport/page",
 		function(unireader)
 			unireader.page_mode_enable = not unireader.page_mode_enable
-			InfoMessage:inform("Page-buttons move "..(unireader.page_mode_enable and "page " or "viewport "), DINFO_DELAY, 1, MSG_AUX)
+			InfoMessage:inform("Page-buttons move "..(unireader.page_mode_enable and "page " or "viewport "), DINFO_TOGGLES, 1, MSG_AUX)
 			self.settings:saveSetting("page_mode_enable", unireader.page_mode_enable)
 		end)
 
@@ -2890,7 +2891,7 @@ function UniReader:addAllCommands()
 		"toggle right-to-left mode on/off",
 		function(unireader)
 			unireader.rtl_mode_enable = not unireader.rtl_mode_enable
-			InfoMessage:inform("Right-To-Left mode "..(unireader.rtl_mode_enable and "on " or "off "), DINFO_DELAY, 1, MSG_AUX)
+			InfoMessage:inform("Right-To-Left mode "..(unireader.rtl_mode_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
 			self.settings:saveSetting("rtl_mode_enable", unireader.rtl_mode_enable)
 		end)
 
@@ -2898,7 +2899,7 @@ function UniReader:addAllCommands()
 		"align the viewport to top/bottom",
 		function(unireader)
 			unireader.comics_mode_enable = not unireader.comics_mode_enable
-			InfoMessage:inform("Align the viewport to "..(unireader.comics_mode_enable and "bottom " or "top "), DINFO_DELAY, 1, MSG_AUX)
+			InfoMessage:inform("Align the viewport to "..(unireader.comics_mode_enable and "bottom " or "top "), DINFO_TOGGLES, 1, MSG_AUX)
 			self.settings:saveSetting("comics_mode_enable", unireader.comics_mode_enable)
 		end)
 
@@ -3275,7 +3276,7 @@ function UniReader:addAllCommands()
 		"show/hide link underlines",
 		function(unireader)
 			unireader.show_links_enable = not unireader.show_links_enable
-			InfoMessage:inform("Link underlines "..(unireader.show_links_enable and "on " or "off "), DINFO_DELAY, 1, MSG_AUX)
+			InfoMessage:inform("Link underlines "..(unireader.show_links_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
 			self.settings:saveSetting("show_links_enable", unireader.show_links_enable)
 			self:redrawCurrentPage()
 		end
@@ -3631,7 +3632,7 @@ function UniReader:modBBox()
 	x,y,w,h = self:getRectInScreen( new_bbox["x0"], new_bbox["y0"], new_bbox["x1"], new_bbox["y1"] )
 	fb.bb:invertRect( x,y, w,h )
 	--fb.bb:invertRect( x+1,y+1, w-2,h-2 ) -- just border?
-	InfoMessage:inform("New page bbox ", DINFO_DELAY, 1, MSG_WARN, "New page bounding box")
+	InfoMessage:inform("New page bbox ", DINFO_TOGGLES, 1, MSG_WARN, "New page bounding box")
 	self:redrawCurrentPage()
 
 	self.rcount = self.rcountmax -- force next full refresh
