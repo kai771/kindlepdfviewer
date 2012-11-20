@@ -5,11 +5,11 @@ echo unlock > /proc/keypad
 echo unlock > /proc/fiveway
 
 # we're always starting from our working directory
-cd /mnt/us/kindlepdfviewer/
+cd /mnt/us/librerator/
 
 # bind-mount system fonts
-if ! grep /mnt/us/kindlepdfviewer/fonts/host /proc/mounts; then
-	mount -o bind /usr/java/lib/fonts /mnt/us/kindlepdfviewer/fonts/host
+if ! grep /mnt/us/librerator/fonts/host /proc/mounts; then
+	mount -o bind /usr/java/lib/fonts /mnt/us/librerator/fonts/host
 fi
 
 # check if we are supposed to shut down the Amazon framework
@@ -25,8 +25,8 @@ killall -stop cvm
 ./reader.lua "$1" 2> crash.log
 
 # unmount system fonts
-if grep /mnt/us/kindlepdfviewer/fonts/host /proc/mounts; then
-	umount /mnt/us/kindlepdfviewer/fonts/host
+if grep /mnt/us/librerator/fonts/host /proc/mounts; then
+	umount /mnt/us/librerator/fonts/host
 fi
 
 # always try to continue cvm

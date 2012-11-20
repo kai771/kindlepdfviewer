@@ -20,7 +20,7 @@ TTF_FONTS_DIR=$(MUPDFDIR)/fonts
 
 # set this to your ARM cross compiler:
 
-SHELL:=/bin/bash
+SHELL:=/bin/sh
 CHOST?=arm-none-linux-gnueabi
 CC:=$(CHOST)-gcc
 CXX:=$(CHOST)-g++
@@ -276,7 +276,7 @@ $(K2PDFOPTLIB):
 
 thirdparty: $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) $(DJVULIBS) $(CRENGINELIBS) $(POPENNSLIB) $(K2PDFOPTLIB)
 
-INSTALL_DIR=kindlepdfviewer
+INSTALL_DIR=librerator
 
 LUA_FILES=battery.lua commands.lua crereader.lua defaults.lua dialog.lua djvureader.lua readerchooser.lua filechooser.lua filehistory.lua fileinfo.lua filesearcher.lua font.lua graphics.lua helppage.lua image.lua inputbox.lua keys.lua pdfreader.lua koptconfig.lua koptreader.lua picviewer.lua reader.lua rendertext.lua screen.lua selectmenu.lua settings.lua unireader.lua widget.lua
 
@@ -285,10 +285,13 @@ customupdate: all
 	file kpdfview | grep ARM || exit 1
 	file extr | grep ARM || exit 1
 	$(STRIP) --strip-unneeded kpdfview extr
-	rm -f kindlepdfviewer-$(VERSION).zip
+	rm -f librerator-$(VERSION).zip
 	rm -rf $(INSTALL_DIR)
-	mkdir -p $(INSTALL_DIR)/{history,screenshots,clipboard,libs}
-	cp -p README.md COPYING kpdfview extr kpdf.sh $(LUA_FILES) $(INSTALL_DIR)
+	mkdir -p $(INSTALL_DIR)/history
+	mkdir -p $(INSTALL_DIR)/screenshots
+	mkdir -p $(INSTALL_DIR)/clipboard
+	mkdir -p $(INSTALL_DIR)/libs
+	cp -p README.md COPYING kpdfview extr librerator.sh $(LUA_FILES) $(INSTALL_DIR)
 	mkdir $(INSTALL_DIR)/data
 	cp -L $(DJVULIB) $(LUALIB) $(K2PDFOPTLIB) $(INSTALL_DIR)/libs
 	$(STRIP) --strip-unneeded $(INSTALL_DIR)/libs/*
@@ -297,6 +300,6 @@ customupdate: all
 	rm $(INSTALL_DIR)/fonts/droid/DroidSansFallback.ttf
 	cp -r git-rev resources $(INSTALL_DIR)
 	mkdir $(INSTALL_DIR)/fonts/host
-	zip -9 -r kindlepdfviewer-$(VERSION).zip $(INSTALL_DIR) launchpad/ kite/
+	zip -9 -r librerator-$(VERSION).zip $(INSTALL_DIR) launchpad/ kite/
 	rm -rf $(INSTALL_DIR)
-	@echo "copy kindlepdfviewer-$(VERSION).zip to /mnt/us/customupdates and install with shift+shift+I"
+	@echo "copy librerator-$(VERSION).zip to /mnt/us/customupdates and install with shift+shift+I"
