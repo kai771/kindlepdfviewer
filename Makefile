@@ -15,11 +15,14 @@ LFSDIR=luafilesystem
 POPENNSDIR=popen-noshell
 K2PDFOPTLIBDIR=libk2pdfopt
 
+INSTALL_DIR=librerator
+LUA_FILES=battery.lua commands.lua crereader.lua defaults.lua dialog.lua djvureader.lua readerchooser.lua filechooser.lua filehistory.lua fileinfo.lua filesearcher.lua font.lua graphics.lua helppage.lua image.lua inputbox.lua keys.lua pdfreader.lua koptconfig.lua koptreader.lua picviewer.lua reader.lua rendertext.lua screen.lua selectmenu.lua settings.lua unireader.lua widget.lua
+
+
 # must point to directory with *.ttf fonts for crengine
 TTF_FONTS_DIR=$(MUPDFDIR)/fonts
 
 # set this to your ARM cross compiler:
-
 SHELL:=/bin/sh
 CHOST?=arm-none-linux-gnueabi
 CC:=$(CHOST)-gcc
@@ -276,10 +279,6 @@ $(K2PDFOPTLIB):
 
 thirdparty: $(MUPDFLIBS) $(THIRDPARTYLIBS) $(LUALIB) $(DJVULIBS) $(CRENGINELIBS) $(POPENNSLIB) $(K2PDFOPTLIB)
 
-INSTALL_DIR=librerator
-
-LUA_FILES=battery.lua commands.lua crereader.lua defaults.lua dialog.lua djvureader.lua readerchooser.lua filechooser.lua filehistory.lua fileinfo.lua filesearcher.lua font.lua graphics.lua helppage.lua image.lua inputbox.lua keys.lua pdfreader.lua koptconfig.lua koptreader.lua picviewer.lua reader.lua rendertext.lua screen.lua selectmenu.lua settings.lua unireader.lua widget.lua
-
 customupdate: all
 	# ensure that the binaries were built for ARM
 	file kpdfview | grep ARM || exit 1
@@ -300,6 +299,6 @@ customupdate: all
 	rm $(INSTALL_DIR)/fonts/droid/DroidSansFallback.ttf
 	cp -r git-rev resources $(INSTALL_DIR)
 	mkdir $(INSTALL_DIR)/fonts/host
-	zip -9 -r librerator-$(VERSION).zip $(INSTALL_DIR) launchpad/ kite/
+	zip -9 -r librerator-$(VERSION).zip $(INSTALL_DIR) launchpad/
 	rm -rf $(INSTALL_DIR)
 	@echo "copy librerator-$(VERSION).zip to /mnt/us/customupdates and install with shift+shift+I"
