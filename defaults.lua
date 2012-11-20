@@ -1,7 +1,7 @@
 -- framebuffer update policy state:
 DRCOUNT = 5
--- default to full refresh on every page turn
-DRCOUNTMAX = 0
+-- full refresh on every DRCOUNTMAX page turn
+DRCOUNTMAX = 10
 
 -- zoom state:
 DGLOBALZOOM = 1.0
@@ -19,9 +19,9 @@ DRENDER_MODE = 0 -- COLOUR
 
 -- set panning distance
 DSHIFT_X = 100
-DSHIFT_Y = 50
--- step to change zoom manually, default = 16%
-DSTEP_MANUAL_ZOOM = 16
+DSHIFT_Y = 100
+-- step to change zoom manually, default = 25%
+DSTEP_MANUAL_ZOOM = 25
 DPAN_BY_PAGE = false -- using shift_[xy] or width/height
 DPAN_MARGIN = 5 -- horizontal margin for two-column zoom (in pixels)
 DPAN_OVERLAP_VERTICAL = 30
@@ -42,21 +42,22 @@ DBACKGROUND_COLOR = 8
 -- delay for info messages in ms
 DINFO_NODELAY=0
 DINFO_DELAY=1500
+DINFO_TOGGLES=300
 
 -- toggle defaults
-DUNIREADER_SHOW_OVERLAP_ENABLE = true
-DUNIREADER_SHOW_LINKS_ENABLE = true
+DUNIREADER_SHOW_OVERLAP_ENABLE = false
+DUNIREADER_SHOW_LINKS_ENABLE = false
 DUNIREADER_COMICS_MODE_ENABLE = true
 DUNIREADER_RTL_MODE_ENABLE = false
 DUNIREADER_PAGE_MODE_ENABLE = false
 
-DDJVUREADER_SHOW_OVERLAP_ENABLE = true
+DDJVUREADER_SHOW_OVERLAP_ENABLE = false
 DDJVUREADER_SHOW_LINKS_ENABLE = false
 DDJVUREADER_COMICS_MODE_ENABLE = true
 DDJVUREADER_RTL_MODE_ENABLE = false
 DDJVUREADER_PAGE_MODE_ENABLE = false
 
-DKOPTREADER_SHOW_OVERLAP_ENABLE = true
+DKOPTREADER_SHOW_OVERLAP_ENABLE = false
 DKOPTREADER_SHOW_LINKS_ENABLE = false
 DKOPTREADER_COMICS_MODE_ENABLE = false
 DKOPTREADER_RTL_MODE_ENABLE = false
