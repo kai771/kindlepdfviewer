@@ -2896,10 +2896,10 @@ function UniReader:addAllCommands()
 		end)
 
 	self.commands:add(KEY_C, nil, "C",
-		"align the viewport to top/bottom",
+		"toggle comics mode on/off",
 		function(unireader)
 			unireader.comics_mode_enable = not unireader.comics_mode_enable
-			InfoMessage:inform("Align the viewport to "..(unireader.comics_mode_enable and "bottom " or "top "), DINFO_TOGGLES, 1, MSG_AUX)
+			InfoMessage:inform("Comics mode "..(unireader.comics_mode_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
 			self.settings:saveSetting("comics_mode_enable", unireader.comics_mode_enable)
 		end)
 
