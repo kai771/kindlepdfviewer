@@ -19,8 +19,8 @@ Building
 Follow these steps:
 
 * automatically fetch thirdparty sources with Makefile:
-		* make sure you have patch, wget, unzip, git and svn installed
-		* run `make fetchthirdparty`.
+	* make sure you have patch, wget, unzip, git and svn installed
+	* run `make fetchthirdparty`.
 
 * run `make thirdparty`. This will build MuPDF (plus the libraries it depends
   on), libDjvuLibre, CREngine and Lua.
