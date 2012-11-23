@@ -1,11 +1,13 @@
-KindlePDFViewer
-===============
+Librerator
+==========
 
-This is a document viewer application, created for usage on the Kindle e-ink reader.
-It is currently restricted to 4bpp inverse grayscale displays. For PDF files
-it is using the muPDF library (see http://mupdf.com/), for DjVu files djvulibre library
-and for ebooks (fb2, mobi, ePub, etc) crengine. It can also read JPEG images using
-libjpeg library. The user interface is scripted using Lua (see http://www.lua.org/).
+This is a fork of KindlePDFViewer, a document viewer application, created for usage 
+on the Kindle e-ink reader. It is currently restricted to 4bpp inverse grayscale 
+displays. For PDF files it is using the muPDF library (see http://mupdf.com/), for 
+DjVu files djvulibre library and for ebooks (fb2, mobi, ePub, etc) crengine. It can 
+also read JPEG images using libjpeg library. The user interface is scripted using 
+Lua (see http://www.lua.org/). For reflowing of PDF and DjVu files, it uses k2pdfopt 
+library.
 
 The application is licensed under the GPLv3 (see COPYING file).
 
@@ -16,21 +18,9 @@ Building
 
 Follow these steps:
 
-* fetch thirdparty sources
-	* manually fetch all the thirdparty sources:
-		* install muPDF sources into subfolder "mupdf"
-		* install muPDF third-party sources (see muPDF homepage) into a new
-		subfolder "mupdf/thirdparty"
-		* install libDjvuLibre sources into subfolder "djvulibre"
-		* install CREngine sources into subfolder "kpvcrlib/crengine"
-		* install LuaJit sources into subfolder "luajit-2.0"
-		* install popen_noshell sources into subfolder "popen-noshell"
-
-	* automatically fetch thirdparty sources with Makefile:
+* automatically fetch thirdparty sources with Makefile:
 		* make sure you have patch, wget, unzip, git and svn installed
 		* run `make fetchthirdparty`.
-
-* adapt Makefile to your needs
 
 * run `make thirdparty`. This will build MuPDF (plus the libraries it depends
   on), libDjvuLibre, CREngine and Lua.
@@ -63,7 +53,7 @@ time. It might also compose the most unfriendly desktop PDF reader, depending
 on your view.
 
 If you are using Fedora Core Linux, do `yum install SDL SDL-devel`.
-If you are using Ubuntu, install `libsdl-dev1.2` package.
+If you are using Ubuntu, do `apt-get install libsdl-dev1.2` package.
 
 To build in "emulation mode", you need to run make like this:
 	make clean cleanthirdparty
@@ -79,10 +69,30 @@ or:
 ./reader.lua /ANY/PATH
 ```
 
-By default emulation will provide DXG resolution of 824*1200. It can be
-specified at compile time, this is example for Kindle 3:
+To keep things simple, put your pdf files in directory `test`, and run
+the emulator like this:
+```
+./reader.lua test
+```
+
+By default emulation will provide K3 resolution of 600*800. It can be
+specified at compile time, this is example for Kindle DX:
 
 ```
-EMULATE_READER_W=600 EMULATE_READER_H=800 EMULATE_READER=1 make kpdfview
+EMULATE_READER_W=824 EMULATE_READER_H=1200 EMULATE_READER=1 make thirdparty kpdfview
 ```
+
+At this time, you can not have both arm and x86 compiled libraries on your computer.
+When compiling for the emulator after having compiled for the Kindle (and vice versa), 
+be sure to run
+```
+make clean cleanthirdparty
+```
+
+You can compile and make launchpad installable package for Kindle using
+```
+make thirdparty kpdfview customupdate
+```
+
+Prefered toolchain for Kindle compiling is Code Sourcery/Mentor Graphics 2012.03-57.
 
