@@ -27,6 +27,7 @@ struct fb_var_screeninfo {
 #else
 #include <linux/fb.h>
 #include "include/einkfb.h"
+#include "include/mxcfb.h"
 #endif
 
 #include <lua.h>
@@ -38,6 +39,7 @@ struct fb_var_screeninfo {
 typedef struct FBInfo {
 	int fd;
 	BlitBuffer *buf;
+	BlitBuffer *real_buf;
 #ifdef EMULATE_READER
 	SDL_Surface *screen;
 #else

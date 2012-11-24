@@ -15,6 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -26,11 +27,12 @@
 #ifdef EMULATE_READER
 	int emu_w = EMULATE_READER_W;
 	int emu_h = EMULATE_READER_H;
-#endif	
-
+#endif
+    
 static int openFrameBuffer(lua_State *L) {
 	const char *fb_device = luaL_checkstring(L, 1);
 	FBInfo *fb = (FBInfo*) lua_newuserdata(L, sizeof(FBInfo));
+	uint8_t *fb_map_address = NULL;
 
 	luaL_getmetatable(L, "einkfb");
 
@@ -72,24 +74,47 @@ static int openFrameBuffer(lua_State *L) {
 		return luaL_error(L, "only grayscale is supported but framebuffer says it isn't");
 	}
 
-	if (fb->vinfo.bits_per_pixel != 4) {
-		return luaL_error(L, "only 4bpp is supported for now, got %d bpp",
-				fb->vinfo.bits_per_pixel);
-	}
-
 	if (fb->vinfo.xres <= 0 || fb->vinfo.yres <= 0) {
 		return luaL_error(L, "invalid resolution %dx%d.\n",
 				fb->vinfo.xres, fb->vinfo.yres);
 	}
 
 	/* mmap the framebuffer */
-	fb->buf->data = mmap(0, fb->finfo.smem_len,
+	fb_map_address = mmap(0, fb->finfo.smem_len,
 			PROT_READ | PROT_WRITE, MAP_SHARED, fb->fd, 0);
-	if(fb->buf->data == MAP_FAILED) {
+	if(fb_map_address == MAP_FAILED) {
 		return luaL_error(L, "cannot mmap framebuffer");
 	}
-	memset(fb->buf->data, 0, fb->finfo.smem_len);
-	fb->buf->pitch = fb->finfo.line_length;
+	
+	if (fb->vinfo.bits_per_pixel == 8) {
+		/* for 8bpp K4, PaperWhite, we create a shadow 4bpp blitbuffer. These
+		 * models use 16 scale 8bpp framebuffer, so we still cheat it as 4bpp
+		 * */
+		fb->buf->pitch = fb->finfo.line_length / 2;
+
+		fb->buf->data = (uint8_t *)calloc(fb->buf->pitch * fb->vinfo.yres, sizeof(uint8_t));
+		if (!fb->buf->data) {
+			return luaL_error(L, "failed to allocate memory for framebuffer's shadow blitbuffer!");
+		}
+		fb->buf->allocated = 1;
+
+		/* now setup framebuffer map */
+		fb->real_buf = (BlitBuffer *)malloc(sizeof(BlitBuffer));
+		if (!fb->buf->data) {
+			return luaL_error(L, "failed to allocate memory for framebuffer's blitbuffer!");
+		}
+		fb->real_buf->pitch = fb->finfo.line_length;
+		fb->real_buf->w = fb->vinfo.xres;
+		fb->real_buf->h = fb->vinfo.yres;
+		fb->real_buf->allocated = 0;
+		fb->real_buf->data = fb_map_address;
+	} else {
+		fb->buf->pitch = fb->finfo.line_length;
+		/* for K2, K3 and DXG, we map framebuffer to fb->buf->data directly */
+		fb->real_buf = NULL;
+		fb->buf->data = fb_map_address;
+		fb->buf->allocated = 0;
+	}
 #else
 	if(SDL_Init(SDL_INIT_VIDEO) < 0) {
 		return luaL_error(L, "cannot initialize SDL.");
@@ -108,7 +133,7 @@ static int openFrameBuffer(lua_State *L) {
 #endif
 	fb->buf->w = fb->vinfo.xres;
 	fb->buf->h = fb->vinfo.yres;
-	fb->buf->allocated = 0;
+	memset(fb->buf->data, 0, fb->buf->pitch * fb->buf->h);
 	return 1;
 }
 
@@ -124,7 +149,12 @@ static int closeFrameBuffer(lua_State *L) {
 	// should be save if called twice
 	if(fb->buf != NULL && fb->buf->data != NULL) {
 #ifndef EMULATE_READER
-		munmap(fb->buf->data, fb->finfo.smem_len);
+		if (fb->vinfo.bits_per_pixel != 4) {
+			munmap(fb->real_buf->data, fb->finfo.smem_len);
+			free(fb->buf->data);
+		} else {
+			munmap(fb->buf->data, fb->finfo.smem_len);
+		}
 		close(fb->fd);
 #else
 		free(fb->buf->data);
@@ -138,20 +168,141 @@ static int closeFrameBuffer(lua_State *L) {
 	return 0;
 }
 
+#ifndef EMULATE_READER
+inline void fbInvert4BppTo8Bpp(FBInfo *fb) {
+	int i = 0, j = 0, h = 0, w = 0, pitch = 0, fb_pitch = 0;
+	uint8_t *shadow_buf = NULL, *fb_buf = NULL;
+
+	shadow_buf = fb->buf->data;
+	fb_buf = fb->real_buf->data;
+	h = fb->buf->h;
+	w = fb->buf->w;
+	pitch = fb->buf->pitch;
+	fb_pitch = fb->real_buf->pitch;
+
+	/* copy bitmap from 4bpp shadow blitbuffer to framebuffer */
+	for (i = (h-1); i > 0; i--) {
+		for (j = (w-1)/2; j > 0; j--) {
+			fb_buf[i*fb_pitch + j*2] = shadow_buf[i*pitch + j];
+			fb_buf[i*fb_pitch + j*2] &= 0xF0;
+			fb_buf[i*fb_pitch + j*2] |= shadow_buf[i*pitch + j]>>4 & 0x0F;
+
+			fb_buf[i*fb_pitch + j*2 + 1] = shadow_buf[i*pitch + j];
+			fb_buf[i*fb_pitch + j*2 + 1] &= 0x0F;
+			fb_buf[i*fb_pitch + j*2 + 1] |= shadow_buf[i*pitch + j]<<4 & 0xF0;
+		}
+	}
+}
+
+inline void fb4BppTo8Bpp(FBInfo *fb) {
+	int i = 0, j = 0, h = 0, w = 0, pitch = 0, fb_pitch = 0;
+	uint8_t *shadow_buf = NULL, *fb_buf = NULL;
+
+	shadow_buf = fb->buf->data;
+	fb_buf = fb->real_buf->data;
+	/* h is 1024 for PaperWhite */
+	h = fb->buf->h;
+	/* w is 758 for PaperWhite */
+	w = fb->buf->w;
+	/* pitch is 384 for shadow buffer */
+	pitch = fb->buf->pitch;
+	/* pitch is 768 for PaperWhite */
+	fb_pitch = fb->real_buf->pitch;
+
+	/* copy bitmap from 4bpp shadow blitbuffer to framebuffer */
+	for (i = (h-1); i > 0; i--) {
+		for (j = (w-1)/2; j > 0; j--) {
+			fb_buf[i*fb_pitch + j*2] = shadow_buf[i*pitch + j];
+			fb_buf[i*fb_pitch + j*2] &= 0xF0;
+			fb_buf[i*fb_pitch + j*2] |= shadow_buf[i*pitch + j]>>4 & 0x0F;
+			fb_buf[i*fb_pitch + j*2] = ~fb_buf[i*fb_pitch + j*2];
+
+			fb_buf[i*fb_pitch + j*2 + 1] = shadow_buf[i*pitch + j];
+			fb_buf[i*fb_pitch + j*2 + 1] &= 0x0F;
+			fb_buf[i*fb_pitch + j*2 + 1] |= shadow_buf[i*pitch + j]<<4 & 0xF0;
+			fb_buf[i*fb_pitch + j*2 + 1] = ~fb_buf[i*fb_pitch + j*2 + 1];
+		}
+	}
+}
+
+inline void fillUpdateAreaT(update_area_t *myarea, FBInfo *fb, lua_State *L) {
+	int fxtype = luaL_optint(L, 2, 0);
+
+	myarea->x1 = luaL_optint(L, 3, 0);
+	myarea->y1 = luaL_optint(L, 4, 0);
+	myarea->x2 = myarea->x1 + luaL_optint(L, 5, fb->vinfo.xres);
+	myarea->y2 = myarea->y1 + luaL_optint(L, 6, fb->vinfo.yres);
+	myarea->buffer = NULL;
+	myarea->which_fx = fxtype ? fx_update_partial : fx_update_full;
+}
+
+inline void fillMxcfbUpdateData51(mxcfb_update_data51 *myarea, FBInfo *fb, lua_State *L) {
+	myarea->update_region.top = luaL_optint(L, 3, 0);
+	myarea->update_region.left = luaL_optint(L, 4, 0);
+	myarea->update_region.width = luaL_optint(L, 5, fb->vinfo.xres);
+	myarea->update_region.height = luaL_optint(L, 6, fb->vinfo.yres);
+	myarea->waveform_mode = 257;
+	myarea->update_mode = 0;
+	myarea->update_marker = 1;
+	myarea->hist_bw_waveform_mode = 0;
+	myarea->hist_gray_waveform_mode = 0;
+	myarea->temp = 0x1001;
+	myarea->flags = 0;
+	myarea->alt_buffer_data.virt_addr = NULL;
+	myarea->alt_buffer_data.phys_addr = NULL;
+	myarea->alt_buffer_data.width = 0;
+	myarea->alt_buffer_data.height = 0;
+	myarea->alt_buffer_data.alt_update_region.top = 0;
+	myarea->alt_buffer_data.alt_update_region.left = 0;
+	myarea->alt_buffer_data.alt_update_region.width = 0;
+	myarea->alt_buffer_data.alt_update_region.height = 0;
+}
+
+inline void Kindle3einkUpdate(FBInfo *fb, lua_State *L) {
+	update_area_t myarea;
+
+	fillUpdateAreaT(&myarea, fb, L);
+
+	ioctl(fb->fd, FBIO_EINK_UPDATE_DISPLAY_AREA, &myarea);
+}
+
+inline void kindle4einkUpdate(FBInfo *fb, lua_State *L) {
+	update_area_t myarea;
+
+	fbInvert4BppTo8Bpp(fb);
+	fillUpdateAreaT(&myarea, fb, L);
+
+	ioctl(fb->fd, FBIO_EINK_UPDATE_DISPLAY_AREA, &myarea);
+}
+
+inline void kindlePWeinkUpdate(FBInfo *fb, lua_State *L) {
+	mxcfb_update_data51 myarea;
+
+	fb4BppTo8Bpp(fb);
+	fillMxcfbUpdateData51(&myarea, fb, L);
+
+	ioctl(fb->fd, 0x4048462e, &myarea);
+}
+#endif
+
 static int einkUpdate(lua_State *L) {
 	FBInfo *fb = (FBInfo*) luaL_checkudata(L, 1, "einkfb");
 	// for Kindle e-ink display
-	int fxtype = luaL_optint(L, 2, 0);
 #ifndef EMULATE_READER
-	update_area_t myarea;
-	myarea.x1 = luaL_optint(L, 3, 0);
-	myarea.y1 = luaL_optint(L, 4, 0);
-	myarea.x2 = myarea.x1 + luaL_optint(L, 5, fb->vinfo.xres);
-	myarea.y2 = myarea.y1 + luaL_optint(L, 6, fb->vinfo.yres);
-	myarea.buffer = NULL;
-	myarea.which_fx = fxtype ? fx_update_partial : fx_update_full;
-	ioctl(fb->fd, FBIO_EINK_UPDATE_DISPLAY_AREA, &myarea);
+	if (fb->vinfo.bits_per_pixel == 8) {
+		if (fb->buf->h == 1024) {
+			/* Kindle PaperWhite */
+			kindlePWeinkUpdate(fb, L);
+		} else {
+			/* kindle4 */
+			kindle4einkUpdate(fb, L);
+		}
+	} else {
+		/* kindle2, 3, DXG */
+		Kindle3einkUpdate(fb, L);
+	}
 #else
+	int fxtype = luaL_optint(L, 2, 0);
 	// for now, we only do fullscreen blits in emulation mode
 	if (fxtype == 0) {
 		// simmulate a full screen update in eink screen
@@ -203,8 +354,24 @@ static int einkSetOrientation(lua_State *L) {
 		return luaL_error(L, "Wrong rotation mode %d given!", mode);
 	}
 
+	/* ioctl has a different definition for rotation mode.
+	 *	          1
+	 *	   +--------------+
+	 *	   | +----------+ |
+	 *	   | |          | |
+	 *	   | | Freedom! | |
+	 *	   | |          | |  
+	 *	   | |          | |  
+	 *	 3 | |          | | 2
+	 *	   | |          | |
+	 *	   | |          | |
+	 *	   | +----------+ |
+	 *	   |              |
+	 *	   |              |
+	 *	   +--------------+
+	 *	          0
+	 * */
 #ifndef EMULATE_READER
-	/* ioctl has a different definition for rotation mode. */
 	if (mode == 1) 
 		mode = 2;
 	else if (mode == 2)
@@ -215,13 +382,31 @@ static int einkSetOrientation(lua_State *L) {
 	if (mode == 0 || mode == 2) {
 		emu_w = EMULATE_READER_W;
 		emu_h = EMULATE_READER_H;
-	}	
+	}
 	else if (mode == 1 || mode == 3) {
 		emu_w = EMULATE_READER_H;
 		emu_h = EMULATE_READER_W;
 	}
 #endif
 	return 0;
+}
+
+static int einkGetOrientation(lua_State *L) {
+	int mode = 0;
+#ifndef EMULATE_READER
+	FBInfo *fb = (FBInfo*) luaL_checkudata(L, 1, "einkfb");
+
+	ioctl(fb->fd, FBIO_EINK_GET_DISPLAY_ORIENTATION, &mode);
+
+	/* adjust ioctl's rotate mode definition to KPV's 
+	 * refer to screen.lua */
+	if (mode == 2)
+		mode = 1;
+	else if (mode == 1)
+		mode = 2;
+#endif
+	lua_pushinteger(L, mode);
+	return 1;
 }
 
 
@@ -234,6 +419,7 @@ static const struct luaL_Reg einkfb_meth[] = {
 	{"close", closeFrameBuffer},
 	{"__gc", closeFrameBuffer},
 	{"refresh", einkUpdate},
+	{"getOrientation", einkGetOrientation},
 	{"setOrientation", einkSetOrientation},
 	{"getSize", getSize},
 	{NULL, NULL}
