@@ -3478,17 +3478,17 @@ end
 function UniReader:modBBox()
 	local bbox = self.cur_bbox
 	Debug("bbox", bbox)
-	x,y,w,h = self:getRectInScreen( bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"] )
-	Debug("getRectInScreen",x,y,w,h)
+	x, y, w, h = self:getRectInScreen( bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"] )
+	Debug("getRectInScreen", x, y, w, h)
 
 	local new_bbox = bbox
-	local x_s, y_s = x,y
+	local x_s, y_s = x, y
 	local running_corner = "top-left"
 
 	Screen:saveCurrentBB()
 
-	fb.bb:invertRect( 0,y_s, G_width,1 )
-	fb.bb:invertRect( x_s,0, 1,G_height )
+	fb.bb:invertRect( 0,y_s, G_width, 1 )
+	fb.bb:invertRect( x_s,0, 1, G_height )
 	InfoMessage:inform(running_corner.." bbox ", DINFO_NODELAY, 1, MSG_WARN,
 		running_corner.." bounding box")
 	fb:refresh(1)
@@ -3502,8 +3502,8 @@ function UniReader:modBBox()
 
 		if ev.type == EV_KEY and ev.value ~= EVENT_VALUE_KEY_RELEASE then
 
-			fb.bb:invertRect(0,y_s, G_width, 1)
-			fb.bb:invertRect(x_s,0, 1, G_height)
+			fb.bb:invertRect(0, y_s, G_width, 1)
+			fb.bb:invertRect(x_s, 0, 1, G_height)
 
 			local step   = 10
 			local factor = 1
@@ -3518,7 +3518,7 @@ function UniReader:modBBox()
 			elseif ev.code == KEY_FW_DOWN then
 				y_direction =  1
 			elseif ev.code == KEY_FW_PRESS then
-				local p_x,p_y = self:screenToPageTransform(x_s,y_s)
+				local p_x, p_y = self:screenToPageTransform(x_s, y_s)
 				if running_corner == "top-left" then
 					new_bbox["x0"] = p_x
 					new_bbox["y0"] = p_y
@@ -3535,6 +3535,9 @@ function UniReader:modBBox()
 					new_bbox["y1"] = p_y
 					running_corner = false
 				end
+
+-- commented out detection of Q-W etc shortcut keys				
+--[[
 			elseif ev.code >= KEY_Q and ev.code <= KEY_P then
 				factor = ev.code - KEY_Q + 1
 				x_direction = last_direction["x"]
@@ -3548,6 +3551,7 @@ function UniReader:modBBox()
 				factor = ev.code - KEY_Z + 20
 				x_direction = last_direction["x"]
 				y_direction = last_direction["y"]
+--]]
 			elseif ev.code == KEY_BACK then
 				running_corner = false
 			end
@@ -3572,6 +3576,8 @@ function UniReader:modBBox()
 					last_direction = {x = x_direction, y = y_direction}
 					Debug("last_direction", last_direction)
 
+-- commented out drawing of rulers and shortcut keys
+--[[
 					-- FIXME partial duplicate of SelectMenu.item_shortcuts
 					local keys = {
 						"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
@@ -3596,6 +3602,7 @@ function UniReader:modBBox()
 					if max > #keys then max = #keys end
 
 					local face = Font:getFace("hpkfont", 11)
+
 
 					for i = 1, max, 1 do
 						local key = keys[i]
@@ -3624,6 +3631,7 @@ function UniReader:modBBox()
 							renderUtf8Text(fb.bb, x_s - 3, y_s + tick - 1, face, key)
 						end
 					end
+--]]					
 				end
 
 				fb:refresh(1)
@@ -3638,8 +3646,8 @@ function UniReader:modBBox()
 	Debug("crop bbox", bbox, "to", new_bbox)
 
 	Screen:restoreFromSavedBB()
-	x,y,w,h = self:getRectInScreen( new_bbox["x0"], new_bbox["y0"], new_bbox["x1"], new_bbox["y1"] )
-	fb.bb:invertRect( x,y, w,h )
+	x, y, w, h = self:getRectInScreen(new_bbox["x0"], new_bbox["y0"], new_bbox["x1"], new_bbox["y1"])
+	fb.bb:invertRect(x, y, w, h)
 	--fb.bb:invertRect( x+1, y+1, w-2, h-2 ) -- just border?
 	InfoMessage:inform("New page bbox ", DINFO_TOGGLES, 1, MSG_WARN, "New page bounding box")
 	self:redrawCurrentPage()
