@@ -3494,6 +3494,8 @@ function UniReader:modBBox()
 	fb:refresh(1)
 
 	local last_direction = {x = 0, y = 0}
+	local step   = 10
+	local factor = 1
 
 	while running_corner do
 		local ev = input.saveWaitForEvent()
@@ -3505,9 +3507,6 @@ function UniReader:modBBox()
 			fb.bb:invertRect(0, y_s, G_width, 1)
 			fb.bb:invertRect(x_s, 0, 1, G_height)
 
-			local step   = 10
-			local factor = 1
-
 			local x_direction, y_direction = 0,0
 			if ev.code == KEY_FW_LEFT then
 				x_direction = -1
@@ -3517,6 +3516,12 @@ function UniReader:modBBox()
 				y_direction = -1
 			elseif ev.code == KEY_FW_DOWN then
 				y_direction =  1
+			elseif ev.code == KEY_Q then
+				step =  30
+			elseif ev.code == KEY_A then
+				step =  10
+			elseif ev.code == KEY_Z then
+				step =  1
 			elseif ev.code == KEY_FW_PRESS then
 				local p_x, p_y = self:screenToPageTransform(x_s, y_s)
 				if running_corner == "top-left" then
