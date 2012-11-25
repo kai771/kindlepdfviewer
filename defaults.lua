@@ -39,6 +39,11 @@ DBATTERY_LOGGING = false
 -- background colour: 8 = gray, 0 = white, 15 = black
 DBACKGROUND_COLOR = 8
 
+-- BBox steps
+DBBOX_STEP_SMALL = 1
+DBBOX_STEP_NORMAL = 10
+DBBOX_STEP_BIG = 30
+
 -- delay for info messages in ms
 DINFO_NODELAY = 0
 DINFO_DELAY = 1500

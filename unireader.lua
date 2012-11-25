@@ -54,6 +54,8 @@ UniReader = {
 	dest_y = 0,
 	min_offset_x = 0,
 	min_offset_y = 0,
+	page_width = 0,
+	page_height = 0,
 	content_top = 0, -- for ZOOM_FIT_TO_CONTENT_WIDTH_PAN (prevView)
 
 	-- set panning distance
@@ -1232,7 +1234,9 @@ function UniReader:setzoom(page, preCache)
 	-- without it, later check whether to use margins will fail for some documents
 	pwidth = math.floor(pwidth * 100) / 100
 	pheight = math.floor(pheight * 100) / 100
-	Debug("page::getSize",pwidth,pheight)
+	page_width = pwidth
+	page_height = pheight
+	Debug("page::getSize", pwidth, pheight)
 
 	local x0, y0, x1, y1 = page:getUsedBBox()
 	if x0 == 0.01 and y0 == 0.01 and x1 == -0.01 and y1 == -0.01 then
@@ -1250,26 +1254,17 @@ function UniReader:setzoom(page, preCache)
 	if y1 > pheight then y1 = pheight end
 
 	if self.bbox.enabled then
-		Debug("ORIGINAL page::getUsedBBox", x0,y0, x1,y1 )
-		local bbox = self.bbox[self.pageno] -- exact
+		Debug("ORIGINAL page::getUsedBBox", x0, y0, x1, y1 )
 
-		local oddEven = self:oddEven(self.pageno)
-		if bbox ~= nil then
-			Debug("bbox from", self.pageno)
-		else
-			bbox = self.bbox[oddEven] -- odd/even
-		end
-		if bbox ~= nil then -- last used up to this page
-			Debug("bbox from", oddEven)
-		else
-			for i = 0,self.pageno do
-				bbox = self.bbox[ self.pageno - i ]
-				if bbox ~= nil then
-					Debug("bbox from", self.pageno - i)
-					break
-				end
-			end
-		end
+		-- use odd setting for odd pages, even for even ones
+		bbox = self.bbox[self:oddEven(self.pageno)]
+		
+		-- no corresponding setting? use the other one
+		if bbox == nil then
+			bbox = self.bbox[self:oddEven(self.pageno + 1)]
+		end	
+		
+		-- if there was either odd or even page bbox setting, then use it
 		if bbox ~= nil then
 			x0 = bbox["x0"]
 			y0 = bbox["y0"]
@@ -2964,36 +2959,20 @@ function UniReader:addAllCommands()
 			self:redrawCurrentPage()
 		end)
 
-	self.commands:add(KEY_Z, nil, "Z",
-		"set crop mode",
-		function(unireader)
-			local bbox = {}
-			bbox["x0"] = - unireader.offset_x / unireader.globalzoom
-			bbox["y0"] = - unireader.offset_y / unireader.globalzoom
-			bbox["x1"] = bbox["x0"] + G_width / unireader.globalzoom
-			bbox["y1"] = bbox["y0"] + G_height / unireader.globalzoom
-			bbox.pan_x = unireader.pan_x
-			bbox.pan_y = unireader.pan_y
-			unireader.bbox[unireader.pageno] = bbox
-			unireader.bbox[unireader:oddEven(unireader.pageno)] = bbox
-			unireader.bbox.enabled = true
-			Debug("bbox", unireader.pageno, unireader.bbox)
-			unireader.globalzoom_mode = unireader.ZOOM_FIT_TO_CONTENT -- use bbox
-			InfoMessage:inform("Manual crop setting saved ", DINFO_DELAY, 1, MSG_WARN)
-		end)
 	self.commands:add(KEY_Z, MOD_SHIFT, "Z",
-		"reset crop",
+		"Remove manual bbox settings",
 		function(unireader)
-			unireader.bbox[unireader.pageno] = nil;
-			InfoMessage:inform("Manual crop setting removed ", DINFO_DELAY, 1, MSG_WARN)
+			unireader.cur_bbox = {
+				["x0"] = 0,
+				["y0"] = 0,
+				["x1"] = page_width,
+				["y1"] = page_height,
+			}
+			unireader.bbox["odd"] = nil
+			unireader.bbox["even"] = nil
+			unireader.bbox.enabled = false
+			InfoMessage:inform("Manual bbox settings removed ", DINFO_DELAY, 1, MSG_WARN)
 			Debug("bbox remove", unireader.pageno, unireader.bbox);
-		end)
-	self.commands:add(KEY_Z, MOD_ALT, "Z",
-		"toggle crop mode",
-		function(unireader)
-			unireader.bbox.enabled = not unireader.bbox.enabled;
-			InfoMessage:inform("Manual crop "..(unireader.bbox.enabled and "enabled " or "disabled "), DINFO_DELAY, 1, MSG_WARN)
-			Debug("bbox override", unireader.bbox.enabled);
 		end)
 	self.commands:add(KEY_X, nil, "X",
 		"invert page bbox",
@@ -3478,7 +3457,7 @@ end
 function UniReader:modBBox()
 	local bbox = self.cur_bbox
 	Debug("bbox", bbox)
-	x, y, w, h = self:getRectInScreen( bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"] )
+	x, y, w, h = self:getRectInScreen(bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"])
 	Debug("getRectInScreen", x, y, w, h)
 
 	local new_bbox = bbox
@@ -3487,8 +3466,8 @@ function UniReader:modBBox()
 
 	Screen:saveCurrentBB()
 
-	fb.bb:invertRect( 0,y_s, G_width, 1 )
-	fb.bb:invertRect( x_s,0, 1, G_height )
+	fb.bb:invertRect(0, y_s, G_width, 1)
+	fb.bb:invertRect(x_s, 0, 1, G_height)
 	InfoMessage:inform(running_corner.." bbox ", DINFO_NODELAY, 1, MSG_WARN,
 		running_corner.." bounding box")
 	fb:refresh(1)
@@ -3517,12 +3496,13 @@ function UniReader:modBBox()
 			elseif ev.code == KEY_FW_DOWN then
 				y_direction =  1
 			elseif ev.code == KEY_Q then
-				step =  30
+				step =  DBBOX_STEP_BIG
 			elseif ev.code == KEY_A then
-				step =  10
+				step =  DBBOX_STEP_NORMAL
 			elseif ev.code == KEY_Z then
-				step =  1
+				step =  DBBOX_STEP_SMALL
 			elseif ev.code == KEY_FW_PRESS then
+				step = DBBOX_STEP_NORMAL
 				local p_x, p_y = self:screenToPageTransform(x_s, y_s)
 				if running_corner == "top-left" then
 					new_bbox["x0"] = p_x
@@ -3645,7 +3625,6 @@ function UniReader:modBBox()
 
 	end
 
-	self.bbox[self.pageno] = new_bbox
 	self.bbox[self:oddEven(self.pageno)] = new_bbox
 	self.bbox.enabled = true
 	Debug("crop bbox", bbox, "to", new_bbox)
