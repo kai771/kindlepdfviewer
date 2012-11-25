@@ -299,6 +299,6 @@ customupdate: all
 	rm $(INSTALL_DIR)/fonts/droid/DroidSansFallback.ttf
 	cp -r git-rev resources $(INSTALL_DIR)
 	mkdir $(INSTALL_DIR)/fonts/host
-	zip -9 -r librerator-$(VERSION).zip $(INSTALL_DIR) launchpad/
+	zip -9 -r librerator-$(VERSION).zip $(INSTALL_DIR) launchpad/ kite/
 	rm -rf $(INSTALL_DIR)
 	@echo "copy librerator-$(VERSION).zip to /mnt/us/customupdates and install with shift+shift+I"
