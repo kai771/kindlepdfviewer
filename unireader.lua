@@ -3512,12 +3512,14 @@ function UniReader:modBBox()
 				y_direction = -1
 			elseif ev.code == KEY_FW_DOWN then
 				y_direction =  1
+			-- comment out next lines if you want rulers and shortcut keys back	
 			elseif ev.code == KEY_Q then
 				step =  DBBOX_STEP_BIG
 			elseif ev.code == KEY_A then
 				step =  DBBOX_STEP_NORMAL
 			elseif ev.code == KEY_Z then
 				step =  DBBOX_STEP_SMALL
+			-- end of comment out	
 			elseif ev.code == KEY_FW_PRESS then
 				step = DBBOX_STEP_NORMAL
 				local p_x, p_y = self:screenToPageTransform(x_s, y_s)
@@ -3538,7 +3540,7 @@ function UniReader:modBBox()
 					running_corner = false
 				end
 
--- commented out detection of Q-W etc shortcut keys				
+-- commented out detection of Q-W etc shortcut keys. Uncomment if you want them back.			
 --[[
 			elseif ev.code >= KEY_Q and ev.code <= KEY_P then
 				factor = ev.code - KEY_Q + 1
@@ -3554,6 +3556,7 @@ function UniReader:modBBox()
 				x_direction = last_direction["x"]
 				y_direction = last_direction["y"]
 --]]
+-- end of commented out detection of Q-W etc shortcut keys				
 			elseif ev.code == KEY_BACK then
 				running_corner = false
 			end
@@ -3578,7 +3581,7 @@ function UniReader:modBBox()
 					last_direction = {x = x_direction, y = y_direction}
 					Debug("last_direction", last_direction)
 
--- commented out drawing of rulers and shortcut keys
+-- commented out drawing of rulers and shortcut keys. Uncomment if you want them back.
 --[[
 					-- FIXME partial duplicate of SelectMenu.item_shortcuts
 					local keys = {
@@ -3634,6 +3637,7 @@ function UniReader:modBBox()
 						end
 					end
 --]]					
+-- end of commented out drawing rulers and shortcut keys.
 				end
 
 				fb:refresh(1)
