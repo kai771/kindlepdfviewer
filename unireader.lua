@@ -2847,11 +2847,14 @@ function UniReader:addAllCommands()
 		function(unireader)
 			unireader:showJumpHist()
 		end)
+	-- remove rotation by 10°, since is mostly useless
+	--[[	
 	self.commands:add(KEY_J, MOD_SHIFT, "J",
 		"rotate 10° clockwise",
 		function(unireader)
 			unireader:setRotate(unireader.globalrotate + 10)
 		end)
+	--]]	
 	self.commands:add(KEY_J, nil, "J",
 		"rotate screen 90° clockwise",
 		function(unireader)
@@ -2862,11 +2865,14 @@ function UniReader:addAllCommands()
 				self:redrawCurrentPage()
 			end
 		end)
+	-- remove rotation by 10°, since is mostly useless
+	--[[	
 	self.commands:add(KEY_K, MOD_SHIFT, "K",
 		"rotate 10° counterclockwise",
 		function(unireader)
 			unireader:setRotate(unireader.globalrotate - 10)
 		end)
+	--]]	
 	self.commands:add(KEY_K, nil, "K",
 		"rotate screen 90° counterclockwise",
 		function(unireader)
