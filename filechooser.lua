@@ -12,10 +12,10 @@ require "readerchooser"
 require "battery"
 
 FileChooser = {
-	title_H = 40,	-- title height
-	spacing = 36,	-- spacing between lines
-	foot_H = 28,	-- foot height
-	margin_H = 10,	-- horisontal margin
+	title_H = DFC_TITLE_H,	-- title height
+	spacing = DFC_SPACING,	-- spacing between lines
+	foot_H = DFC_FOOT_H,	-- foot height
+	margin_H = DFC_MARGIN_H,	-- horisontal margin
 
 	-- state buffer
 	dirs = nil,
@@ -312,6 +312,27 @@ function FileChooser:addAllCommands()
 			end
 		end
 	)
+	self.commands:add(KEY_FW_DOWN, MOD_SHIFT, "joypad down",
+		"next "..DFC_SHIFT_UP_DOWN.." items",
+		function(self)
+			if self.page < (self.items / self.perpage) then
+				if self.current <= self.perpage - DFC_SHIFT_UP_DOWN then
+					self.current = self.current + DFC_SHIFT_UP_DOWN
+				else
+					self.current = self.perpage
+				end
+			else
+				-- lpitems = number of items on the last page
+				local lpitems = self.items % self.perpage
+				if self.current <=	lpitems - DFC_SHIFT_UP_DOWN then
+					self.current = self.current + DFC_SHIFT_UP_DOWN
+				else
+					self.current = lpitems
+				end
+			end	
+			self.markerdirty = true
+		end
+	)
 	self.commands:add(KEY_FW_UP, nil, "joypad up",
 		"previous item",
 		function(self)
@@ -325,6 +346,17 @@ function FileChooser:addAllCommands()
 				self.current = self.current - 1
 				self.markerdirty = true
 			end
+		end
+	)
+	self.commands:add(KEY_FW_UP, MOD_SHIFT, "joypad up",
+		"previous "..DFC_SHIFT_UP_DOWN.." items",
+		function(self)
+			if self.current > DFC_SHIFT_UP_DOWN then
+				self.current = self.current - DFC_SHIFT_UP_DOWN
+			else
+				self.current = 1
+			end	
+			self.markerdirty = true
 		end
 	)
 	-- NuPogodi, 01.10.12: fast jumps to items at positions 10, 20, .. 90, 0% within the list

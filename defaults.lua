@@ -100,6 +100,12 @@ DSM_MARGIN_H = 10	-- horisontal margin
 DSM_SHORTCUT_WIDTH = 40 -- width used to draw shortcut key
 DSM_SHIFT_UP_DOWN = 5 -- number of items to skip when holding Shift and pressing up/down
 
+-- FileChooser defaults
+DFC_TITLE_H = 40	-- title height
+DFC_SPACING = 36	-- spacing between lines
+DFC_FOOT_H = 28	-- foot height
+DFC_MARGIN_H = 10	-- horisontal margin
+DFC_SHIFT_UP_DOWN = 5 -- number of items to skip when holding Shift and pressing up/down
 
 -- koptreader config defaults
 DKOPTREADER_CONFIG_FONT_SIZE = 1.0		-- range from 0.1 to 3.0
