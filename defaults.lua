@@ -46,6 +46,10 @@ DPREVENT_UPSIDE_DOWN = true
 -- on top of the screen, like KPV 2012.11.
 DKPV_STYLE_BOOKMARKS = false
 
+-- if set to true, it will display lists (Table of Contets, Bookmarks, Highlights, Menus)
+-- with shortcut keys Q-P etc on the left, like on KPV 2012.11.
+DKPV_STYLE_LISTS = false
+
 -- background colour: 8 = gray, 0 = white, 15 = black
 DBACKGROUND_COLOR = 8
 
@@ -93,6 +97,7 @@ DSM_TITLE_H = 40	-- title height
 DSM_SPACING = 36	-- spacing between lines
 DSM_FOOT_H = 27	-- foot height
 DSM_MARGIN_H = 10	-- horisontal margin
+DSM_SHORTCUT_WIDTH = 40 -- width used to draw shortcut key
 DSM_SHIFT_UP_DOWN = 5 -- number of items to skip when holding Shift and pressing up/down
 
 

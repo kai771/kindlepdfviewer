@@ -14,6 +14,7 @@ SelectMenu = {
 	spacing = DSM_SPACING,	-- spacing between lines
 	foot_H = DSM_FOOT_H,	-- foot height
 	margin_H = DSM_MARGIN_H,	-- horisontal margin
+	shortcut_width = DSM_SHORTCUT_WIDTH, -- width used to draw shortcut key
 	current_entry = 0,
 
 	menu_title = "No Title",
@@ -219,6 +220,9 @@ function SelectMenu:addAllCommands()
 			end
 		)
 	end
+	
+	-- Left out if not DKPV_STYLE_LISTS ------------------------------
+	if DKPV_STYLE_LISTS then
 	local KEY_Q_to_P = {}
 	for i = KEY_Q, KEY_P do 
 		table.insert(KEY_Q_to_P, Keydef:new(i, nil, ""))
@@ -276,6 +280,9 @@ function SelectMenu:addAllCommands()
 			sm.selected_item = sm:getItemIndexByShortCut("Ent", sm.perpage)
 		end
 	)
+	end
+	-- ^^Left out if not DKPV_STYLE_LISTS ---------------
+	
 	self.commands:add(KEY_H,MOD_ALT,"H",
 		"show help page",
 		function(sm)
@@ -324,7 +331,12 @@ function SelectMenu:choose(ypos, height)
 		local fface = Font:getFace("ffont", 16)
 		local sface = Font:getFace("scfont", 22)
 		
-		local lx = self.margin_H + 40
+		local lx 
+		if DKPV_STYLE_LISTS then 
+			lx = self.margin_H + self.shortcut_width
+		else
+			lx = self.margin_H
+		end		
 		local fw = fb.bb:getWidth() - lx - self.margin_H
 		
 		if self.pagedirty then
@@ -350,21 +362,23 @@ function SelectMenu:choose(ypos, height)
 					if i <= self.items then
 						y = ypos + self.title_H + (self.spacing * c) + 4
 
-						-- paint shortcut indications
-						if c <= 10 or c > 20 then
-							blitbuffer.paintBorder(fb.bb, self.margin_H, y-22, 29, 29, 2, 15)
-						else
-							fb.bb:paintRect(self.margin_H, y-22, 29, 29, 3)
-						end
-						if self.item_shortcuts[c] ~= nil and 
-							string.len(self.item_shortcuts[c]) == 3 then
-							-- debug "Del", "Sym and "Ent"
-							renderUtf8Text(fb.bb, self.margin_H + 3, y, fface,
-								self.item_shortcuts[c], true)
-						else
-							renderUtf8Text(fb.bb, self.margin_H + 8, y, sface,
-								self.item_shortcuts[c], true)
-						end
+						if DKPV_STYLE_LISTS then
+							-- paint shortcut indications
+							if c <= 10 or c > 20 then
+								blitbuffer.paintBorder(fb.bb, self.margin_H, y-22, 29, 29, 2, 15)
+							else
+								fb.bb:paintRect(self.margin_H, y-22, 29, 29, 3)
+							end
+							if self.item_shortcuts[c] ~= nil and 
+								string.len(self.item_shortcuts[c]) == 3 then
+								-- debug "Del", "Sym and "Ent"
+								renderUtf8Text(fb.bb, self.margin_H + 3, y, fface,
+									self.item_shortcuts[c], true)
+							else
+								renderUtf8Text(fb.bb, self.margin_H + 8, y, sface,
+									self.item_shortcuts[c], true)
+							end
+						end	
 
 						self.last_shortcut = c
 						-- NuPogodi, 30.08.12: improved method to use own fontface for each menu item
