@@ -94,5 +94,5 @@ You can compile and make launchpad installable package for Kindle using
 make thirdparty kpdfview customupdate
 ```
 
-Prefered toolchain for Kindle compiling is Code Sourcery/Mentor Graphics 2012.03-57.
+Preferred toolchain for Kindle compiling is Code Sourcery/Mentor Graphics 2012.03-57.
 
