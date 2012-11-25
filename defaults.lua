@@ -44,7 +44,7 @@ DPREVENT_UPSIDE_DOWN = true
 
 -- if set to true, it will display "Bookmark added" and "Bookmark already exist
 -- on top of the screen, like KPV 2012.11.
-DKPV_STYLE_BOOKMARKS = true
+DKPV_STYLE_BOOKMARKS = false
 
 -- background colour: 8 = gray, 0 = white, 15 = black
 DBACKGROUND_COLOR = 8
