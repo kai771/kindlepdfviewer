@@ -2739,12 +2739,12 @@ function UniReader:addAllCommands()
 		end)
 	-- to leave or to erase 8 hotkeys switching zoom-mode directly?
 
-	self.commands:add(KEY_A, MOD_SHIFT, "A",
+	self.commands:add(KEY_A, nil, "A",
 		"zoom to fit page",
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_PAGE)
 		end)
-	self.commands:add(KEY_A, nil, "A",
+	self.commands:add(KEY_A, MOD_SHIFT, "A",
 		"zoom to fit content",
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_CONTENT)
