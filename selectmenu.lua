@@ -100,7 +100,7 @@ function SelectMenu:addAllCommands()
 			end
 		end
 	)
-	self.commands:add(KEY_FW_UP, MOD_SHIFT, "Shift-joypad up",
+	self.commands:add(KEY_FW_UP, MOD_SHIFT, "joypad up",
 		"previous "..DSM_SHIFT_UP_DOWN.." items",
 		function(sm)
 			if sm.current > DSM_SHIFT_UP_DOWN then
@@ -129,7 +129,7 @@ function SelectMenu:addAllCommands()
 			end
 		end
 	)
-	self.commands:add(KEY_FW_DOWN, MOD_SHIFT, "Shift-joypad down",
+	self.commands:add(KEY_FW_DOWN, MOD_SHIFT, "joypad down",
 		"next "..DSM_SHIFT_UP_DOWN.." items",
 		function(sm)
 			if sm.page < (sm.items / sm.perpage) then
