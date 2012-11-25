@@ -3,16 +3,17 @@ require "keys"
 require "graphics"
 require "font"
 require "commands"
+require "defaults"
 
 SelectMenu = {
-	fsize = 22,	-- font for displaying item names
-	tfsize = 25,	-- font for page title
-	ffsize = 16,-- font for paging display
+	fsize = DSM_FSIZE,	-- font for displaying item names
+	tfsize = DSM_TFSIZE,	-- font for page title
+	ffsize = DSM_FFSIZE,-- font for paging display
 
-	title_H = 40,	-- title height
-	spacing = 36,	-- spacing between lines
-	foot_H = 27,	-- foot height
-	margin_H = 10,	-- horisontal margin
+	title_H = DSM_TITLE_H,	-- title height
+	spacing = DSM_SPACING,	-- spacing between lines
+	foot_H = DSM_FOOT_H,	-- foot height
+	margin_H = DSM_MARGIN_H,	-- horisontal margin
 	current_entry = 0,
 
 	menu_title = "No Title",
@@ -99,6 +100,17 @@ function SelectMenu:addAllCommands()
 			end
 		end
 	)
+	self.commands:add(KEY_FW_UP, MOD_SHIFT, "Shift-joypad up",
+		"previous "..DSM_SHIFT_UP_DOWN.." items",
+		function(sm)
+			if sm.current > DSM_SHIFT_UP_DOWN then
+				sm.current = sm.current - DSM_SHIFT_UP_DOWN
+			else
+				sm.current = 1
+			end	
+			sm.markerdirty = true
+		end
+	)
 	self.commands:add(KEY_FW_DOWN, nil, "joypad down",
 		"next item",
 		function(sm)
@@ -115,6 +127,27 @@ function SelectMenu:addAllCommands()
 					sm.markerdirty = true
 				end
 			end
+		end
+	)
+	self.commands:add(KEY_FW_DOWN, MOD_SHIFT, "Shift-joypad down",
+		"next "..DSM_SHIFT_UP_DOWN.." items",
+		function(sm)
+			if sm.page < (sm.items / sm.perpage) then
+				if sm.current <= sm.perpage - DSM_SHIFT_UP_DOWN then
+					sm.current = sm.current + DSM_SHIFT_UP_DOWN
+				else
+					sm.current = sm.perpage
+				end
+			else
+				-- lpitems = number of items on the last page
+				local lpitems = sm.items % sm.perpage
+				if sm.current <=	lpitems - DSM_SHIFT_UP_DOWN then
+					sm.current = sm.current + DSM_SHIFT_UP_DOWN
+				else
+					sm.current = lpitems
+				end
+			end	
+			sm.markerdirty = true
 		end
 	)
 	self.commands:add({KEY_PGFWD, KEY_LPGFWD}, nil, ">",

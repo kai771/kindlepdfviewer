@@ -84,6 +84,18 @@ DPICVIEWER_COMICS_MODE_ENABLE = true
 DPICVIEWER_RTL_MODE_ENABLE = false
 DPICVIEWER_PAGE_MODE_ENABLE = false
 
+-- SelectMenu defaults
+DSM_FSIZE = 22	-- font for displaying item names
+DSM_TFSIZE = 25 -- font for page title
+DSM_FFSIZE = 16 -- font for paging display
+
+DSM_TITLE_H = 40	-- title height
+DSM_SPACING = 36	-- spacing between lines
+DSM_FOOT_H = 27	-- foot height
+DSM_MARGIN_H = 10	-- horisontal margin
+DSM_SHIFT_UP_DOWN = 5 -- number of items to skip when holding Shift and pressing up/down
+
+
 -- koptreader config defaults
 DKOPTREADER_CONFIG_FONT_SIZE = 1.0		-- range from 0.1 to 3.0
 DKOPTREADER_CONFIG_TEXT_WRAP = 1		-- 1 = on, 0 = off
