@@ -2518,7 +2518,9 @@ function UniReader:inputLoop()
 	self.toc_cview = nil
 	self.toc_curidx_to_x = nil
 	self.show_overlap = 0
-	self:setRotationMode(0)
+	if DFORCE_PORTRAIT then
+		self:setRotationMode(0)
+	end	
 	self:setDefaults()
 	if self.doc ~= nil then
 		self.doc:close()

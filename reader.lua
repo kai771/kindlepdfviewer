@@ -1,5 +1,8 @@
 #!./kpdfview
 --[[
+		Librerator: a fork of KindlePDFViewer by Kai771
+		See http://github.com/kai771/kindlepdfviewer, librerator branch.
+
     KindlePDFViewer: a reader implementation
     Copyright (C) 2011 Hans-Werner Hilse <hilse@web.de>
 
@@ -118,7 +121,9 @@ Screen:updateRotationMode()
 Screen.native_rotation_mode = Screen.cur_rotation_mode
 
 -- force portrait mode
-Screen:setRotationMode(0)
+if DFORCE_PORTRAIT then
+	Screen:setRotationMode(0)
+end	
 G_width, G_height = fb:getSize()
 
 -- set up reader's setting: font

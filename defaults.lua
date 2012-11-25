@@ -36,6 +36,9 @@ DCACHE_DOCUMENT_SIZE = 1024*1024*8 -- FIXME random, needs testing
 -- default value for battery level logging
 DBATTERY_LOGGING = false
 
+-- force portrait mode on start and document close
+DFORCE_PORTRAIT = true
+
 -- background colour: 8 = gray, 0 = white, 15 = black
 DBACKGROUND_COLOR = 8
 
