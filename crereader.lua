@@ -634,12 +634,20 @@ function CREReader:adjustCreReaderCommands()
 		"add bookmark to current page",
 		function(self)
 			ok = self:addBookmark(self.doc:getXPointer())
-			if not ok then
-				InfoMessage:inform("Page already marked ", DINFO_DELAY, 1, MSG_WARN)
-			else
-				InfoMessage:inform("Page marked ", DINFO_DELAY, 1, MSG_WARN)
-			end
-		end
+			if DKPV_STYLE_BOOKMARKS then
+				if not ok then
+					InfoMessage:drawTopMsg("Bookmark already exists")
+				else
+					InfoMessage:drawTopMsg("Bookmark added")
+				end
+			else	-- not DKPV_STYLE_BOOKMARKS
+				if not ok then
+					InfoMessage:inform("Bookmark already exists ", DINFO_DELAY, 1, MSG_WARN)
+				else
+					InfoMessage:inform("Bookmark added ", DINFO_DELAY, 1, MSG_WARN)
+				end
+			end	
+		end -- function
 	)
 	self.commands:addGroup(MOD_ALT.."K/L",{
 		Keydef:new(KEY_K,MOD_ALT), Keydef:new(KEY_L,MOD_ALT)},
