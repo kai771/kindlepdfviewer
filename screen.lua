@@ -71,7 +71,13 @@ function Screen:screenRotate(orien)
 		return
 	end
 
-	self.cur_rotation_mode = (self.cur_rotation_mode + orien) % 4
+	local cur_mode = self.cur_rotation_mode
+	
+	if DPREVENT_UPSIDE_DOWN and (cur_mode == 1 or cur_mode == 3) then
+		self.cur_rotation_mode = 0
+	else	
+		self.cur_rotation_mode = (cur_mode + orien) % 4
+	end	
 	-- you have to reopen framebuffer after rotate
 	fb:setOrientation(self.cur_rotation_mode)
 	fb:close()

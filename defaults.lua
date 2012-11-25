@@ -39,6 +39,9 @@ DBATTERY_LOGGING = false
 -- force portrait mode on start and document close
 DFORCE_PORTRAIT = true
 
+-- prevent rotation to portrait upside-down
+DPREVENT_UPSIDE_DOWN = true
+
 -- background colour: 8 = gray, 0 = white, 15 = black
 DBACKGROUND_COLOR = 8
 
