@@ -2814,6 +2814,50 @@ function UniReader:clearReaderAssociation()
 	end
 end
 
+function UniReader:showMainMenu()
+	local main_menu_list = {
+		"Table of Contents...",
+		"Go to...",
+		"Add bookmark",
+		"View bookmarks...",
+		"Add highlight",
+		"View highlights...",
+		"Zoom mode...",
+		"Options...",
+		"Exit",
+		}
+	local main_menu = SelectMenu:new{
+		menu_title = "Librerator - Main Menu",
+		item_array = main_menu_list,
+		current_entry = 0
+		}
+	local re = main_menu:choose(0, G_height)
+	Debug("My re=", tostring(re))
+	if re == 1 then 
+		self:showToc()
+	elseif re == 2 then 
+		self:gotoInput()
+	elseif re == 3 then
+		self:redrawCurrentPage()
+		self:addBookmarkCommand()
+	elseif re == 4 then
+		self:showBookMarks()
+	elseif re == 5 then
+		self:redrawCurrentPage()
+		self:startHighLightMode()
+	elseif re == 6 then
+		self:showHighLight()
+	elseif re == 7 then
+		self:showZoomModeMenu()
+	elseif re == 8 then
+--
+	elseif re == 9 then
+		keep_running = false
+		return "break"		
+	end
+end
+
+
 -- command definitions
 function UniReader:addAllCommands()
 	self.commands = Commands:new()
@@ -3120,6 +3164,17 @@ function UniReader:addAllCommands()
 			unireader:modBBox()
 		end)
 		
+	self.commands:add(KEY_MENU, nil, "Menu",
+		"show Main Menu",
+		function(unireader)
+			local re = unireader:showMainMenu()
+			if re == "break" then
+				return "break"
+			else	
+				unireader:redrawCurrentPage()
+			end
+		end)
+
 	self.commands:add(KEY_MENU, MOD_ALT, "Menu",
 		"toggle info box",
 		function(unireader)
