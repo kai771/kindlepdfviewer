@@ -3075,14 +3075,6 @@ function UniReader:addAllCommands()
 		"clear reader association with this doc",
 		function(unireader)
 			unireader:clearReaderAssociation()
---[[		
-			if self.settings:readSetting("reader_association") == "N/A" then
-				InfoMessage:inform("No reader associated ", DINFO_DELAY, 1, MSG_AUX)
-			else
-				self.settings:saveSetting("reader_association", "N/A")
-				InfoMessage:inform("Reader association cleared", DINFO_DELAY, 1, MSG_AUX)
-			end
---]]			
 		end)
 
 	self.commands:add(KEY_R, MOD_SHIFT, "R",
