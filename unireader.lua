@@ -2703,6 +2703,23 @@ function UniReader:gotoInput()
 	end
 end
 
+function UniReader:addBookmarkCommand()
+	ok = self:addBookmark(self.pageno)
+	if DKPV_STYLE_BOOKMARKS then
+		if not ok then
+			InfoMessage:drawTopMsg("Bookmark already exists")
+		else	
+			InfoMessage:drawTopMsg("Bookmark added")
+		end	
+	else -- not DKPV_STYLE_BOOKMARKS
+		if not ok then
+			InfoMessage:inform("Bookmark already exists ", DINFO_DELAY, 1, MSG_WARN)
+		else	
+			InfoMessage:inform("Bookmark added ", DINFO_TOGGLES, 1, MSG_WARN)
+		end	
+	end
+end
+
 -- command definitions
 function UniReader:addAllCommands()
 	self.commands = Commands:new()
@@ -2716,6 +2733,7 @@ function UniReader:addAllCommands()
 			end
 		end
 	)
+	
 	self.commands:addGroup("< >",{
 		Keydef:new(KEY_PGBCK, nil), Keydef:new(KEY_LPGBCK, nil),
 		Keydef:new(KEY_PGFWD, nil), Keydef:new(KEY_LPGFWD, nil)},
@@ -2725,6 +2743,7 @@ function UniReader:addAllCommands()
 			(keydef.keycode == KEY_PGBCK or keydef.keycode == KEY_LPGBCK)
 			and unireader:prevView() or unireader:nextView())
 		end)
+		
 	self.commands:addGroup(MOD_ALT.."< >", {
 		Keydef:new(KEY_PGBCK, MOD_ALT), Keydef:new(KEY_PGFWD, MOD_ALT),
 		Keydef:new(KEY_LPGBCK, MOD_ALT), Keydef:new(KEY_LPGFWD, MOD_ALT)},
@@ -2735,6 +2754,7 @@ function UniReader:addAllCommands()
 			InfoMessage:inform(string.format("New zoom is %.2f ", new_zoom), DINFO_NODELAY, 1, MSG_WARN)
 			unireader:setGlobalZoom(new_zoom)
 		end)
+		
 	-- NuPogodi, 03.09.12: make zoom step user-configurable
 	self.commands:addGroup(MOD_SHIFT.."< >", {
 		Keydef:new(KEY_PGBCK, MOD_SHIFT), Keydef:new(KEY_PGFWD, MOD_SHIFT),
@@ -2756,6 +2776,7 @@ function UniReader:addAllCommands()
 				end
 			end
 		end)
+		
 	self.commands:add(KEY_BACK, nil, "Back",
 		"go backward in jump history",
 		function(unireader)
@@ -2767,7 +2788,6 @@ function UniReader:addAllCommands()
 			else
 				prev_jump_no = unireader.jump_history.cur - 1
 			end
-
 			if prev_jump_no >= 1 then
 				unireader.show_overlap = 0
 				unireader.jump_history.cur = prev_jump_no
@@ -2776,6 +2796,7 @@ function UniReader:addAllCommands()
 				InfoMessage:inform("Already first jump ", DINFO_DELAY, 1, MSG_WARN)
 			end
 		end)
+		
 	self.commands:add(KEY_BACK, MOD_SHIFT, "Back",
 		"go forward in jump history",
 		function(unireader)
@@ -2792,11 +2813,13 @@ function UniReader:addAllCommands()
 				InfoMessage:inform("Already last jump ", DINFO_DELAY, 1, MSG_WARN)
 			end
 		end)
+		
 	self.commands:addGroup("vol-/+",{Keydef:new(KEY_VPLUS, nil),Keydef:new(KEY_VMINUS, nil)},
 		"decrease/increase gamma 10%",
 		function(unireader, keydef)
 			unireader:modifyGamma(keydef.keycode==KEY_VPLUS and 1.1 or 0.9)
 		end)
+		
 	--numeric key group
 	local numeric_keydefs = {}
 	for i=1,10 do numeric_keydefs[i]=Keydef:new(KEY_1+i-1, nil, tostring(i%10)) end
@@ -2819,52 +2842,62 @@ function UniReader:addAllCommands()
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_PAGE)
 		end)
+		
 	self.commands:add(KEY_A, MOD_SHIFT, "A",
 		"zoom to fit content",
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_CONTENT)
 		end)
+		
 	self.commands:add(KEY_S, MOD_SHIFT, "S",
 		"zoom to fit page width",
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_PAGE_WIDTH)
 		end)
+		
 	self.commands:add(KEY_S, nil, "S",
 		"zoom to fit content width",
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_CONTENT_WIDTH)
 		end)
+		
 	self.commands:add(KEY_D, MOD_SHIFT, "D",
 		"zoom to fit page height",
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_PAGE_HEIGHT)
 		end)
+		
 	self.commands:add(KEY_D, nil, "D",
 		"zoom to fit content height",
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_CONTENT_HEIGHT)
 		end)
+		
 	self.commands:add(KEY_F, MOD_SHIFT, "F",
 		"zoom to fit margin 2-column mode",
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_CONTENT_HALF_WIDTH_MARGIN)
 		end)
+		
 	self.commands:add(KEY_F, nil, "F",
 		"zoom to fit content 2-column mode",
 		function(unireader)
 			unireader:setglobalzoom_mode(unireader.ZOOM_FIT_TO_CONTENT_HALF_WIDTH)
 		end)
+		
 	self.commands:add(KEY_G, nil, "G",
 		"go to page",
 		function(unireader)
 			unireader:gotoInput()
 		end)
+		
 	self.commands:add(KEY_H, nil, "H",
 		"show help page",
 		function(unireader)
 			HelpPage:show(0, G_height, unireader.commands)
 			unireader:redrawCurrentPage()
 		end)
+		
 	self.commands:add(KEY_DOT, MOD_ALT, ".",
 		"toggle battery level logging",
 		function(unireader)
@@ -2872,34 +2905,25 @@ function UniReader:addAllCommands()
 			InfoMessage:inform("Battery logging "..(G_battery_logging and "on " or "off "), DINFO_DELAY, 1, MSG_AUX)
 			G_reader_settings:saveSetting("G_battery_logging", G_battery_logging)
 		end)
+		
 	self.commands:add(KEY_T, nil, "T",
 		"show table of content (TOC)",
 		function(unireader)
 			unireader:showToc()
 		end)
+		
 	self.commands:add(KEY_B, nil, "B",
 		"show bookmarks",
 		function(unireader)
 			unireader:showBookMarks()
 		end)
+		
 	self.commands:add(KEY_B, MOD_ALT, "B",
 		"add bookmark to current page",
 		function(unireader)
-			ok = unireader:addBookmark(self.pageno)
-			if DKPV_STYLE_BOOKMARKS then
-				if not ok then
-					InfoMessage:drawTopMsg("Bookmark already exists")
-				else	
-					InfoMessage:drawTopMsg("Bookmark added")
-				end	
-			else -- not DKPV_STYLE_BOOKMARKS
-				if not ok then
-					InfoMessage:inform("Bookmark already exists ", DINFO_DELAY, 1, MSG_WARN)
-				else	
-					InfoMessage:inform("Bookmark added ", DINFO_DELAY, 1, MSG_WARN)
-				end	
-			end
-		end) -- function
+			unireader:addBookmarkCommand()
+		end)
+		
 	self.commands:addGroup(MOD_ALT.."K/L", {
 		Keydef:new(KEY_K, MOD_ALT), Keydef:new(KEY_L, MOD_ALT)},
 		"jump between bookmarks",
@@ -2914,11 +2938,13 @@ function UniReader:addAllCommands()
 				self:gotoJump(bm.page, true)
 			end
 		end)
+		
 	self.commands:add(KEY_B, MOD_SHIFT, "B",
 		"show jump history",
 		function(unireader)
 			unireader:showJumpHist()
 		end)
+		
 	-- remove rotation by 10°, since is mostly useless
 	--[[	
 	self.commands:add(KEY_J, MOD_SHIFT, "J",
@@ -2926,7 +2952,9 @@ function UniReader:addAllCommands()
 		function(unireader)
 			unireader:setRotate(unireader.globalrotate + 10)
 		end)
-	--]]	
+	--]]
+	-- end of remove rotation by 10°
+	
 	self.commands:add(KEY_J, nil, "J",
 		"rotate screen 90° clockwise",
 		function(unireader)
@@ -2937,6 +2965,7 @@ function UniReader:addAllCommands()
 				self:redrawCurrentPage()
 			end
 		end)
+		
 	-- remove rotation by 10°, since is mostly useless
 	--[[	
 	self.commands:add(KEY_K, MOD_SHIFT, "K",
@@ -2946,6 +2975,7 @@ function UniReader:addAllCommands()
 		end)
 	--]]	
 	-- end of remove rotation by 10°
+	
 	self.commands:add(KEY_K, nil, "K",
 		"rotate screen 90° counterclockwise",
 		function(unireader)
@@ -3046,6 +3076,7 @@ function UniReader:addAllCommands()
 			InfoMessage:inform("Manual bbox settings removed ", DINFO_DELAY, 1, MSG_WARN)
 			Debug("bbox remove", unireader.pageno, unireader.bbox);
 		end)
+		
 	self.commands:add(KEY_X, nil, "X",
 		"invert page bbox",
 		function(unireader)
@@ -3056,17 +3087,20 @@ function UniReader:addAllCommands()
 			fb.bb:invertRect( x,y, w,h )
 			fb:refresh(1)
 		end)
+		
 	self.commands:add(KEY_X, MOD_SHIFT, "X",
 		"modify page bbox",
 		function(unireader)
 			unireader:modBBox()
 		end)
+		
 	self.commands:add(KEY_MENU, MOD_ALT, "Menu",
 		"toggle info box",
 		function(unireader)
 			unireader:showInfo()
 			unireader:redrawCurrentPage()
 		end)
+		
 	-- panning: NuPogodi, 03.09.2012: since Alt+KEY_FW-keys do not work and Shift+KEY_FW-keys alone
 	-- are not enough to cover the wide range, I've extracted changing pansteps to separate functions
 	local panning_keys = {	Keydef:new(KEY_FW_LEFT, nil), Keydef:new(KEY_FW_RIGHT, nil),
@@ -3255,6 +3289,7 @@ function UniReader:addAllCommands()
 				end
 			end
 		end)
+		
 	-- functions to change panning steps
 	self.commands:addGroup("Shift + left/right", {Keydef:new(KEY_FW_LEFT, MOD_SHIFT), Keydef:new(KEY_FW_RIGHT, MOD_SHIFT)},
 		"increase/decrease X-panning step",
@@ -3279,6 +3314,7 @@ function UniReader:addAllCommands()
 				end
 			end
 		end)
+		
 	self.commands:addGroup("Shift + up/down", {Keydef:new(KEY_FW_DOWN, MOD_SHIFT), Keydef:new(KEY_FW_UP, MOD_SHIFT)},
 		"increase/decrease Y-panning step",
 		function(unireader, keydef)
@@ -3310,14 +3346,14 @@ function UniReader:addAllCommands()
 		function(unireader)
 			unireader:startHighLightMode()
 			unireader:redrawCurrentPage()
-		end
-	)
+		end)
+
 	self.commands:add(KEY_N, MOD_SHIFT, "N",
 		"show all highlights",
 		function(unireader)
 			unireader:showHighLight()
-		end
-	)
+		end)
+
 	self.commands:add(KEY_DOT, nil, ".",
 		"search and highlight text",
 		function(unireader)
@@ -3331,14 +3367,14 @@ function UniReader:addAllCommands()
 			else
 				unireader:gotoJump(unireader.pageno)
 			end
-		end
-	)
+		end)
+
 	self.commands:add(KEY_L, MOD_SHIFT, "L",
 		"show/hide link underlines",
 		function(unireader)
 			unireader:toggleLinkUnderlines()
-		end
-	)
+		end)
+
 	self.commands:add(KEY_L, nil, "L",
 		"page links shortcut keys",
 		function(unireader)
@@ -3491,34 +3527,36 @@ function UniReader:addAllCommands()
 				unireader:gotoJump(goto_page, false, "link")
 
 			end
-		end
-	)
+		end)
+
 	-- NuPogodi, 02.10.12: added functions to switch kpdfviewer mode from readers
 	self.commands:add(KEY_M, MOD_ALT, "M",
 		"set user privilege level",
 		function(unireader)
 			FileChooser:changeFileChooserMode()
 			self:redrawCurrentPage()
-		end
-	)
+		end)
+
 	self.commands:add(KEY_E, nil, "E",
 		"configure event notifications",
 		function(unireader)
 			InfoMessage:chooseNotificatonMethods()
 			self:redrawCurrentPage()
-		end
-	)
+		end)
+
 	self.commands:add(KEY_BACK, MOD_ALT, "Back",
 		"close document",
 		function(unireader)
 			return "break"
 		end)
+		
 	self.commands:add(KEY_HOME, nil, "Home",
 		"exit application",
 		function(unireader)
 			keep_running = false
 			return "break"
 		end)
+		
 	-- commands.map is very large, impacts startup performance on device
 	--Debug("defined commands "..dump(self.commands.map))
 end
@@ -3610,6 +3648,7 @@ function UniReader:modBBox()
 				y_direction = last_direction["y"]
 --]]
 -- end of commented out detection of Q-W etc shortcut keys				
+
 			elseif ev.code == KEY_BACK then
 				running_corner = false
 			end
