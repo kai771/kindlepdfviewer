@@ -3072,28 +3072,13 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_Z, MOD_SHIFT, "Z",
 		"Remove manual bbox settings",
 		function(unireader)
-			unireader.cur_bbox = {
-				["x0"] = 0,
-				["y0"] = 0,
-				["x1"] = page_width,
-				["y1"] = page_height,
-			}
-			unireader.bbox["odd"] = nil
-			unireader.bbox["even"] = nil
-			unireader.bbox.enabled = false
-			InfoMessage:inform("Manual bbox settings removed ", DINFO_DELAY, 1, MSG_WARN)
-			Debug("bbox remove", unireader.pageno, unireader.bbox);
+			unireader:removeBBox()
 		end)
 		
 	self.commands:add(KEY_X, nil, "X",
 		"invert page bbox",
 		function(unireader)
-			local bbox = unireader.cur_bbox
-			Debug("bbox", bbox)
-			x,y,w,h = unireader:getRectInScreen( bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"] )
-			Debug("inxertRect",x,y,w,h)
-			fb.bb:invertRect( x,y, w,h )
-			fb:refresh(1)
+			unireader:invertBBox()
 		end)
 		
 	self.commands:add(KEY_X, MOD_SHIFT, "X",
@@ -3537,7 +3522,6 @@ function UniReader:addAllCommands()
 			end
 		end)
 
-	-- NuPogodi, 02.10.12: added functions to switch kpdfviewer mode from readers
 	self.commands:add(KEY_M, MOD_ALT, "M",
 		"set user privilege level",
 		function(unireader)
@@ -3567,6 +3551,29 @@ function UniReader:addAllCommands()
 		
 	-- commands.map is very large, impacts startup performance on device
 	--Debug("defined commands "..dump(self.commands.map))
+end
+
+function UniReader:invertBBox()
+	local bbox = self.cur_bbox
+	Debug("bbox", bbox)
+	x,y,w,h = self:getRectInScreen( bbox["x0"], bbox["y0"], bbox["x1"], bbox["y1"] )
+	Debug("inxertRect",x,y,w,h)
+	fb.bb:invertRect( x,y, w,h )
+	fb:refresh(1)
+end
+
+function UniReader:removeBBox()
+	self.cur_bbox = {
+		["x0"] = 0,
+		["y0"] = 0,
+		["x1"] = page_width,
+		["y1"] = page_height,
+	}
+	self.bbox["odd"] = nil
+	self.bbox["even"] = nil
+	self.bbox.enabled = false
+	InfoMessage:inform("Manual bbox settings removed ", DINFO_DELAY, 1, MSG_WARN)
+	Debug("Manual bbox settings removed");
 end
 
 function UniReader:modBBox()
