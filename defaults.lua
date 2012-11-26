@@ -53,6 +53,12 @@ DKPV_STYLE_LISTS = false
 -- background colour: 8 = gray, 0 = white, 15 = black
 DBACKGROUND_COLOR = 8
 
+-- Highlight colour: 8 = gray, 0 = white, 15 = black
+-- values for DHIGHLIGHT_DRAWER can be "underscore" or "marker" - with quotes
+DHIGHLIGHT_LINE_COLOR = 5
+DHIGHLIGHT_LINE_WIDTH = 2
+DHIGHLIGHT_DRAWER = "underscore"
+
 -- BBox steps
 DBBOX_STEP_SMALL = 1
 DBBOX_STEP_NORMAL = 10

@@ -293,10 +293,10 @@ function UniReader:toggleTextHighLight(word_list)
 				w = w
 				h = h * 1.2
 
-				self.highlight.drawer = self.highlight.drawer or "underscore"
+				self.highlight.drawer = DHIGHLIGHT_DRAWER
 				if self.highlight.drawer == "underscore" then
-					self.highlight.line_width = self.highlight.line_width or 2
-					self.highlight.line_color = self.highlight.line_color or 5
+					self.highlight.line_width = DHIGHLIGHT_LINE_WIDTH
+					self.highlight.line_color = DHIGHLIGHT_LINE_COLOR
 					fb.bb:paintRect(x, y+h-1, w,
 						self.highlight.line_width,
 						self.highlight.line_color)
