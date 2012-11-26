@@ -2605,6 +2605,49 @@ function UniReader:gotoPrevNextTocEntry(direction)
 	end
 end
 
+function UniReader:showZoomModeMenu()
+	local cur_entry = 1
+	local cur_zoom = self.globalzoom_mode
+
+	-- translate zoom mode to entry number
+	if cur_zoom <= -1 and cur_zoom >= -6 then cur_entry = -cur_zoom - 1
+	elseif cur_zoom == -8 then cur_entry = 5	-- zoom to content height pan --> zoom to content height
+	elseif cur_zoom == -7 then cur_entry = 4	-- zoom to content width pan --> zoom to content width
+	elseif self.pan_by_page == -10 then cur_entry = 6
+	elseif self.pan_by_page == -9 then cur_entry = 7
+	end 
+	
+	local mode_list = {
+		"Fit to page",								-- ZOOM_FIT_TO_PAGE = -1,
+		"Fit to page width",					-- ZOOM_FIT_TO_PAGE_WIDTH = -2,
+		"Fit to page height",					-- ZOOM_FIT_TO_PAGE_HEIGHT = -3,
+		"Fit to content",							-- ZOOM_FIT_TO_CONTENT = -4,
+		"Fit to content width",				-- ZOOM_FIT_TO_CONTENT_WIDTH = -5,
+		"Fit to content height",			-- ZOOM_FIT_TO_CONTENT_HEIGHT = -6,
+		"2-column mode",							-- ZOOM_FIT_TO_CONTENT_HALF_WIDTH = -10,
+		"2-column mode with margin",	-- ZOOM_FIT_TO_CONTENT_HALF_WIDTH_MARGIN = -9,
+--		"Zoom by value",						-- ZOOM_BY_VALUE = 0
+		}
+	local zoom_menu = SelectMenu:new{
+		menu_title = "Select Zoom Mode",
+		item_array = mode_list,
+		current_entry = cur_entry
+		}
+	local re = zoom_menu:choose(0, G_height)
+	if re ~= nil then
+	
+		-- translate entry number to zoom mode
+		if re >= 1 and re <= 6 then cur_zoom = - re
+		elseif re == 7 then cur_zoom = -10
+		elseif re == 8 then cur_zoom = -9 
+		end 
+		
+		self:setglobalzoom_mode(cur_zoom)
+	else
+		self:redrawCurrentPage()
+	end	
+end
+
 function UniReader:toggleOverlap()
 	self.show_overlap_enable = not self.show_overlap_enable
 	self.settings:saveSetting("show_overlap_enable", self.show_overlap_enable)
@@ -2752,36 +2795,11 @@ function UniReader:addAllCommands()
 		end)
 	-- end numeric keys
 
-	-- function calls menu to visualize and/or to switch zoom mode
 	self.commands:add(KEY_M, nil, "M",
 		"select zoom mode",
 		function(unireader)
-			local mode_list = {
-				"Zoom by value",			-- ZOOM_BY_VALUE = 0, remove?
-				"Fit zoom to page",			-- A	ZOOM_FIT_TO_PAGE = -1,
-				"Fit zoom to page width",		-- S	ZOOM_FIT_TO_PAGE_WIDTH = -2,
-				"Fit zoom to page height",		-- D	ZOOM_FIT_TO_PAGE_HEIGHT = -3,
-				"Fit zoom to content",			-- ^A	ZOOM_FIT_TO_CONTENT = -4,
-				"Fit zoom to content width",		-- ^S	ZOOM_FIT_TO_CONTENT_WIDTH = -5,
-				"Fit zoom to content height",		-- ^D	ZOOM_FIT_TO_CONTENT_HEIGHT = -6,
-				"Fit zoom to content width with panoraming",	-- 	ZOOM_FIT_TO_CONTENT_WIDTH_PAN = -7, remove?
-				"Fit zoom to content height with panoraming",	-- 	ZOOM_FIT_TO_CONTENT_HEIGHT_PAN = -8, remove?
-				"Fit zoom to content half-width with margin",	-- F	ZOOM_FIT_TO_CONTENT_HALF_WIDTH_MARGIN = -9,
-				"Fit zoom to content half-width"		-- ^F	ZOOM_FIT_TO_CONTENT_HALF_WIDTH = -10,
-				}
-			local zoom_menu = SelectMenu:new{
-				menu_title = "Select mode to zoom pages",
-				item_array = mode_list,
-				current_entry = - unireader.globalzoom_mode
-				}
-			local re = zoom_menu:choose(0, G_height)
-			if not re or re==(1-unireader.globalzoom_mode) or re==1 or re==8 or re==9 then -- if not proper zoom-mode
-				unireader:redrawCurrentPage()
-			else
-				unireader:setglobalzoom_mode(1-re)
-			end
+			unireader:showZoomModeMenu()
 		end)
-	-- to leave or to erase 8 hotkeys switching zoom-mode directly?
 
 	self.commands:add(KEY_A, nil, "A",
 		"zoom to fit page",
