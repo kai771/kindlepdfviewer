@@ -2605,6 +2605,48 @@ function UniReader:gotoPrevNextTocEntry(direction)
 	end
 end
 
+function UniReader:toggleOverlap()
+	self.show_overlap_enable = not self.show_overlap_enable
+	self.settings:saveSetting("show_overlap_enable", self.show_overlap_enable)
+	self:redrawCurrentPage()
+	if DINFO_OVERLAP_SHOW then
+		InfoMessage:inform("Overlap "..(self.show_overlap_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
+	end	
+end
+
+function UniReader:toggleComicsMode()
+	self.comics_mode_enable = not self.comics_mode_enable
+	self.settings:saveSetting("comics_mode_enable", self.comics_mode_enable)
+	if DINFO_COMICS_MODE_SHOW then
+		InfoMessage:inform("Comics mode "..(self.comics_mode_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
+	end	
+end
+
+function UniReader:toggleRTLMode()
+	self.rtl_mode_enable = not self.rtl_mode_enable
+	self.settings:saveSetting("rtl_mode_enable", self.rtl_mode_enable)
+	if DINFO_RTL_MODE_SHOW then
+		InfoMessage:inform("Right-To-Left mode "..(self.rtl_mode_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
+	end	
+end
+
+function UniReader:togglePageMode()
+	self.page_mode_enable = not self.page_mode_enable
+	self.settings:saveSetting("page_mode_enable", self.page_mode_enable)
+	if DINFO_PAGE_MODE_SHOW then
+		InfoMessage:inform("Page-buttons move "..(self.page_mode_enable and "page " or "viewport "), DINFO_TOGGLES, 1, MSG_AUX)
+	end	
+end
+
+function UniReader:toggleLinkUnderlines()
+	self.show_links_enable = not self.show_links_enable
+	self.settings:saveSetting("show_links_enable", self.show_links_enable)
+	self:redrawCurrentPage()
+	if DINFO_LINK_UNDERLINES_SHOW then
+		InfoMessage:inform("Link underlines "..(self.show_links_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
+	end	
+end
+
 -- command definitions
 function UniReader:addAllCommands()
 	self.commands = Commands:new()
@@ -2881,6 +2923,7 @@ function UniReader:addAllCommands()
 			unireader:setRotate(unireader.globalrotate - 10)
 		end)
 	--]]	
+	-- end of remove rotation by 10°
 	self.commands:add(KEY_K, nil, "K",
 		"rotate screen 90° counterclockwise",
 		function(unireader)
@@ -2895,34 +2938,25 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_O, nil, "O",
 		"toggle showing page overlap areas",
 		function(unireader)
-			unireader.show_overlap_enable = not unireader.show_overlap_enable
---      InfoMessage:inform("Turning overlap "..(unireader.show_overlap_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
-			self.settings:saveSetting("show_overlap_enable", unireader.show_overlap_enable)
-			self:redrawCurrentPage()
+			unireader:toggleOverlap()
 		end)
 
 	self.commands:add(KEY_P, nil, "P",
 		"toggle page-keys mode: viewport/page",
 		function(unireader)
-			unireader.page_mode_enable = not unireader.page_mode_enable
-			InfoMessage:inform("Page-buttons move "..(unireader.page_mode_enable and "page " or "viewport "), DINFO_TOGGLES, 1, MSG_AUX)
-			self.settings:saveSetting("page_mode_enable", unireader.page_mode_enable)
+			unireader:togglePageMode()
 		end)
 
 	self.commands:add(KEY_U, nil, "U",
 		"toggle right-to-left mode on/off",
 		function(unireader)
-			unireader.rtl_mode_enable = not unireader.rtl_mode_enable
-			InfoMessage:inform("Right-To-Left mode "..(unireader.rtl_mode_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
-			self.settings:saveSetting("rtl_mode_enable", unireader.rtl_mode_enable)
+			unireader:toggleRTLMode()
 		end)
 
 	self.commands:add(KEY_C, nil, "C",
 		"toggle comics mode on/off",
 		function(unireader)
-			unireader.comics_mode_enable = not unireader.comics_mode_enable
-			InfoMessage:inform("Comics mode "..(unireader.comics_mode_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
-			self.settings:saveSetting("comics_mode_enable", unireader.comics_mode_enable)
+			unireader:toggleComicsMode()
 		end)
 
 	self.commands:add(KEY_C, MOD_SHIFT, "C",
@@ -3280,10 +3314,7 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_L, MOD_SHIFT, "L",
 		"show/hide link underlines",
 		function(unireader)
-			unireader.show_links_enable = not unireader.show_links_enable
-			InfoMessage:inform("Link underlines "..(unireader.show_links_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
-			self.settings:saveSetting("show_links_enable", unireader.show_links_enable)
-			self:redrawCurrentPage()
+			unireader:toggleLinkUnderlines()
 		end
 	)
 	self.commands:add(KEY_L, nil, "L",
