@@ -2787,6 +2787,20 @@ function UniReader:jumpForward()
 	end
 end
 
+function UniReader:resetDefaultReader()
+	G_reader_settings:delSetting("reader_preferences")
+	InfoMessage:inform("Reader preferences reset", DINFO_DELAY, 1, MSG_AUX)
+end
+
+function UniReader:clearReaderAssociation()
+	if self.settings:readSetting("reader_association") == "N/A" then
+		InfoMessage:inform("No reader associated ", DINFO_DELAY, 1, MSG_AUX)
+	else
+		self.settings:saveSetting("reader_association", "N/A")
+		InfoMessage:inform("Reader association cleared", DINFO_DELAY, 1, MSG_AUX)
+	end
+end
+
 -- command definitions
 function UniReader:addAllCommands()
 	self.commands = Commands:new()
@@ -3054,19 +3068,21 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_C, MOD_SHIFT, "C",
 		"reset default reader preferences",
 		function(unireader)
-			G_reader_settings:delSetting("reader_preferences")
-			InfoMessage:inform("Reader preferences reset", DINFO_DELAY, 1, MSG_AUX)
+		  unireader:resetDefaultReader()
 		end)
 	
 	self.commands:add(KEY_C, MOD_ALT, "C",
 		"clear reader association with this doc",
 		function(unireader)
+			unireader:clearReaderAssociation()
+--[[		
 			if self.settings:readSetting("reader_association") == "N/A" then
 				InfoMessage:inform("No reader associated ", DINFO_DELAY, 1, MSG_AUX)
 			else
 				self.settings:saveSetting("reader_association", "N/A")
 				InfoMessage:inform("Reader association cleared", DINFO_DELAY, 1, MSG_AUX)
 			end
+--]]			
 		end)
 
 	self.commands:add(KEY_R, MOD_SHIFT, "R",
