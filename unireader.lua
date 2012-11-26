@@ -2690,6 +2690,12 @@ function UniReader:toggleLinkUnderlines()
 	end	
 end
 
+function UniReader:toggleBatteryLogging()
+	G_battery_logging = not G_battery_logging
+	InfoMessage:inform("Battery logging "..(G_battery_logging and "on " or "off "), DINFO_DELAY, 1, MSG_AUX)
+	G_reader_settings:saveSetting("G_battery_logging", G_battery_logging)
+end
+
 function UniReader:gotoInput()
 	local numpages = self.doc:getPages()
 	local page = NumInputBox:input(G_height-100, 100,
@@ -2937,9 +2943,7 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_DOT, MOD_ALT, ".",
 		"toggle battery level logging",
 		function(unireader)
-			G_battery_logging = not G_battery_logging
-			InfoMessage:inform("Battery logging "..(G_battery_logging and "on " or "off "), DINFO_DELAY, 1, MSG_AUX)
-			G_reader_settings:saveSetting("G_battery_logging", G_battery_logging)
+			unireader:toggleBatteryLogging()
 		end)
 		
 	self.commands:add(KEY_T, nil, "T",
