@@ -2709,6 +2709,19 @@ function UniReader:gotoInput()
 	end
 end
 
+function UniReader:searchInput()
+	Screen:saveCurrentBB()
+	local search = InputBox:input(G_height - 100, 100,
+		"Search:", self.last_search.search )
+	Screen:restoreFromSavedBB()
+
+	if search ~= nil and string.len(search) > 0 then
+		self:searchHighLight(search)
+	else
+		self:gotoJump(self.pageno)
+	end
+end
+
 function UniReader:refreshCountInput()
 	local count = NumInputBox:input(G_height-100, 100,
 		"Full refresh every N pages (0-200)", self.rcountmax, true)
@@ -3370,16 +3383,7 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_DOT, nil, ".",
 		"search and highlight text",
 		function(unireader)
-			Screen:saveCurrentBB()
-			local search = InputBox:input(G_height - 100, 100,
-				"Search:", self.last_search.search )
-			Screen:restoreFromSavedBB()
-
-			if search ~= nil and string.len( search ) > 0 then
-				unireader:searchHighLight(search)
-			else
-				unireader:gotoJump(unireader.pageno)
-			end
+			unireader:searchInput()
 		end)
 
 	self.commands:add(KEY_L, MOD_SHIFT, "L",
