@@ -2690,6 +2690,19 @@ function UniReader:toggleLinkUnderlines()
 	end	
 end
 
+function UniReader:gotoInput()
+	local numpages = self.doc:getPages()
+	local page = NumInputBox:input(G_height-100, 100,
+		"Page:", "current page "..self.pageno.." of "..numpages, true)
+	-- convert string to number
+	if not pcall(function () page = math.floor(page) end)
+	or page < 1 or page > numpages or page == self.pageno then
+		self:redrawCurrentPage()
+	else
+		self:gotoJump(page)
+	end
+end
+
 -- command definitions
 function UniReader:addAllCommands()
 	self.commands = Commands:new()
@@ -2844,16 +2857,7 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_G, nil, "G",
 		"go to page",
 		function(unireader)
-			local numpages = unireader.doc:getPages()
-			local page = NumInputBox:input(G_height-100, 100,
-				"Page:", "current page "..self.pageno.." of "..numpages, true)
-			-- convert string to number
-			if not pcall(function () page = math.floor(page) end)
-			or page < 1 or page > numpages or page == unireader.pageno then
-				unireader:redrawCurrentPage()
-			else
-				unireader:gotoJump(page)
-			end
+			unireader:gotoInput()
 		end)
 	self.commands:add(KEY_H, nil, "H",
 		"show help page",
