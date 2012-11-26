@@ -2411,7 +2411,7 @@ function memUsage()
 end
 
 
--- used in UniReader:showMenu()
+-- used in UniReader:showInfo()
 function UniReader:_drawReadingInfo()
 	local width, height = G_width, G_height
 	local numpages = self.doc:getPages()
@@ -2447,7 +2447,7 @@ function UniReader:_drawReadingInfo()
 							5, 4, load_percent, 8)
 end
 
-function UniReader:showMenu()
+function UniReader:showInfo()
 	self:_drawReadingInfo()
 
 	fb:refresh(1)
@@ -3005,10 +3005,10 @@ function UniReader:addAllCommands()
 		function(unireader)
 			unireader:modBBox()
 		end)
-	self.commands:add(KEY_MENU, nil, "Menu",
+	self.commands:add(KEY_MENU, MOD_ALT, "Menu",
 		"toggle info box",
 		function(unireader)
-			unireader:showMenu()
+			unireader:showInfo()
 			unireader:redrawCurrentPage()
 		end)
 	-- panning: NuPogodi, 03.09.2012: since Alt+KEY_FW-keys do not work and Shift+KEY_FW-keys alone
