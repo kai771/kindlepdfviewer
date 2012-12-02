@@ -27,6 +27,7 @@ FileChooser = {
 	current = 1,
 	oldcurrent = 0,
 	exception_message = nil,
+	onpage = 0, -- number of items displayed on the current page - added by Kai771
 
 	pagedirty = true,
 	markerdirty = false,
@@ -224,9 +225,11 @@ function FileChooser:choose(ypos, height)
 				local i = (self.page - 1) * self.perpage + c
 				if i <= #self.dirs then
 					DrawFileItem(self.dirs[i],self.margin_H,ypos+self.title_H+self.spacing*c,"folder")
+					self.onpage = c
 				elseif i <= self.items then
 					local file_type = string.lower(string.match(self.files[i-#self.dirs], ".+%.([^.]+)") or "")
 					DrawFileItem(self.files[i-#self.dirs],self.margin_H,ypos+self.title_H+self.spacing*c,file_type)
+					self.onpage = c
 				end
 			end
 			-- draw footer
@@ -300,18 +303,12 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_FW_DOWN, nil, "joypad down",
 		"next item",
 		function(self)
-			if self.current == self.perpage then
-				if self.page < (self.items / self.perpage) then
-					self.current = 1
-					self.page = self.page + 1
-					self.pagedirty = true
-				end
+			if self.current == self.onpage then
+				self.current = 1
+				self.markerdirty = true
 			else
-				if self.page ~= math.floor(self.items / self.perpage) + 1
-					or self.current + (self.page-1)*self.perpage < self.items then
-					self.current = self.current + 1
-					self.markerdirty = true
-				end
+				self.current = self.current + 1
+				self.markerdirty = true
 			end
 		end
 	)
@@ -340,11 +337,8 @@ function FileChooser:addAllCommands()
 		"previous item",
 		function(self)
 			if self.current == 1 then
-				if self.page > 1 then
-					self.current = self.perpage
-					self.page = self.page - 1
-					self.pagedirty = true
-				end
+				self.current = self.onpage
+				self.markerdirty = true
 			else
 				self.current = self.current - 1
 				self.markerdirty = true

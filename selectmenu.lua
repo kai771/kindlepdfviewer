@@ -34,6 +34,7 @@ SelectMenu = {
 	current = 1,
 	oldcurrent = 0,
 	selected_item = nil,
+	onpage = 0, -- number of items displayed on the current page - added by Kai771
 
 	commands = nil,
 	expandable = false, -- if true handle Right/Left FW selector keys
@@ -55,6 +56,7 @@ function SelectMenu:new(o)
 	o.current = 1
 	o.oldcurrent = 0
 	o.selected_item = nil
+	o.onpage = 0
 	-- increase spacing for DXG so we don't have more than 30 shortcuts
 	if fb.bb:getHeight() == 1200 then
 		o.spacing = 37
@@ -90,11 +92,8 @@ function SelectMenu:addAllCommands()
 		"previous item",
 		function(sm)
 			if sm.current == 1 then
-				if sm.page > 1 then
-					sm.current = sm.perpage
-					sm.page = sm.page - 1
-					sm.pagedirty = true
-				end
+				sm.current = sm.onpage
+				sm.markerdirty = true
 			else
 				sm.current = sm.current - 1
 				sm.markerdirty = true
@@ -115,18 +114,12 @@ function SelectMenu:addAllCommands()
 	self.commands:add(KEY_FW_DOWN, nil, "joypad down",
 		"next item",
 		function(sm)
-			if sm.current == sm.perpage then
-				if sm.page < (sm.items / sm.perpage) then
-					sm.current = 1
-					sm.page = sm.page + 1
-					sm.pagedirty = true
-				end
-			else
-				if sm.page ~= math.floor(sm.items / sm.perpage) + 1
-					or sm.current + (sm.page - 1) * sm.perpage < sm.items then
-					sm.current = sm.current + 1
+			if sm.current == sm.onpage then
+				sm.current = 1
 					sm.markerdirty = true
-				end
+			else
+				sm.current = sm.current + 1
+				sm.markerdirty = true
 			end
 		end
 	)
@@ -379,7 +372,8 @@ function SelectMenu:choose(ypos, height)
 									self.item_shortcuts[c], true)
 							end
 						end	
-
+						
+						self.onpage = c
 						self.last_shortcut = c
 						-- NuPogodi, 30.08.12: improved method to use own fontface for each menu item
 						if self.own_glyph == 1 then -- Font.fontmap[_index], like "Droid/DroidSans.ttf"
