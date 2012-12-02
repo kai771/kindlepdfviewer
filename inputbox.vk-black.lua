@@ -522,7 +522,7 @@ function InputBox:addAllCommands()
 					end	
 				end	
 			else
-				if vk_cursor_x > 0 then vk_cursor_x = vk_cursor_x - 1 end
+				if vk_cursor_x > 0 then vk_cursor_x = vk_cursor_x - 1 else vk_cursor_x = 9 end
 				self:updateVKCursor()
 			end	
 		end
@@ -555,10 +555,8 @@ function InputBox:addAllCommands()
 					end	
 				end
 			else	
-				if vk_cursor_x < 9 then 
-					vk_cursor_x = vk_cursor_x + 1 
-					self:updateVKCursor()
-				end
+				if vk_cursor_x < 9 then vk_cursor_x = vk_cursor_x + 1 else vk_cursor_x = 0 end
+				self:updateVKCursor()
 			end	
 		end
 	)
