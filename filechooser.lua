@@ -10,12 +10,13 @@ require "selectmenu"
 require "dialog"
 require "readerchooser"
 require "battery"
+require "defaults"
 
 FileChooser = {
 	title_H = DFC_TITLE_H,	-- title height
 	spacing = DFC_SPACING,	-- spacing between lines
 	foot_H = DFC_FOOT_H,	-- foot height
-	margin_H = DFC_MARGIN_H,	-- horisontal margin
+	margin_H = DFC_MARGIN_H,	-- horizontal margin
 
 	-- state buffer
 	dirs = nil,
@@ -86,7 +87,7 @@ function DrawFileItem(name,x,y,image)
 	-- check whether the icon file exists or not
 	if not io.open(fn, "r") then fn = "./resources/other.png" end
 	local iw = ImageWidget:new({ file = fn })
-	iw:paintTo(fb.bb, x, y - iw:getSize().h + 1)
+	iw:paintTo(fb.bb, x, y - iw:getSize().h + DFC_ICON_DROP)
 	-- then drawing filenames
 	local cface = Font:getFace("cfont", 22)
 	local xleft = x + iw:getSize().w + 9 -- the gap between icon & filename

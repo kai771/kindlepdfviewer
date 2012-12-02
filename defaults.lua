@@ -42,7 +42,7 @@ DFORCE_PORTRAIT = true
 -- prevent rotation to portrait upside-down
 DPREVENT_UPSIDE_DOWN = true
 
--- if set to true, it will display "Bookmark added" and "Bookmark already exist
+-- if set to true, it will display "Bookmark added" and "Bookmark already exists"
 -- on top of the screen, like KPV 2012.11.
 DKPV_STYLE_BOOKMARKS = false
 
@@ -109,15 +109,16 @@ DSM_FFSIZE = 16 -- font for paging display
 DSM_TITLE_H = 40	-- title height
 DSM_SPACING = 36	-- spacing between lines
 DSM_FOOT_H = 27	-- foot height
-DSM_MARGIN_H = 10	-- horisontal margin
+DSM_MARGIN_H = 10	-- horizontal margin
 DSM_SHORTCUT_WIDTH = 40 -- width used to draw shortcut key
 DSM_SHIFT_UP_DOWN = 5 -- number of items to skip when holding Shift and pressing up/down
 
 -- FileChooser defaults
 DFC_TITLE_H = 40	-- title height
-DFC_SPACING = 36	-- spacing between lines
+DFC_SPACING = 37	-- spacing between lines
+DFC_ICON_DROP = 7	-- amount of pixels icon is placed bellow filename base line
 DFC_FOOT_H = 28	-- foot height
-DFC_MARGIN_H = 10	-- horisontal margin
+DFC_MARGIN_H = 10	-- horizontal margin
 DFC_SHIFT_UP_DOWN = 5 -- number of items to skip when holding Shift and pressing up/down
 
 -- koptreader config defaults
