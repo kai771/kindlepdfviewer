@@ -51,7 +51,7 @@ InputBox = {
 	fwidth = 15,
 	commands = nil,
 
-	vk_bg = 0,
+	vk_bg = 3,
 	charlist = {}, -- table to store input string
 	charpos = 1,
 	charposl = 1,	-- position of the first displayed char
@@ -82,6 +82,7 @@ function InputBox:refreshText()
 	-- clear previous painted text
 	fb.bb:paintRect(self.input_start_x-5, self.input_start_y-19, self.input_slot_w, self.fheight, self.input_bg)
 	-- paint new text
+--	renderUtf8Text(fb.bb, self.input_start_x, self.input_start_y, self.face, self.input_string, true)
 	renderUtf8Text(fb.bb, self.input_start_x, self.input_start_y, self.face, text, true)
 end
 
@@ -159,15 +160,14 @@ end
 function InputBox:drawBox(ypos, w, h, title)
 	-- draw input border
 	local r = 6 -- round corners
-	blitbuffer.paintBorder(fb.bb, 0, ypos, fb.bb:getWidth(), r, r, 15, r)
-	fb.bb:paintRect(0, ypos+r, w, h - r, self.vk_bg)
+	fb.bb:paintRect(1, ypos+r, w, h - r, self.vk_bg)
+	blitbuffer.paintBorder(fb.bb, 1, ypos, fb.bb:getWidth() - 2, r, r, self.vk_bg, r)
 	-- draw input title
 	self.input_start_y = ypos + 37
 	-- draw the box title > estimate the start point for future text & the text slot width
 	self.input_start_x = 25 + renderUtf8Text(fb.bb, 15, self.input_start_y, self.face, title, true)
 	self.input_slot_w = fb.bb:getWidth() - self.input_start_x - 5
 	self.max_input_chars = math.floor(self.input_slot_w / self.fwidth)
-	fb.bb:invertRect(0, ypos+r, fb.bb:getWidth(), 120)
 	-- draw input slot
 	fb.bb:paintRect(self.input_start_x - 5, ypos + 10, self.input_slot_w, h - 20, self.input_bg)
 end
@@ -309,11 +309,7 @@ function InputBox:invertVKey(cx, cy)
 	local vy = fb.bb:getHeight() - vk_kh
 	local x = vk_ml + cx*vk_kw + cx*vk_gx
 	local y = vy - (vk_mb + cy*vk_kh + cy*vk_gy)
---	fb.bb:invertRect(x, y, vk_kw, vk_kh)
-	fb.bb:invertRect(x, y, vk_kw, 2)
-	fb.bb:invertRect(x, y+vk_kh, vk_kw, 2)
-	fb.bb:invertRect(x, y+2, 2, vk_kh-2)
-	fb.bb:invertRect(x+vk_kw-2, y+2, 2, vk_kh-2)
+	fb.bb:invertRect(x, y, vk_kw, vk_kh)
 end
 
 function InputBox:updateVKCursor()
@@ -332,7 +328,7 @@ function InputBox:updateVKCursor()
 end
 
 function InputBox:DrawVKey(key,x,y,face,rx,ry,t,c)
---	blitbuffer.paintBorder(fb.bb, x-10, y-ry-8, rx*2, ry*2, t, c, 0)
+	blitbuffer.paintBorder(fb.bb, x-10, y-ry-8, rx*2, ry*2, t, c, 0)
 	renderUtf8Text(fb.bb, x, y, face, key, true)
 end
 
@@ -347,7 +343,7 @@ function InputBox:DrawVirtualKeyboard()
 	-- h = y-correction to adjust cicles & chars
 	local dx, dy, lx, r, c, bg, t = vk_dx, vk_dy, vk_lx, vk_r, vk_c, self.vk_bg, vk_t
 
-	fb.bb:paintRect(0, fb.bb:getHeight()-120, fb.bb:getWidth(), 120, bg)
+	fb.bb:paintRect(1, fb.bb:getHeight()-120, fb.bb:getWidth()-2, 120, bg)
 	-- font to draw characters - MUST have UTF8-support
 	local vkfont = Font:getFace("infont", 22)
 	for k,v in ipairs(self.INPUT_KEYS) do
@@ -364,23 +360,21 @@ function InputBox:DrawVirtualKeyboard()
 	-- the rest symbols (manually)
 	local smfont = Font:getFace("infont", 14)
 	-- Del
---	blitbuffer.paintBorder(fb.bb, lx+9*dx-10, vy-dy-r-8, r*2, r*2, t, c, 0)
+	blitbuffer.paintBorder(fb.bb, lx+9*dx-10, vy-dy-r-8, r*2, r*2, t, c, 0)
 	renderUtf8Text(fb.bb, lx-5+9*dx, vy-dy-3, smfont, "Del", true)
 	-- Sym - now replaced with Space by Kai771
---	blitbuffer.paintBorder(fb.bb, lx+8*dx-10, vy-r-8, r*2, r*2, t, c, 0)
+	blitbuffer.paintBorder(fb.bb, lx+8*dx-10, vy-r-8, r*2, r*2, t, c, 0)
 	renderUtf8Text(fb.bb, lx-5+8*dx, vy-3, smfont, "Spc", true)
 	-- Enter
---	blitbuffer.paintBorder(fb.bb, lx+9*dx-10, vy-r-8, r*2, r*2, t, c, 0)
+	blitbuffer.paintBorder(fb.bb, lx+9*dx-10, vy-r-8, r*2, r*2, t, c, 0)
 	renderUtf8Text(fb.bb, lx-5+9*dx, vy-2, smfont, "Ent", true)
 	-- Menu
---	blitbuffer.paintBorder(fb.bb, lx+10*dx-8, vy-2*dy-r-8, r+50, r*2, t, c, 0)
+	blitbuffer.paintBorder(fb.bb, lx+10*dx-8, vy-2*dy-r-8, r+50, r*2, t, c, 0)
 	renderUtf8Text(fb.bb, lx+10*dx+11, vy-2*dy-3, smfont, "Menu", true)
 	-- fiveway
 	local h=dy+2*r-2
 	blitbuffer.paintBorder(fb.bb, lx+10*dx-8, vy-dy-r-6, h, h, 9, c, r)
 	renderUtf8Text(fb.bb, lx+10*dx+22, vy-20, smfont, (self.layout-1), true)
-	-- added for black keyboard
-	fb.bb:invertRect(0, fb.bb:getHeight()-120, fb.bb:getWidth(), 120)
 	if vk_cursor_y < 3 then self:invertVKey(vk_cursor_x, vk_cursor_y) end
 	fb:refresh(1, 1, fb.bb:getHeight()-120, fb.bb:getWidth()-2, 120)
 end

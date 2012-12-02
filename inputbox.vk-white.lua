@@ -159,16 +159,17 @@ end
 function InputBox:drawBox(ypos, w, h, title)
 	-- draw input border
 	local r = 6 -- round corners
+	fb.bb:paintRect(1, ypos+r, w, h - r, self.vk_bg)
 	blitbuffer.paintBorder(fb.bb, 0, ypos, fb.bb:getWidth(), r, r, 15, r)
-	fb.bb:paintRect(0, ypos+r, w, h - r, self.vk_bg)
+	blitbuffer.paintBorder(fb.bb, 1, ypos + 2, fb.bb:getWidth() - 2, r, r, self.vk_bg, r)
 	-- draw input title
 	self.input_start_y = ypos + 37
 	-- draw the box title > estimate the start point for future text & the text slot width
 	self.input_start_x = 25 + renderUtf8Text(fb.bb, 15, self.input_start_y, self.face, title, true)
 	self.input_slot_w = fb.bb:getWidth() - self.input_start_x - 5
 	self.max_input_chars = math.floor(self.input_slot_w / self.fwidth)
-	fb.bb:invertRect(0, ypos+r, fb.bb:getWidth(), 120)
 	-- draw input slot
+	fb.bb:paintRect(self.input_start_x - 6, ypos+9, self.input_slot_w+2, h-18, 15)
 	fb.bb:paintRect(self.input_start_x - 5, ypos + 10, self.input_slot_w, h - 20, self.input_bg)
 end
 
@@ -347,7 +348,7 @@ function InputBox:DrawVirtualKeyboard()
 	-- h = y-correction to adjust cicles & chars
 	local dx, dy, lx, r, c, bg, t = vk_dx, vk_dy, vk_lx, vk_r, vk_c, self.vk_bg, vk_t
 
-	fb.bb:paintRect(0, fb.bb:getHeight()-120, fb.bb:getWidth(), 120, bg)
+	fb.bb:paintRect(1, fb.bb:getHeight()-119, fb.bb:getWidth()-2, 120, bg)
 	-- font to draw characters - MUST have UTF8-support
 	local vkfont = Font:getFace("infont", 22)
 	for k,v in ipairs(self.INPUT_KEYS) do
@@ -379,8 +380,6 @@ function InputBox:DrawVirtualKeyboard()
 	local h=dy+2*r-2
 	blitbuffer.paintBorder(fb.bb, lx+10*dx-8, vy-dy-r-6, h, h, 9, c, r)
 	renderUtf8Text(fb.bb, lx+10*dx+22, vy-20, smfont, (self.layout-1), true)
-	-- added for black keyboard
-	fb.bb:invertRect(0, fb.bb:getHeight()-120, fb.bb:getWidth(), 120)
 	if vk_cursor_y < 3 then self:invertVKey(vk_cursor_x, vk_cursor_y) end
 	fb:refresh(1, 1, fb.bb:getHeight()-120, fb.bb:getWidth()-2, 120)
 end
