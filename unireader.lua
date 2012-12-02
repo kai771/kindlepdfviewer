@@ -62,7 +62,7 @@ UniReader = {
 	shift_x = DSHIFT_X,
 	shift_y = DSHIFT_Y,
 	-- step to change zoom manually, default = 16%
-	step_manual_zoom = DSTEP_MANUAL_ZOOM,
+	step_manual_zoom = DSTEP_MANUAL_ZOOM / 100,
 	pan_by_page = DPAN_BY_PAGE, -- using shift_[xy] or width/height
 	pan_x = 0, -- top-left offset of page when pan activated
 	pan_y = 0,
@@ -1386,6 +1386,7 @@ function UniReader:setzoom(page, preCache)
 
 	dc:setRotate(self.globalrotate);
 	self.fullwidth, self.fullheight = page:getSize(dc)
+
 	if not preCache then -- save current page fullsize
 		self.cur_full_width = self.fullwidth
 		self.cur_full_height = self.fullheight
@@ -1877,6 +1878,7 @@ end
 -- adjust zoom state and trigger re-rendering
 function UniReader:setGlobalZoom(zoom)
 	if self.globalzoom ~= zoom then
+		self.pan_by_page = nil
 		self.globalzoom_mode = self.ZOOM_BY_VALUE
 		self.globalzoom = zoom
 		self:redrawCurrentPage()
@@ -2615,6 +2617,7 @@ function UniReader:showZoomModeMenu()
 	elseif cur_zoom == -7 then cur_entry = 4	-- zoom to content width pan --> zoom to content width
 	elseif self.pan_by_page == -10 then cur_entry = 6
 	elseif self.pan_by_page == -9 then cur_entry = 7
+	else cur_entry = 8
 	end 
 	
 	local mode_list = {
@@ -2626,7 +2629,7 @@ function UniReader:showZoomModeMenu()
 		"Fit to content height",			-- ZOOM_FIT_TO_CONTENT_HEIGHT = -6,
 		"2-column mode",							-- ZOOM_FIT_TO_CONTENT_HALF_WIDTH = -10,
 		"2-column mode with margin",	-- ZOOM_FIT_TO_CONTENT_HALF_WIDTH_MARGIN = -9,
---		"Zoom by value",						-- ZOOM_BY_VALUE = 0
+		"Zoom manually...",						-- ZOOM_BY_VALUE = 0
 		}
 	local zoom_menu = SelectMenu:new{
 		menu_title = "Select Zoom Mode",
@@ -2636,13 +2639,16 @@ function UniReader:showZoomModeMenu()
 	local re = zoom_menu:choose(0, G_height)
 	if re ~= nil then
 	
-		-- translate entry number to zoom mode
-		if re >= 1 and re <= 6 then cur_zoom = - re
-		elseif re == 7 then cur_zoom = -10
-		elseif re == 8 then cur_zoom = -9 
-		end 
-		
-		self:setglobalzoom_mode(cur_zoom)
+		if re == 9 then 
+			self:zoomInput()
+		else	
+			-- translate entry number to zoom mode
+			if re >= 1 and re <= 6 then cur_zoom = - re
+			elseif re == 7 then cur_zoom = -10
+			elseif re == 8 then cur_zoom = -9 
+			end 	
+			self:setglobalzoom_mode(cur_zoom)
+		end
 	else
 		self:redrawCurrentPage()
 	end	
@@ -2694,6 +2700,16 @@ function UniReader:toggleBatteryLogging()
 	G_battery_logging = not G_battery_logging
 	InfoMessage:inform("Battery logging "..(G_battery_logging and "on " or "off "), DINFO_DELAY, 1, MSG_AUX)
 	G_reader_settings:saveSetting("G_battery_logging", G_battery_logging)
+end
+
+function UniReader:zoomInput()
+	local new_zoom = NumInputBox:input(G_height-100, 100,
+		"Zoom:", "current zoom: "..(math.floor(self.globalzoom*100)).."%", true)
+	if not pcall(function () new_zoom = new_zoom/100 end) or new_zoom == self.globalzoom then
+		self:redrawCurrentPage()
+	else
+		self:setGlobalZoom(new_zoom)
+	end		
 end
 
 function UniReader:gotoInput()
@@ -2831,11 +2847,14 @@ function UniReader:showMainMenu()
 		item_array = main_menu_list,
 		current_entry = 0
 		}
+	Screen:saveCurrentBB()
 	local re = main_menu:choose(0, G_height)
+	Screen:restoreFromSavedBB()
 	Debug("My re=", tostring(re))
 	if re == 1 then 
 		self:showToc()
-	elseif re == 2 then 
+	elseif re == 2 then
+		fb:refresh(1)
 		self:gotoInput()
 	elseif re == 3 then
 		self:redrawCurrentPage()
@@ -2885,11 +2904,12 @@ function UniReader:addAllCommands()
 	self.commands:addGroup(MOD_ALT.."< >", {
 		Keydef:new(KEY_PGBCK, MOD_ALT), Keydef:new(KEY_PGFWD, MOD_ALT),
 		Keydef:new(KEY_LPGBCK, MOD_ALT), Keydef:new(KEY_LPGFWD, MOD_ALT)},
-		"zoom out/in ".. self.step_manual_zoom .."% ",
+		"zoom out/in ".. (self.step_manual_zoom*100) .."% ",
 		function(unireader, keydef)
 			local is_zoom_out = (keydef.keycode == KEY_PGBCK or keydef.keycode == KEY_LPGBCK)
-			local new_zoom = unireader.globalzoom_orig * (1 + (is_zoom_out and -1 or 1)*unireader.step_manual_zoom/100)
-			InfoMessage:inform(string.format("New zoom is %.2f ", new_zoom), DINFO_NODELAY, 1, MSG_WARN)
+			local new_zoom = math.floor(unireader.globalzoom_orig/unireader.step_manual_zoom) * unireader.step_manual_zoom + ((is_zoom_out and -1 or 1) * unireader.step_manual_zoom)
+			if new_zoom < unireader.step_manual_zoom then new_zoom = unireader.step_manual_zoom end
+			InfoMessage:inform("New zoom is ".. (new_zoom * 100).. "%", DINFO_NODELAY, 1, MSG_WARN)
 			unireader:setGlobalZoom(new_zoom)
 		end)
 		
@@ -2902,15 +2922,15 @@ function UniReader:addAllCommands()
 			if keydef.keycode == KEY_PGFWD or keydef.keycode == KEY_LPGFWD then
 				unireader.step_manual_zoom = unireader.step_manual_zoom * 2
 				self.settings:saveSetting("step_manual_zoom", self.step_manual_zoom)
-				InfoMessage:inform("New zoom step: "..unireader.step_manual_zoom.."% ", DINFO_DELAY, 1, MSG_WARN)
+				InfoMessage:inform("New zoom step: "..(unireader.step_manual_zoom*100).."% ", DINFO_DELAY, 1, MSG_WARN)
 			else
-				local minstep = 1
+				local minstep = 0.01
 				if unireader.step_manual_zoom > 2*minstep then
 					unireader.step_manual_zoom = unireader.step_manual_zoom / 2
 					self.settings:saveSetting("step_manual_zoom", self.step_manual_zoom)
-					InfoMessage:inform("New zoom step: "..unireader.step_manual_zoom.."% ", DINFO_DELAY, 1, MSG_WARN)
+					InfoMessage:inform("New zoom step: "..(unireader.step_manual_zoom*100).."% ", DINFO_DELAY, 1, MSG_WARN)
 				else
-					InfoMessage:inform("Min zoom step: "..minstep.."% ", DINFO_DELAY, 1, MSG_WARN)
+					InfoMessage:inform("Min zoom step: "..(minstep*100).."% ", DINFO_DELAY, 1, MSG_WARN)
 				end
 			end
 		end)
@@ -3146,6 +3166,12 @@ function UniReader:addAllCommands()
 			unireader:forceScreenRefresh()
 		end)
 
+	self.commands:add(KEY_Z, nil, "Z",
+		"Set custom zoom",
+		function(unireader)
+			unireader:zoomInput()
+		end)
+		
 	self.commands:add(KEY_Z, MOD_SHIFT, "Z",
 		"Remove manual bbox settings",
 		function(unireader)
