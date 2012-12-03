@@ -76,6 +76,10 @@ UniReader = {
 	comics_mode_enable,
 	rtl_mode_enable, -- rtl = right-to-left
 	page_mode_enable,
+	
+	-- last selections in menus:
+	main_menu_cur = 0,
+	settings_menu_cur = 0,
 
 	-- the document:
 	doc = nil,
@@ -2630,6 +2634,8 @@ function UniReader:showZoomModeMenu()
 		"2-column mode",							-- ZOOM_FIT_TO_CONTENT_HALF_WIDTH = -10,
 		"2-column mode with margin",	-- ZOOM_FIT_TO_CONTENT_HALF_WIDTH_MARGIN = -9,
 		"Zoom manually...",						-- ZOOM_BY_VALUE = 0
+		"Rotate screen clockwise",
+		"Rotate screen anti-clockwise",
 		}
 	local zoom_menu = SelectMenu:new{
 		menu_title = "Select Zoom Mode",
@@ -2644,8 +2650,14 @@ function UniReader:showZoomModeMenu()
 		else	
 			-- translate entry number to zoom mode
 			if re >= 1 and re <= 6 then cur_zoom = - re
-			elseif re == 7 then cur_zoom = -10
-			elseif re == 8 then cur_zoom = -9 
+			elseif re == 7 then cur_zoom = self.ZOOM_FIT_TO_CONTENT_HALF_WIDTH
+			elseif re == 8 then cur_zoom = self.ZOOM_FIT_TO_CONTENT_HALF_WIDTH_MARGIN
+			elseif re == 10 or re == 11 then
+				if re == 10 then self:screenRotate("clockwise")
+				else self:screenRotate("anticlockwise") end
+				if self.globalzoom_mode == self.ZOOM_FIT_TO_CONTENT_WIDTH_PAN then
+					cur_zoom = self.ZOOM_FIT_TO_CONTENT_WIDTH
+				end
 			end 	
 			self:setglobalzoom_mode(cur_zoom)
 		end
@@ -2834,48 +2846,109 @@ function UniReader:showMainMenu()
 	local main_menu_list = {
 		"Table of Contents...",
 		"Go to...",
+		"View jump history...",
 		"Add bookmark",
 		"View bookmarks...",
 		"Add highlight",
 		"View highlights...",
-		"Zoom mode...",
-		"Options...",
-		"Exit",
+		"Follow link...",
+		"Zoom & Rotate...",
+		"Settings...",
+		"Close book",
+		"Exit Librerator",
 		}
 	local main_menu = SelectMenu:new{
 		menu_title = "Librerator - Main Menu",
 		item_array = main_menu_list,
-		current_entry = 0
+		current_entry = self.main_menu_cur
 		}
 	Screen:saveCurrentBB()
 	local re = main_menu:choose(0, G_height)
 	Screen:restoreFromSavedBB()
-	Debug("My re=", tostring(re))
+	Debug("Main menu: selected item ", tostring(re))
+	if re ~= nil then self.main_menu_cur = re - 1 end
 	if re == 1 then 
 		self:showToc()
 	elseif re == 2 then
 		fb:refresh(1)
 		self:gotoInput()
 	elseif re == 3 then
+		self:showJumpHist()
+	elseif re == 4 then
 		self:redrawCurrentPage()
 		self:addBookmarkCommand()
-	elseif re == 4 then
-		self:showBookMarks()
 	elseif re == 5 then
+		self:showBookMarks()
+	elseif re == 6 then
 		self:redrawCurrentPage()
 		self:startHighLightMode()
-	elseif re == 6 then
-		self:showHighLight()
 	elseif re == 7 then
-		self:showZoomModeMenu()
+		self:showHighLight()
 	elseif re == 8 then
---
+		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
 	elseif re == 9 then
+		self:showZoomModeMenu()
+	elseif re == 10 then
+		self:showSettingsMenu()
+	elseif re == 11 then
+		keep_running = false
+		return "break"		
+	elseif re == 12 then
 		keep_running = false
 		return "break"		
 	end
 end
 
+function UniReader:showSettingsMenu()
+	local settings_menu_list = {
+		"Turn overlap "..(self.show_overlap_enable and "off" or "on"),
+		"Turn comics mode "..(self.comics_mode_enable and "off" or "on"),
+		"Turn right-to-left mode "..(self.rtl_mode_enable and "off" or "on"),
+		"Turn link underlines "..(self.show_links_enable and "off" or "on"),
+		"Set page-keys mode to "..(self.page_mode_enable and "viewport" or "page"),
+		"Set first page offset...",
+		"Manually set BBox",
+		"Remove manually set BBox",
+		"Adjust gamma",
+		"Configure event notifications",
+		"Reset default reader preferences",
+		"Clear reader association with this document",
+		}
+	local settings_menu = SelectMenu:new{
+		menu_title = "Librerator - Settings",
+		item_array = settings_menu_list,
+		current_entry = self.settings_menu_cur
+		}
+	local re = settings_menu:choose(0, G_height)
+	Debug("Settings menu: selected item ", tostring(re))
+	if re ~= nil then self.settings_menu_cur = re - 1 end
+	if re == 1 then 
+		self:toggleOverlap()
+	elseif re == 2 then
+		self:toggleComicsMode()
+	elseif re == 3 then
+		self:toggleRTLMode()
+	elseif re == 4 then
+		self:toggleLinkUnderlines()
+	elseif re == 5 then
+		self:togglePageMode()
+	elseif re == 6 then
+		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
+	elseif re == 7 then
+		self:redrawCurrentPage()
+		self:modBBox()
+	elseif re == 8 then
+		self:removeBBox()
+	elseif re == 9 then
+		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
+	elseif re == 10 then
+		InfoMessage:chooseNotificatonMethods()
+	elseif re == 11 then
+		self:resetDefaultReader()
+	elseif re == 12 then
+		self:clearReaderAssociation()
+	end
+end
 
 -- command definitions
 function UniReader:addAllCommands()
@@ -2964,12 +3037,6 @@ function UniReader:addAllCommands()
 		end)
 	-- end numeric keys
 
-	self.commands:add(KEY_M, nil, "M",
-		"select zoom mode",
-		function(unireader)
-			unireader:showZoomModeMenu()
-		end)
-
 	self.commands:add(KEY_A, nil, "A",
 		"zoom to fit page",
 		function(unireader)
@@ -3038,7 +3105,7 @@ function UniReader:addAllCommands()
 		end)
 		
 	self.commands:add(KEY_T, nil, "T",
-		"show table of content (TOC)",
+		"show table of contents (TOC)",
 		function(unireader)
 			unireader:showToc()
 		end)
@@ -3172,6 +3239,12 @@ function UniReader:addAllCommands()
 			unireader:zoomInput()
 		end)
 		
+	self.commands:add(KEY_Z, MOD_ALT, "Z",
+		"select zoom mode",
+		function(unireader)
+			unireader:showZoomModeMenu()
+		end)
+
 	self.commands:add(KEY_Z, MOD_SHIFT, "Z",
 		"Remove manual bbox settings",
 		function(unireader)
