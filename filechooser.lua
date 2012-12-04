@@ -98,9 +98,9 @@ function DrawFileItem(name,x,y,image)
 	if sizeUtf8Text(xleft, G_width - x, cface, name, true).x < width then
 		renderUtf8Text(fb.bb, xleft, y, cface, name, true)
 	else
-		local lgap = sizeUtf8Text(0, width, cface, " ...", true).x
+		local lgap = sizeUtf8Text(0, width, cface, "...", true).x
 		local handle = renderUtf8TextWidth(fb.bb, xleft, y, cface, name, true, width - lgap - x)
-		renderUtf8Text(fb.bb, handle.x + lgap + x, y, cface, " ...", true)
+		renderUtf8Text(fb.bb, xleft + handle.x, y, cface, "...", true)
 	end
 	iw:free()
 end
