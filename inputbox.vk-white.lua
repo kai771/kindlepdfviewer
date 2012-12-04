@@ -452,7 +452,7 @@ function InputBox:addCharCommands(layout)
 		-- just redefining existing
 		self.commands:add(v[1], nil, "A..Z", "enter character from virtual keyboard (VK)",
 			function(self)
-				self:addChar(v[layout])
+				self:addChar(v[self.layout])
 			end
 		)
 		-- and commands for chars pressed with Shift
