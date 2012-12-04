@@ -32,6 +32,8 @@ FileChooser = {
 	pagedirty = true,
 	markerdirty = false,
 	perpage,
+	
+	file_menu_cur = 0, -- last item selected in File menu
 
 	clipboard = lfs.currentdir() .. "/clipboard", -- NO finishing slash
 	before_clipboard, -- NuPogodi, 30.09.12: to store the path where jump to clipboard was made from
@@ -289,6 +291,170 @@ function FileChooser:choose(ypos, height)
 	end -- while
 end
 
+function FileChooser:gotoInput()
+	local n = math.ceil(self.items / self.perpage)
+	local page = NumInputBox:input(G_height-100, 100, "Page:", "current page "..self.page.." of "..n, true)
+	if pcall(function () page = math.floor(page) end) -- convert string to number
+	and page ~= self.page and page > 0 and page <= n then
+		self.page = page
+		if self.current + (page-1)*self.perpage > self.items then
+			self.current = self.items - (page-1)*self.perpage
+		end
+	end
+	self.pagedirty = true
+end
+
+function FileChooser:showFileInfo()
+	local folder = self.dirs[self.perpage*(self.page-1)+self.current]
+	if folder then
+		if folder == ".." then
+			warningUnsupportedFunction()
+		else
+			folder = self.path.."/"..folder
+			if FileInfo:show(folder) == "goto" then
+				self:setPath(folder)
+			end
+		end
+	else -- file info
+		FileInfo:show(self.path, self.files[self.perpage*(self.page-1)+self.current-#self.dirs])
+	end
+	self.pagedirty = true
+end
+
+function FileChooser:doDelete()
+	local pos = self.perpage*(self.page-1)+self.current
+	if pos > #self.dirs then -- file
+		if InfoMessage.InfoMethod[MSG_CONFIRM] == 0 then	-- silent regime
+			self:deleteFileAtPosition(pos)
+		else
+			InfoMessage:inform("Press 'Y' to confirm ", DINFO_NODELAY, 0, MSG_CONFIRM)
+			if ReturnKey() == KEY_Y then self:deleteFileAtPosition(pos) end
+		end
+	elseif self.dirs[pos] == ".." then 
+		warningUnsupportedFunction()
+	else -- other folders
+		if InfoMessage.InfoMethod[MSG_CONFIRM] == 0 then -- silent regime
+			self:deleteFolderAtPosition(pos)
+		else
+			InfoMessage:inform("Press 'Y' to confirm ", DINFO_NODELAY, 0, MSG_CONFIRM)
+			if ReturnKey() == KEY_Y then self:deleteFolderAtPosition(pos) end
+		end
+	end
+	self.pagedirty = true
+end
+
+function FileChooser:doRename()
+	local oldname = self:FullFileName()
+	if oldname then
+		local name_we = self.files[self.perpage*(self.page-1)+self.current-#self.dirs]
+		local ext = ""
+		-- in RESTRICTED mode don't allow renaming extension
+		if self.filemanager_mode == self.RESTRICTED then
+			ext = "."..string.lower(string.match(oldname, ".+%.([^.]+)") or "")
+			name_we = string.sub(name_we, 1, -1-string.len(ext))
+		end
+		local newname = InputBox:input(0, 0, "New filename:", name_we)
+		if newname then
+			newname = self.path.."/"..newname..ext
+			os.rename(oldname, newname)
+			os.rename(DocToHistory(oldname), DocToHistory(newname))
+			self:setPath(self.path)
+		end
+		self.pagedirty = true
+	end
+end
+
+function FileChooser:showLastDocuments()
+	FileHistory:init()
+	FileHistory:choose("")
+	self.pagedirty = true
+	return nil
+end
+
+function FileChooser:doSearch()
+	local keywords = InputBox:input(0, 0, "Search:")
+	if keywords then
+		InfoMessage:inform("Searching... ", DINFO_NODELAY, 1, MSG_AUX)
+		FileSearcher:init( self.path )
+		FileSearcher:choose(keywords)
+	end
+	self.pagedirty = true
+end
+
+function FileChooser:doCopy()
+	local file = self:FullFileName()
+	if file then
+		os.execute("cp "..InQuotes(file).." "..self.clipboard)
+		local fn = self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
+		os.execute("cp "..InQuotes(DocToHistory(file)).." "
+			..InQuotes(DocToHistory(self.clipboard.."/"..fn)) )
+		InfoMessage:inform("File copied to clipboard ", DINFO_DELAY, 1, MSG_WARN)
+	end
+end
+
+function FileChooser:doCut()
+	-- TODO (NuPogodi, 27.09.12): overwrite?
+	local file = self:FullFileName()
+	if file then
+		local fn = self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
+		os.rename(file, self.clipboard.."/"..fn)
+		os.rename(DocToHistory(file), DocToHistory(self.clipboard.."/"..fn))
+		InfoMessage:inform("File moved to clipboard ", DINFO_DELAY, 0, MSG_WARN)
+		local pos = self.perpage*(self.page-1)+self.current
+		table.remove(self.files, pos-#self.dirs)
+		self.items = self.items - 1
+		self.current, self.page = gotoTargetItem(pos, self.items, pos, self.page, self.perpage)
+		self.pagedirty = true
+	end
+end
+
+function FileChooser:doPaste()
+	-- TODO (NuPogodi, 27.09.12): first test whether the clipboard is empty & answer respectively
+	-- TODO (NuPogodi, 27.09.12): overwrite?
+	InfoMessage:inform("Moving files from clipboard...", DINFO_NODELAY, 0, MSG_AUX)
+	for f in lfs.dir(self.clipboard) do
+		if lfs.attributes(self.clipboard.."/"..f, "mode") == "file" then
+			os.rename(self.clipboard.."/"..f, self.path.."/"..f)
+			os.rename(DocToHistory(self.clipboard.."/"..f), DocToHistory(self.path.."/"..f))
+		end
+	end
+	self:setPath(self.path)
+	self.pagedirty = true
+end
+
+function FileChooser:toggleBatteryLogging()
+	G_battery_logging = not G_battery_logging
+	InfoMessage:inform("Battery logging "..(G_battery_logging and "on " or "off "), DINFO_DELAY, 1, MSG_AUX)
+	G_reader_settings:saveSetting("G_battery_logging", G_battery_logging)
+end
+
+function FileChooser:viewClipboard()
+	-- save the current directory in order to
+	-- return from clipboard via ".." entry
+	local current_path = self.path
+	if self.clipboard ~= self.path then
+		self:setPath(self.clipboard)
+		self.before_clipboard = current_path
+	end
+	self.pagedirty = true
+end
+
+function FileChooser:doNewFolder()
+	local folder = InputBox:input(0, 0, "New Folder:")
+	if folder then
+		if lfs.mkdir(self.path.."/"..folder) then
+			self:setPath(self.path)
+		end
+	end
+	self.pagedirty = true
+end
+
+function FileChooser:doCalculator()
+	local CalcBox = InputBox:new{ inputmode = MODE_CALC }
+	CalcBox:input(0, 0, "Calc ")
+	self.pagedirty = true
+end
+
 -- add available commands
 function FileChooser:addAllCommands()
 	self.commands = Commands:new{}
@@ -397,35 +563,13 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_G, nil, "G", -- NuPogodi, 01.10.12: goto page No.
 		"goto page",
 		function(self)
-			local n = math.ceil(self.items / self.perpage)
-			local page = NumInputBox:input(G_height-100, 100, "Page:", "current page "..self.page.." of "..n, true)
-			if pcall(function () page = math.floor(page) end) -- convert string to number
-			and page ~= self.page and page > 0 and page <= n then
-				self.page = page
-				if self.current + (page-1)*self.perpage > self.items then
-					self.current = self.items - (page-1)*self.perpage
-				end
-			end
-			self.pagedirty = true
+			self:gotoInput()
 		end
 	)
 	self.commands:add(KEY_FW_RIGHT, nil, "joypad right",
 		"show document information",
 		function(self)
-			local folder = self.dirs[self.perpage*(self.page-1)+self.current]
-			if folder then
-				if folder == ".." then
-					warningUnsupportedFunction()
-				else
-					folder = self.path.."/"..folder
-					if FileInfo:show(folder) == "goto" then
-						self:setPath(folder)
-					end
-				end
-			else -- file info
-				FileInfo:show(self.path, self.files[self.perpage*(self.page-1)+self.current-#self.dirs])
-			end
-			self.pagedirty = true
+			self:showFileInfo()
 		end
 	)
 	self.commands:add({KEY_ENTER, KEY_FW_PRESS}, nil, "Enter",
@@ -448,48 +592,13 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_DEL, nil, "Del",
 		"delete selected item",
 		function(self)
-			local pos = self.perpage*(self.page-1)+self.current
-			if pos > #self.dirs then -- file
-				if InfoMessage.InfoMethod[MSG_CONFIRM] == 0 then	-- silent regime
-					self:deleteFileAtPosition(pos)
-				else
-					InfoMessage:inform("Press 'Y' to confirm ", DINFO_NODELAY, 0, MSG_CONFIRM)
-					if ReturnKey() == KEY_Y then self:deleteFileAtPosition(pos) end
-				end
-			elseif self.dirs[pos] == ".." then 
-				warningUnsupportedFunction()
-			else -- other folders
-				if InfoMessage.InfoMethod[MSG_CONFIRM] == 0 then -- silent regime
-					self:deleteFolderAtPosition(pos)
-				else
-					InfoMessage:inform("Press 'Y' to confirm ", DINFO_NODELAY, 0, MSG_CONFIRM)
-					if ReturnKey() == KEY_Y then self:deleteFolderAtPosition(pos) end
-				end
-			end
-			self.pagedirty = true
-		end -- function
+			self:doDelete()
+		end
 	)
 	self.commands:add(KEY_R, MOD_SHIFT, "R",
 		"rename file",
 		function(self)
-			local oldname = self:FullFileName()
-			if oldname then
-				local name_we = self.files[self.perpage*(self.page-1)+self.current-#self.dirs]
-				local ext = ""
-				-- in RESTRICTED mode don't allow renaming extension
-				if self.filemanager_mode == self.RESTRICTED then
-					ext = "."..string.lower(string.match(oldname, ".+%.([^.]+)") or "")
-					name_we = string.sub(name_we, 1, -1-string.len(ext))
-				end
-				local newname = InputBox:input(0, 0, "New filename:", name_we)
-				if newname then
-					newname = self.path.."/"..newname..ext
-					os.rename(oldname, newname)
-					os.rename(DocToHistory(oldname), DocToHistory(newname))
-					self:setPath(self.path)
-				end
-				self.pagedirty = true
-			end
+			self:doRename()
 		end
 	)
 	self.commands:add(KEY_M, MOD_ALT, "M",
@@ -534,111 +643,67 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_L, nil, "L",
 		"show last documents",
 		function(self)
-			FileHistory:init()
-			FileHistory:choose("")
-			self.pagedirty = true
-			return nil
+			self:showLastDocuments()
 		end
 	)
 	self.commands:add(KEY_S, nil, "S",
 		"search files (single space matches all)",
 		function(self)
-			local keywords = InputBox:input(0, 0, "Search:")
-			if keywords then
-				InfoMessage:inform("Searching... ", DINFO_NODELAY, 1, MSG_AUX)
-				FileSearcher:init( self.path )
-				FileSearcher:choose(keywords)
-			end
-			self.pagedirty = true
+			self:doSearch()
 		end
 	)
 	self.commands:add(KEY_C, MOD_SHIFT, "C",
 		"copy file to 'clipboard'",
 		function(self)
-			local file = self:FullFileName()
-			if file then
-				os.execute("cp "..InQuotes(file).." "..self.clipboard)
-				local fn = self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
-				os.execute("cp "..InQuotes(DocToHistory(file)).." "
-					..InQuotes(DocToHistory(self.clipboard.."/"..fn)) )
-				InfoMessage:inform("File copied to clipboard ", DINFO_DELAY, 1, MSG_WARN)
-			end
+			self:doCopy()
 		end
 	)
 	self.commands:add(KEY_X, MOD_SHIFT, "X",
 		"move file to 'clipboard'",
 		function(self)
-			-- TODO (NuPogodi, 27.09.12): overwrite?
-			local file = self:FullFileName()
-			if file then
-				local fn = self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
-				os.rename(file, self.clipboard.."/"..fn)
-				os.rename(DocToHistory(file), DocToHistory(self.clipboard.."/"..fn))
-				InfoMessage:inform("File moved to clipboard ", DINFO_DELAY, 0, MSG_WARN)
-				local pos = self.perpage*(self.page-1)+self.current
-				table.remove(self.files, pos-#self.dirs)
-				self.items = self.items - 1
-				self.current, self.page = gotoTargetItem(pos, self.items, pos, self.page, self.perpage)
-				self.pagedirty = true
-			end
+			self:doCut()
 		end
 	)
 	self.commands:add(KEY_V, MOD_SHIFT, "V",
 		"paste file(s) from 'clipboard'",
 		function(self)
-			-- TODO (NuPogodi, 27.09.12): first test whether the clipboard is empty & answer respectively
-			-- TODO (NuPogodi, 27.09.12): overwrite?
-			InfoMessage:inform("Moving files from clipboard...", DINFO_NODELAY, 0, MSG_AUX)
-			for f in lfs.dir(self.clipboard) do
-				if lfs.attributes(self.clipboard.."/"..f, "mode") == "file" then
-					os.rename(self.clipboard.."/"..f, self.path.."/"..f)
-					os.rename(DocToHistory(self.clipboard.."/"..f), DocToHistory(self.path.."/"..f))
-				end
-			end
-			self:setPath(self.path)
-			self.pagedirty = true
+			FileChooser:doPaste()
 		end
 	)
 	self.commands:add(KEY_DOT, MOD_ALT, ".",
 		"toggle battery level logging",
 		function(self)
-			G_battery_logging = not G_battery_logging
-			InfoMessage:inform("Battery logging "..(G_battery_logging and "on " or "off "), DINFO_DELAY, 1, MSG_AUX)
-			G_reader_settings:saveSetting("G_battery_logging", G_battery_logging)
+			FileChooser:toggleBatteryLogging()
 		end
 	)
 	self.commands:add(KEY_B, MOD_SHIFT, "B",
 		"show content of 'clipboard'",
 		function(self)
-			-- save the current directory in order to
-			-- return from clipboard via ".." entry
-			local current_path = self.path
-			if self.clipboard ~= self.path then
-				self:setPath(self.clipboard)
-				self.before_clipboard = current_path
-			end
-			self.pagedirty = true
+			self:viewClipboard()
 		end
 	)
 	self.commands:add(KEY_N, MOD_SHIFT, "N",
 		"make new folder",
 		function(self)
-			local folder = InputBox:input(0, 0, "New Folder:")
-			if folder then
-				if lfs.mkdir(self.path.."/"..folder) then
-					self:setPath(self.path)
-				end
-			end
-			self.pagedirty = true
+			self:doNewFolder()
 		end
 	)
 	self.commands:add(KEY_K, MOD_SHIFT, "K",
 		"run calculator",
 		function(self)
-			local CalcBox = InputBox:new{ inputmode = MODE_CALC }
-			CalcBox:input(0, 0, "Calc ")
-			self.pagedirty = true
+			self:doCalculator()
 		end
+	)
+	self.commands:add(KEY_MENU, nil, "Menu",
+		"show File Chooser menu",
+		function(self)
+			local re = self:showFileMenu()
+			if re == "break" then
+				return "break"
+			else	
+				self.pagedirty = true
+			end
+	end
 	)
 	self.commands:addGroup("Home, Alt + Back", { Keydef:new(KEY_HOME, nil),Keydef:new(KEY_BACK, MOD_ALT)}, "exit",
 		function(self)
@@ -724,3 +789,68 @@ function warningUnsupportedFunction()
 	InfoMessage:inform("Unsupported function ", DINFO_DELAY, 1, MSG_WARN)
 	return nil
 end
+
+function FileChooser:showFileMenu()
+	local file_menu_list = {
+		"Show last documents...",
+		"Go to...",
+		"Search...",
+		"Cut",
+		"Copy",
+		"Paste",
+		"Rename...",
+		"New folder...",
+		"Change font...",
+		"Calculator",
+		"Turn battery logging "..(G_battery_logging and "off" or "on"),
+		"File Manager mode...",
+		"Exit Librerator",
+		}
+	local file_menu = SelectMenu:new{
+		menu_title = "Librerator - File Chooser Menu",
+		item_array = file_menu_list,
+		current_entry = self.file_menu_cur
+		}
+	Screen:saveCurrentBB()
+	local re = file_menu:choose(0, G_height)
+	Screen:restoreFromSavedBB()
+	Debug("File Chooser menu: selected item ", tostring(re))
+	if re ~= nil then self.file_menu_cur = re - 1 end
+	if re == 1 then 
+		self:showLastDocuments()
+	elseif re == 2 then
+		fb:refresh(1)
+		self:gotoInput()
+	elseif re == 3 then
+		fb:refresh(1)
+		self:doSearch()
+	elseif re == 4 then
+		self:doCut()
+	elseif re == 5 then
+		self:doCopy()
+	elseif re == 6 then
+		self:doPaste()
+	elseif re == 7 then
+		fb:refresh(1)
+		self:doRename()
+	elseif re == 8 then
+		fb:refresh(1)
+		self:doNewFolder()
+	elseif re == 9 then
+		Font:chooseFonts()
+		self.pagedirty = true
+	elseif re == 10 then
+		fb:refresh(1)
+		self:doCalculator()
+	elseif re == 11 then
+		self:toggleBatteryLogging()
+	elseif re == 12 then
+		self:setFileManagerMode()
+	elseif re == 13 then
+		return "break"
+	else
+		self.pagedirty = true	
+	end
+end
+
+
