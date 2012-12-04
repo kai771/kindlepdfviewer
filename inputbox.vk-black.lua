@@ -211,9 +211,17 @@ function InputBox:input(ypos, height, title, d_text, is_hint)
 			fb.bb:dimRect(self.input_start_x-5, self.input_start_y-19, self.input_slot_w, self.fheight, self.input_bg)
 		else
 			-- add text to input_string
+			-- add text to input_string
 			self:StringToCharlist(d_text)
-			self.input_cur_x = self.input_cur_x + (self.fwidth * #self.charlist)
-			self.cursor.x_pos = self.cursor.x_pos + (self.fwidth * #self.charlist)
+			if self.charpos < self.max_input_chars then 
+				self.pos_on_screen = self.charpos
+				self.charposl = 1
+			else
+				self.pos_on_screen = self.max_input_chars
+				self.charposl = self.charpos - self.max_input_chars + 1
+			end
+			self.input_cur_x = self.input_cur_x + (self.fwidth * (self.pos_on_screen - 1))
+			self.cursor.x_pos = self.cursor.x_pos + (self.fwidth * (self.pos_on_screen - 1))
 			self:refreshText()
 		end
 	end
