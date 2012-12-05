@@ -12,6 +12,7 @@ DGLOBALROTATE = 0
 
 -- gamma setting:
 DGLOBALGAMMA = 1.0   -- GAMMA_NO_GAMMA
+DGAMMA_STEP = 0.2
 
 -- DjVu page rendering mode (used in djvu.c:drawPage())
 -- See comments in djvureader.lua:DJVUReader:select_render_mode()
@@ -75,6 +76,7 @@ DINFO_COMICS_MODE_SHOW = true
 DINFO_RTL_MODE_SHOW = true
 DINFO_PAGE_MODE_SHOW = true
 DINFO_LINK_UNDERLINES_SHOW = true
+DINFO_GAMMA_CHANGE_SHOW = true
 
 -- toggle defaults
 DUNIREADER_SHOW_OVERLAP_ENABLE = false

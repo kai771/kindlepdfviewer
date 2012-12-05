@@ -1864,8 +1864,19 @@ end
 -- adjust global gamma setting
 function UniReader:modifyGamma(factor)
 	Debug("modifyGamma, gamma=", self.globalgamma, " factor=", factor)
-	self.globalgamma = self.globalgamma * factor;
-	InfoMessage:inform(string.format("New gamma is %.2f", self.globalgamma), DINFO_NODELAY, 1, MSG_AUX)
+	self.globalgamma = self.globalgamma * factor
+	if DINFO_GAMMA_CHANGE_SHOW then
+		InfoMessage:inform(string.format("New gamma is %.2f", self.globalgamma), DINFO_NODELAY, 1, MSG_AUX)
+	end	
+	self:redrawCurrentPage()
+end
+
+function UniReader:incDecGamma(factor)
+	Debug("incDecGamma, gamma=", self.globalgamma, " factor=", factor)
+	if self.globalgamma + factor > 0 then self.globalgamma = self.globalgamma + factor end
+	if DINFO_GAMMA_CHANGE_SHOW then
+		InfoMessage:inform(string.format("New gamma is %.2f", self.globalgamma), DINFO_NODELAY, 1, MSG_AUX)
+	end	
 	self:redrawCurrentPage()
 end
 
@@ -2944,7 +2955,8 @@ function UniReader:showSettingsMenu()
 	elseif re == 8 then
 		self:removeBBox()
 	elseif re == 9 then
-		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
+		self:redrawCurrentPage()
+		self:doAdjustGamma()
 	elseif re == 10 then
 		InfoMessage:chooseNotificatonMethods()
 	elseif re == 11 then
@@ -2952,6 +2964,23 @@ function UniReader:showSettingsMenu()
 	elseif re == 12 then
 		self:clearReaderAssociation()
 	end
+end
+
+function UniReader:doAdjustGamma()
+	InfoMessage:inform("Press left/right to adjust gamma", DINFO_NODELAY, 1, MSG_AUX)
+	while true do
+		local ev = input.saveWaitForEvent()
+		ev.code = adjustKeyEvents(ev)
+		if ev.type == EV_KEY and ev.value ~= EVENT_VALUE_KEY_RELEASE then
+			Debug("key pressed: "..tostring(keydef))
+			if ev.code == KEY_FW_LEFT then self:incDecGamma(-DGAMMA_STEP)
+			elseif ev.code == KEY_FW_RIGHT then self:incDecGamma (DGAMMA_STEP)
+			else 
+				InfoMessage:inform("Gamma adjusted", DINFO_DELAY, 1, MSG_AUX)
+				return nil 
+			end
+		end	
+	end	
 end
 
 -- command definitions
@@ -3027,7 +3056,7 @@ function UniReader:addAllCommands()
 	self.commands:addGroup("vol-/+",{Keydef:new(KEY_VPLUS, nil),Keydef:new(KEY_VMINUS, nil)},
 		"decrease/increase gamma 10%",
 		function(unireader, keydef)
-			unireader:modifyGamma(keydef.keycode==KEY_VPLUS and 1.1 or 0.9)
+			unireader:incDecGamma(keydef.keycode==KEY_VPLUS and DGAMMA_STEP or -DGAMMA_STEP)
 		end)
 		
 	--numeric key group
