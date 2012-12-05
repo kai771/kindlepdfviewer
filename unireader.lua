@@ -76,6 +76,7 @@ UniReader = {
 	comics_mode_enable,
 	rtl_mode_enable, -- rtl = right-to-left
 	page_mode_enable,
+	fp_offset = 0,	-- first page offset
 	
 	-- last selections in menus:
 	main_menu_cur = 0,
@@ -953,6 +954,7 @@ function UniReader:initGlobalSettings(settings)
 	self.cache_max_memsize = settings:readSetting("cache_max_memsize") or self.cache_max_memsize
 	self.cache_max_ttl = settings:readSetting("cache_max_ttl") or self.cache_max_ttl
 	self.rcountmax = settings:readSetting("rcountmax") or self.rcountmax
+	self.fp_offset = settings:readSetting("fp_offset") or self.fp_offset
 end
 
 -- Method to load settings before document open
@@ -1027,6 +1029,10 @@ function UniReader:loadSettings(filename)
 		tmp = self.settings:readSetting("page_mode_enable")
 		if tmp ~= nil then
 			self.page_mode_enable = tmp
+		end
+		tmp = self.settings:readSetting("fp_offset")
+		if tmp ~= nil then
+			self.fp_offset = tmp
 		end
 
 
@@ -1574,7 +1580,7 @@ function UniReader:addBookmark(pageno)
 		notes = "in "..notes
 	end
 	mark_item = {
-		page = pageno,
+		page = pageno - self.fp_offset,
 		datetime = os.date("%Y-%m-%d %H:%M:%S"),
 		notes = notes,
 	}
@@ -2208,7 +2214,7 @@ function UniReader:showBookMarks()
 		}
 		ret_code, item_no = bm_menu:choose(0, fb.bb:getHeight())
 		if ret_code then -- normal item selection
-			return self:gotoJump(self.bookmarks[ret_code].page)
+			return self:gotoJump(self.bookmarks[ret_code].page + self.fp_offset)
 		elseif item_no then -- delete item
 			table.remove(menu_items, item_no)
 			table.remove(self.bookmarks, item_no)
@@ -2223,7 +2229,7 @@ end
 
 function UniReader:nextBookMarkedPage()
 	for k,v in ipairs(self.bookmarks) do
-		if self.pageno < v.page then
+		if self.pageno - self.fp_offset < v.page then
 			return v
 		end
 	end
@@ -2233,10 +2239,10 @@ end
 function UniReader:prevBookMarkedPage()
 	local pre_item = nil
 	for k,v in ipairs(self.bookmarks) do
-		if self.pageno <= v.page then
+		if self.pageno  - self.fp_offset <= v.page then
 			if not pre_item then
 				break
-			elseif pre_item.page < self.pageno then
+			elseif pre_item.page + self.fp_offset < self.pageno then
 				return pre_item
 			end
 		end
@@ -2737,15 +2743,20 @@ end
 
 function UniReader:gotoInput()
 	local numpages = self.doc:getPages()
+	local fpo = self.fp_offset
 	local page = NumInputBox:input(G_height-100, 100,
-		"Page:", "current page "..self.pageno.." of "..numpages, true)
+		"Page:", "current page "..(self.pageno - fpo).." of "..(numpages - fpo).." (fpo="..fpo..")", true)
 	-- convert string to number
-	if not pcall(function () page = math.floor(page) end)
-	or page < 1 or page > numpages or page == self.pageno then
-		self:redrawCurrentPage()
-	else
-		self:gotoJump(page)
-	end
+		if not pcall(function () page = math.floor(page) end) then
+			self:redrawCurrentPage()
+		else
+			page = page + self.fp_offset
+			if page < 1 or page > numpages or page == self.pageno then
+				self:redrawCurrentPage()
+			else	
+				self:gotoJump(page)
+			end	
+		end
 end
 
 function UniReader:searchInput()
@@ -2775,6 +2786,17 @@ function UniReader:refreshCountInput()
 		-- storing this parameter in both global and local settings
 		G_reader_settings:saveSetting("rcountmax", self.rcountmax)
 		self.settings:saveSetting("rcountmax", self.rcountmax)
+	end
+	self:redrawCurrentPage()
+end
+
+function UniReader:fpOffsetInput()
+	local fpo = NumInputBox:input(G_height-100, 100,
+		"First page is page no. ", self.fp_offset + 1, true)
+	-- convert string to number
+	if pcall(function () count = math.floor(fpo) end) then
+		self.fp_offset = fpo - 1
+		self.settings:saveSetting("fp_offset", self.fp_offset)
 	end
 	self:redrawCurrentPage()
 end
@@ -2948,7 +2970,8 @@ function UniReader:showSettingsMenu()
 	elseif re == 5 then
 		self:togglePageMode()
 	elseif re == 6 then
-		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
+--		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
+		self:fpOffsetInput()
 	elseif re == 7 then
 		self:redrawCurrentPage()
 		self:modBBox()
@@ -3166,7 +3189,7 @@ function UniReader:addAllCommands()
 				bm = self:nextBookMarkedPage()
 			end
 			if bm then
-				self:gotoJump(bm.page, true)
+				self:gotoJump(bm.page + self.fp_offset, true)
 			end
 		end)
 		
@@ -3228,6 +3251,12 @@ function UniReader:addAllCommands()
 		"toggle page-keys mode: viewport/page",
 		function(unireader)
 			unireader:togglePageMode()
+		end)
+
+	self.commands:add(KEY_P, MOD_ALT, "P",
+		"set first page offset",
+		function(unireader)
+			unireader:fpOffsetInput()
 		end)
 
 	self.commands:add(KEY_U, nil, "U",
