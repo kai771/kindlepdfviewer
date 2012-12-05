@@ -2888,6 +2888,7 @@ function UniReader:showMainMenu()
 		"Follow link...",
 		"Zoom & Rotate...",
 		"Settings...",
+		"Info...",
 		"Close book",
 		"Exit Librerator",
 		}
@@ -2929,9 +2930,11 @@ function UniReader:showMainMenu()
 	elseif re == 11 then
 		self:showSettingsMenu()
 	elseif re == 12 then
+		self:showInfo()
+	elseif re == 13 then
 		keep_running = true
 		return "break"		
-	elseif re == 13 then
+	elseif re == 14 then
 		keep_running = false
 		return "break"		
 	end
