@@ -2846,6 +2846,7 @@ function UniReader:showMainMenu()
 	local main_menu_list = {
 		"Table of Contents...",
 		"Go to...",
+		"Search...",
 		"View jump history...",
 		"Add bookmark",
 		"View bookmarks...",
@@ -2873,27 +2874,30 @@ function UniReader:showMainMenu()
 		fb:refresh(1)
 		self:gotoInput()
 	elseif re == 3 then
-		self:showJumpHist()
+		fb:refresh(1)
+		self:searchInput()
 	elseif re == 4 then
+		self:showJumpHist()
+	elseif re == 5 then
 		self:redrawCurrentPage()
 		self:addBookmarkCommand()
-	elseif re == 5 then
-		self:showBookMarks()
 	elseif re == 6 then
+		self:showBookMarks()
+	elseif re == 7 then
 		self:redrawCurrentPage()
 		self:startHighLightMode()
-	elseif re == 7 then
-		self:showHighLight()
 	elseif re == 8 then
-		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
+		self:showHighLight()
 	elseif re == 9 then
-		self:showZoomModeMenu()
+		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
 	elseif re == 10 then
-		self:showSettingsMenu()
+		self:showZoomModeMenu()
 	elseif re == 11 then
+		self:showSettingsMenu()
+	elseif re == 12 then
 		keep_running = false
 		return "break"		
-	elseif re == 12 then
+	elseif re == 13 then
 		keep_running = false
 		return "break"		
 	end
