@@ -584,6 +584,7 @@ function FileChooser:addAllCommands()
 			else
 				self.pathfile = self.path.."/"..self.files[self.perpage*(self.page-1)+self.current - #self.dirs]
 				openFile(self.pathfile)
+				if not keep_running then return "break" end
 			end
 			self.pagedirty = true
 		end
@@ -695,7 +696,7 @@ function FileChooser:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_MENU, nil, "Menu",
-		"show File Chooser menu",
+		"show FileChooser menu",
 		function(self)
 			local re = self:showFileMenu()
 			if re == "break" then
@@ -705,7 +706,8 @@ function FileChooser:addAllCommands()
 			end
 	end
 	)
-	self.commands:addGroup("Home, Alt + Back", { Keydef:new(KEY_HOME, nil),Keydef:new(KEY_BACK, MOD_ALT)}, "exit",
+--	self.commands:addGroup("Alt + Home, Alt + Back", { Keydef:new(KEY_HOME, MOD_ALT),Keydef:new(KEY_BACK, MOD_ALT)}, "exit",
+	self.commands:add(KEY_HOME, MOD_ALT, "Home", "exit Librerator",
 		function(self)
 			return "break"
 		end

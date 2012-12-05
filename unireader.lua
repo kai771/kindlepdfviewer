@@ -2929,7 +2929,7 @@ function UniReader:showMainMenu()
 	elseif re == 11 then
 		self:showSettingsMenu()
 	elseif re == 12 then
-		keep_running = false
+		keep_running = true
 		return "break"		
 	elseif re == 13 then
 		keep_running = false
@@ -3775,11 +3775,12 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_BACK, MOD_ALT, "Back",
 		"close document",
 		function(unireader)
+			keep_running = true
 			return "break"
 		end)
 		
-	self.commands:add(KEY_HOME, nil, "Home",
-		"exit application",
+	self.commands:add(KEY_HOME, MOD_ALT, "Home",
+		"exit Librerator",
 		function(unireader)
 			keep_running = false
 			return "break"
