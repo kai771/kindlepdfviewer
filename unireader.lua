@@ -2909,6 +2909,7 @@ function UniReader:showMainMenu()
 	elseif re == 3 then
 		fb:refresh(1)
 		self:searchInput()
+		return "norefresh"
 	elseif re == 4 then
 		self:showJumpHist()
 	elseif re == 5 then
@@ -3331,6 +3332,8 @@ function UniReader:addAllCommands()
 			local re = unireader:showMainMenu()
 			if re == "break" then
 				return "break"
+			elseif re == "norefresh" then
+			-- don't refresh the screen
 			else	
 				unireader:redrawCurrentPage()
 			end
