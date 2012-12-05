@@ -2197,7 +2197,7 @@ function UniReader:showBookMarks()
 		}
 		ret_code, item_no = bm_menu:choose(0, fb.bb:getHeight())
 		if ret_code then -- normal item selection
-			return self:goto(self.bookmarks[ret_code].page)
+			return self:gotoJump(self.bookmarks[ret_code].page)
 		elseif item_no then -- delete item
 			table.remove(menu_items, item_no)
 			table.remove(self.bookmarks, item_no)
@@ -2807,7 +2807,7 @@ function UniReader:jumpBack()
 	if prev_jump_no >= 1 then
 		self.show_overlap = 0
 		self.jump_history.cur = prev_jump_no
-		self:goto(self.jump_history[prev_jump_no].page, true)
+		self:gotoJump(self.jump_history[prev_jump_no].page, true)
 	else
 		InfoMessage:inform("Already first jump ", DINFO_DELAY, 1, MSG_WARN)
 	end
@@ -2818,7 +2818,7 @@ function UniReader:jumpForward()
 	if next_jump_no <= #self.jump_history then
 		self.show_overlap = 0
 		self.jump_history.cur = next_jump_no
-		self:goto(self.jump_history[next_jump_no].page, true)
+		self:gotoJump(self.jump_history[next_jump_no].page, true)
 		-- set new head if we reached the top of backward stack
 		if self.jump_history.cur == #self.jump_history then
 			self.jump_history.cur = self.jump_history.cur + 1
