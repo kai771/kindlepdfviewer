@@ -2163,7 +2163,7 @@ function UniReader:showJumpHist()
 			cur_sign = ""
 		end
 		table.insert(menu_items,
-			cur_sign..v.datetime.." -> Page "..v.page.." "..v.notes)
+			cur_sign..v.datetime.." -> Page "..(v.page - self.fp_offset).." "..v.notes)
 	end
 
 	if #menu_items == 0 then
@@ -2172,7 +2172,7 @@ function UniReader:showJumpHist()
 		-- if cur points to head, draw entry for current page
 		if self.jump_history.cur > #self.jump_history then
 			table.insert(menu_items,
-				"Current Page "..self.pageno)
+				"Current Page "..(self.pageno - self.fp_offset))
 		end
 
 		jump_menu = SelectMenu:new{
