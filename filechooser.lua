@@ -328,7 +328,8 @@ function FileChooser:doDelete()
 			self:deleteFileAtPosition(pos)
 		else
 			InfoMessage:inform("Press 'Y' to confirm ", DINFO_NODELAY, 0, MSG_CONFIRM)
-			if ReturnKey() == KEY_Y then self:deleteFileAtPosition(pos) end
+			local rk = ReturnKey()
+			if rk == KEY_Y or rk == KEY_FW_RIGHT then self:deleteFileAtPosition(pos) end
 		end
 	elseif self.dirs[pos] == ".." then 
 		warningUnsupportedFunction()
@@ -337,7 +338,8 @@ function FileChooser:doDelete()
 			self:deleteFolderAtPosition(pos)
 		else
 			InfoMessage:inform("Press 'Y' to confirm ", DINFO_NODELAY, 0, MSG_CONFIRM)
-			if ReturnKey() == KEY_Y then self:deleteFolderAtPosition(pos) end
+			local rk = ReturnKey()
+			if rk == KEY_Y or rk == KEY_FW_RIGHT then self:deleteFolderAtPosition(pos) end
 		end
 	end
 	self.pagedirty = true
@@ -800,6 +802,7 @@ function FileChooser:showFileMenu()
 		"Cut",
 		"Copy",
 		"Paste",
+		"Delete",
 		"Rename...",
 		"New folder...",
 		"Change font...",
@@ -833,22 +836,24 @@ function FileChooser:showFileMenu()
 	elseif re == 6 then
 		self:doPaste()
 	elseif re == 7 then
-		fb:refresh(1)
-		self:doRename()
+		self:doDelete()
 	elseif re == 8 then
 		fb:refresh(1)
-		self:doNewFolder()
+		self:doRename()
 	elseif re == 9 then
+		fb:refresh(1)
+		self:doNewFolder()
+	elseif re == 10 then
 		Font:chooseFonts()
 		self.pagedirty = true
-	elseif re == 10 then
+	elseif re == 11 then
 		fb:refresh(1)
 		self:doCalculator()
-	elseif re == 11 then
-		self:toggleBatteryLogging()
 	elseif re == 12 then
-		self:setFileManagerMode()
+		self:toggleBatteryLogging()
 	elseif re == 13 then
+		self:setFileManagerMode()
+	elseif re == 14 then
 		return "break"
 	else
 		self.pagedirty = true	
