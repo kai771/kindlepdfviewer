@@ -30,6 +30,7 @@ require "screen"
 require "commands"
 require "dialog"
 require "readerchooser"
+require "device"
 require "defaults"
 
 function openFile(filename)
@@ -65,7 +66,7 @@ function showusage()
 	print("-h, --help                show this usage help")
 	print("")
 	print("If you give the name of a directory instead of a file path, a file")
-	print("chooser will show up and let you select a PDF|DJVU file")
+	print("chooser will show up and let you select a file")
 	print("")
 	print("If you don't pass any path, the last viewed document will be opened")
 	print("")
@@ -111,6 +112,12 @@ else
 		input.open("/dev/input/event2")
 		setK3Keycodes()
 	end
+	
+	-- check if we are running on Kindle 4 (as far as I can tell, K4NT has the same key codes as K3)
+	if Device:getModel() == "Kindle4" then
+		Debug("Auto-detected Kindle 4")
+		setK3Keycodes()
+	end	
 end
 
 G_screen_saver_mode = false
