@@ -455,6 +455,11 @@ function CREReader:showHighLight()
 	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
 end
 
+function CREReader:showZoomModeMenu()
+	self:redrawCurrentPage()
+	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+end
+
 function CREReader:fpOffsetInput()
 	self:redrawCurrentPage()
 	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
@@ -503,8 +508,6 @@ function CREReader:showFontsMenu()
 		self:setDocFontAsDefault()
 	end
 end
-
-
 
 function CREReader:changeDocFont()
 	local face_list = cre.getFontFaces()
