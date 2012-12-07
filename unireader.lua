@@ -1569,6 +1569,7 @@ end
 -- return nil if page already marked
 -- otherwise, return true
 function UniReader:addBookmark(pageno)
+Debug("My pageno=", pageno)
 	for k,v in ipairs(self.bookmarks) do
 		if v.page == pageno then
 			return nil
@@ -1576,11 +1577,19 @@ function UniReader:addBookmark(pageno)
 	end
 	-- build notes from TOC
 	local notes = self:getTocTitleByPage(pageno)
+	local page
+
+	if pcall(function () page = pageno - self.fp_offset end) then
+		page = pageno - self.fp_offset
+	else
+		page = pageno
+	end
+			
 	if notes ~= "" then
 		notes = "in "..notes
 	end
 	mark_item = {
-		page = pageno - self.fp_offset,
+		page = page,
 		datetime = os.date("%Y-%m-%d %H:%M:%S"),
 		notes = notes,
 	}
