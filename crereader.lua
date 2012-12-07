@@ -393,7 +393,7 @@ end
 ----------------------------------------------------
 -- menu related methods
 ----------------------------------------------------
--- used in CREReader:showMenu()
+-- used in CREReader:showInfo()
 function CREReader:_drawReadingInfo()
 	local width = G_width
 	local load_percent = self.percent/100
@@ -431,7 +431,7 @@ function CREReader:_drawReadingInfo()
 	blitbuffer.progressBar(fb.bb, 10, ypos, width - 20, 15, 5, 4, load_percent/100, 8)
 end
 
-function CREReader:showMenu()
+function CREReader:showInfo()
 	self:_drawReadingInfo()
 	fb:refresh(1)
 	while true do
@@ -444,6 +444,16 @@ function CREReader:showMenu()
 		end
 	end
 end
+
+function CREReader:startHighLightMode()
+	self:redrawCurrentPage()
+	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+end	
+
+function CREReader:showHighLight()
+	self:redrawCurrentPage()
+	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+end	
 
 function CREReader:fpOffsetInput()
 	self:redrawCurrentPage()
