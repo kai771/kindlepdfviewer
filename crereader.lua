@@ -483,7 +483,7 @@ end
 function CREReader:showFontsMenu()
 	local fonts_menu_list = {
 		"Change document font...",
-		"Font size...",
+		"Font size & spacing...",
 		"Toggle bold/normal",
 		"Set document font as default",
 		}
@@ -499,7 +499,8 @@ function CREReader:showFontsMenu()
 		self:redrawCurrentPage()
 		self:changeDocFont()
 	elseif re == 2 then
---
+		self:redrawCurrentPage()
+		self:doIncDecFontSizeSpacing()
 	elseif re == 3 then
 		self:redrawCurrentPage()
 		self:toggleBoldNormal()
@@ -542,6 +543,57 @@ function CREReader:toggleBoldNormal()
 	InfoMessage:inform("Changing font-weight...", DINFO_NODELAY, 1, MSG_AUX)
 	local prev_xpointer = self.doc:getXPointer()
 	self.doc:toggleFontBolder()
+	self:goto(prev_xpointer, nil, "xpointer")
+end
+
+function CREReader:doIncDecFontSizeSpacing()
+	InfoMessage:inform("left/right spacing, up/down size", DINFO_NODELAY, 1, MSG_AUX)
+	while true do
+		local ev = input.saveWaitForEvent()
+		ev.code = adjustKeyEvents(ev)
+		if ev.type == EV_KEY and ev.value ~= EVENT_VALUE_KEY_RELEASE then
+			Debug("key pressed: "..tostring(keydef))
+			if ev.code == KEY_FW_UP then self:incDecFontSize(1)
+			elseif ev.code == KEY_FW_DOWN then self:incDecFontSize(-1)
+			elseif ev.code == KEY_FW_LEFT then self:incDecFontSpacing(-10)
+			elseif ev.code == KEY_FW_RIGHT then self:incDecFontSpacing(10)
+			else 
+				InfoMessage:inform("Font size and spacing adjusted", DINFO_DELAY, 1, MSG_AUX)
+				return nil 
+			end
+		end	
+	end	
+end
+
+function CREReader:incDecFontSize(delta)
+	local change
+	if delta > 0 then change = "Increasing"
+	else change = "Decreasing" end
+	
+	self.font_zoom = self.font_zoom + delta
+	self.font_zoom = math.max(self.font_zoom, -3)
+	self.font_zoom = math.min(self.font_zoom, 4)
+
+	if DINFO_FONT_SIZE_CHANGE_SHOW then
+		InfoMessage:inform(change.." font size to "..self.font_zoom..". ", DINFO_NODELAY, 1, MSG_AUX)
+	end	
+	Debug("font zoomed to", self.font_zoom)
+	local prev_xpointer = self.doc:getXPointer()
+	self.doc:zoomFont(delta)
+	self:goto(prev_xpointer, nil, "xpointer")
+end
+
+function CREReader:incDecFontSpacing(factor)
+	self.line_space_percent = self.line_space_percent + factor
+	self.line_space_percent = math.max(self.line_space_percent, 80)
+	self.line_space_percent = math.min(self.line_space_percent, 200)
+
+	if DINFO_LINE_SPACING_CHANGE_SHOW then
+		InfoMessage:inform("Changing line space to "..self.line_space_percent.."% ", DINFO_NODELAY, 1, MSG_AUX)
+	end	
+	Debug("line spacing set to", self.line_space_percent)
+	local prev_xpointer = self.doc:getXPointer()
+	self.doc:setDefaultInterlineSpace(self.line_space_percent)
 	self:goto(prev_xpointer, nil, "xpointer")
 end
 
@@ -641,18 +693,11 @@ function CREReader:adjustCreReaderCommands()
 		Keydef:new(KEY_LPGBCK,MOD_SHIFT),Keydef:new(KEY_LPGFWD,MOD_SHIFT)},
 		"increase/decrease font size",
 		function(self)
-			local delta = 1
-			local change = "Increasing"
 			if keydef.keycode == KEY_PGBCK or keydef.keycode == KEY_LPGBCK then
-				delta = -1
-				change = "Decreasing"
-			end
-			self.font_zoom = self.font_zoom + delta
-			InfoMessage:inform(change.." font size to "..self.font_zoom..". ", DINFO_NODELAY, 1, MSG_AUX)
-			Debug("font zoomed to", self.font_zoom)
-			local prev_xpointer = self.doc:getXPointer()
-			self.doc:zoomFont(delta)
-			self:goto(prev_xpointer, nil, "xpointer")
+				self:incDecFontSize(-1)
+			else
+				self:incDecFontSize(1)
+			end	
 		end
 	)
 	self.commands:addGroup(MOD_ALT.."< >",{
@@ -661,17 +706,10 @@ function CREReader:adjustCreReaderCommands()
 		"increase/decrease line spacing",
 		function(self)
 			if keydef.keycode == KEY_PGBCK or keydef.keycode == KEY_LPGBCK then
-				self.line_space_percent = self.line_space_percent - 10
-				self.line_space_percent = math.max(self.line_space_percent, 80)
-			else
-				self.line_space_percent = self.line_space_percent + 10
-				self.line_space_percent = math.min(self.line_space_percent, 200)
-			end
-			InfoMessage:inform("Changing line space to "..self.line_space_percent.."% ", DINFO_NODELAY, 1, MSG_AUX)
-			Debug("line spacing set to", self.line_space_percent)
-			local prev_xpointer = self.doc:getXPointer()
-			self.doc:setDefaultInterlineSpace(self.line_space_percent)
-			self:goto(prev_xpointer, nil, "xpointer")
+				self:incDecFontSpacing(-10)
+			else	
+				self:incDecFontSpacing(10)
+			end	
 		end
 	)
 	local numeric_keydefs = {}
@@ -691,19 +729,6 @@ function CREReader:adjustCreReaderCommands()
 		"open 'go to position' input box",
 		function(unireader)
 			self:gotoInput()
---[[		
-			local height = self.doc:getFullHeight()
-			local position = NumInputBox:input(G_height-100, 100,
-				"Position in percent:", "current: "..math.floor((self.pos / height)*100), true)
-			-- convert string to number
-			if position and pcall(function () position = position + 0 end) then
-				if position >= 0 and position <= 100 then
-					self:goto(math.floor(height * position / 100))
-					return
-				end
-			end
-			self:redrawCurrentPage()
---]]			
 		end
 	)
 	self.commands:add({KEY_F, KEY_AA}, nil, "F",
