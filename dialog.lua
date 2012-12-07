@@ -218,6 +218,10 @@ function InfoMessage:getSoundVolume()
 	if util.isEmulated() == 1 then
 		return 0
 	end
+	local dev_model = Device:getModel()
+	if dev_model ~= "Kindle2" or dev_model ~= "KindleDXG" or dev_model ~= "Kindle3" then
+		return 0
+	end	
 	local tmp = io.popen('lipc-get-prop com.lab126.audio Volume', "r")
 	local volume = tmp:read("*number")
 	tmp:close()
