@@ -448,32 +448,32 @@ end
 function CREReader:startHighLightMode()
 	self:redrawCurrentPage()
 	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
-end	
+end
 
 function CREReader:showHighLight()
 	self:redrawCurrentPage()
 	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
-end	
+end
 
 function CREReader:fpOffsetInput()
 	self:redrawCurrentPage()
 	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
-end	
+end
 
 function CREReader:modBBox()
 	self:redrawCurrentPage()
 	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
-end	
+end
 
 function CREReader:removeBBox()
 	self:redrawCurrentPage()
 	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
-end	
+end
 
 function CREReader:doAdjustGamma()
 	self:redrawCurrentPage()
 	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
-end	
+end
 
 function CREReader:showFontsMenu()
 	local fonts_menu_list = {
@@ -540,6 +540,20 @@ function CREReader:toggleBoldNormal()
 	local prev_xpointer = self.doc:getXPointer()
 	self.doc:toggleFontBolder()
 	self:goto(prev_xpointer, nil, "xpointer")
+end
+
+function CREReader:gotoInput()
+	local height = self.doc:getFullHeight()
+	local position = NumInputBox:input(G_height-100, 100,
+		"Position in percent:", "current: "..math.floor((self.pos / height)*100), true)
+	-- convert string to number
+	if position and pcall(function () position = position + 0 end) then
+		if position >= 0 and position <= 100 then
+			self:goto(math.floor(height * position / 100))
+			return
+		end
+	end
+	self:redrawCurrentPage()
 end
 
 function CREReader:adjustCreReaderCommands()
@@ -673,6 +687,8 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:add(KEY_G,nil,"G",
 		"open 'go to position' input box",
 		function(unireader)
+			self:gotoInput()
+--[[		
 			local height = self.doc:getFullHeight()
 			local position = NumInputBox:input(G_height-100, 100,
 				"Position in percent:", "current: "..math.floor((self.pos / height)*100), true)
@@ -684,6 +700,7 @@ function CREReader:adjustCreReaderCommands()
 				end
 			end
 			self:redrawCurrentPage()
+--]]			
 		end
 	)
 	self.commands:add({KEY_F, KEY_AA}, nil, "F",
