@@ -2951,6 +2951,7 @@ function UniReader:showSettingsMenu()
 		"Manually set BBox",
 		"Remove manually set BBox",
 		"Adjust gamma",
+		"Fonts...",
 		"Configure event notifications",
 		"Reset default reader preferences",
 		"Clear reader association with this document",
@@ -2985,12 +2986,19 @@ function UniReader:showSettingsMenu()
 		self:redrawCurrentPage()
 		self:doAdjustGamma()
 	elseif re == 10 then
-		InfoMessage:chooseNotificatonMethods()
+		self:showFontsMenu()
 	elseif re == 11 then
-		self:resetDefaultReader()
+		InfoMessage:chooseNotificatonMethods()
 	elseif re == 12 then
+		self:resetDefaultReader()
+	elseif re == 13 then
 		self:clearReaderAssociation()
 	end
+end
+
+function UniReader:showFontsMenu()
+	self:redrawCurrentPage()
+	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
 end
 
 function UniReader:doAdjustGamma()

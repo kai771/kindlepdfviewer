@@ -12,6 +12,7 @@ CREReader = UniReader:new{
 	font_face = nil,
 	default_font = "Droid Sans",
 	font_zoom = 0,
+	fonts_menu_cur = 0,
 
 	line_space_percent = 100,
 }
@@ -444,9 +445,92 @@ function CREReader:showMenu()
 	end
 end
 
-function CREReader:modBBox()
+function CREReader:fpOffsetInput()
+	self:redrawCurrentPage()
 	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
 end	
+
+function CREReader:modBBox()
+	self:redrawCurrentPage()
+	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+end	
+
+function CREReader:removeBBox()
+	self:redrawCurrentPage()
+	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+end	
+
+function CREReader:doAdjustGamma()
+	self:redrawCurrentPage()
+	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+end	
+
+function CREReader:showFontsMenu()
+	local fonts_menu_list = {
+		"Change document font...",
+		"Font size...",
+		"Toggle bold/normal",
+		"Set document font as default",
+		}
+	local fonts_menu = SelectMenu:new{
+		menu_title = "Librerator - Fonts Menu",
+		item_array = fonts_menu_list,
+		current_entry = self.fonts_menu_cur
+		}
+	local re = fonts_menu:choose(0, G_height)
+	Debug("Fonts menu: selected item ", tostring(re))
+	if re ~= nil then self.fonts_menu_cur = re - 1 end
+	if re == 1 then 
+		self:redrawCurrentPage()
+		self:changeDocFont()
+	elseif re == 2 then
+--
+	elseif re == 3 then
+		self:redrawCurrentPage()
+		self:toggleBoldNormal()
+	elseif re == 4 then
+		self:redrawCurrentPage()
+		self:setDocFontAsDefault()
+	end
+end
+
+
+
+function CREReader:changeDocFont()
+	local face_list = cre.getFontFaces()
+	-- define the current font in face_list 
+	local item_no = 0
+	while face_list[item_no] ~= self.font_face and item_no < #face_list do 
+		item_no = item_no + 1 
+	end
+	local fonts_menu = SelectMenu:new{
+		menu_title = "Fonts Menu ",
+		item_array = face_list, 
+		current_entry = item_no - 1,
+	}
+	item_no = fonts_menu:choose(0, G_height)
+	local prev_xpointer = self.doc:getXPointer()
+	if item_no then
+		Debug(face_list[item_no])
+		InfoMessage:inform("Redrawing with "..face_list[item_no].." ", DINFO_NODELAY, 1, MSG_AUX)
+		self.doc:setFontFace(face_list[item_no])
+		self.font_face = face_list[item_no]
+	end
+	self:goto(prev_xpointer, nil, "xpointer")
+end
+
+function CREReader:setDocFontAsDefault()
+	self.default_font = self.font_face
+	G_reader_settings:saveSetting("cre_font", self.font_face)
+	InfoMessage:inform("Default document font set ", DINFO_DELAY, 1, MSG_WARN)
+end
+
+function CREReader:toggleBoldNormal()
+	InfoMessage:inform("Changing font-weight...", DINFO_NODELAY, 1, MSG_AUX)
+	local prev_xpointer = self.doc:getXPointer()
+	self.doc:toggleFontBolder()
+	self:goto(prev_xpointer, nil, "xpointer")
+end
 
 function CREReader:adjustCreReaderCommands()
 	self.commands:delGroup("[joypad]")
@@ -595,43 +679,19 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:add({KEY_F, KEY_AA}, nil, "F",
 		"change document font",
 		function(self)
-			local face_list = cre.getFontFaces()
-			-- define the current font in face_list 
-			local item_no = 0
-			while face_list[item_no] ~= self.font_face and item_no < #face_list do 
-				item_no = item_no + 1 
-			end
-			local fonts_menu = SelectMenu:new{
-				menu_title = "Fonts Menu ",
-				item_array = face_list, 
-				current_entry = item_no - 1,
-			}
-			item_no = fonts_menu:choose(0, G_height)
-			local prev_xpointer = self.doc:getXPointer()
-			if item_no then
-				Debug(face_list[item_no])
-				InfoMessage:inform("Redrawing with "..face_list[item_no].." ", DINFO_NODELAY, 1, MSG_AUX)
-				self.doc:setFontFace(face_list[item_no])
-				self.font_face = face_list[item_no]
-			end
-			self:goto(prev_xpointer, nil, "xpointer")
+			self:changeDocFont()
 		end
 	)
 	self.commands:add(KEY_F, MOD_SHIFT, "F",
 		"use document font as default font",
 		function(self)
-			self.default_font = self.font_face
-			G_reader_settings:saveSetting("cre_font", self.font_face)
-			InfoMessage:inform("Default document font set ", DINFO_DELAY, 1, MSG_WARN)
+			self:setDocFontAsDefault()
 		end
 	)
 	self.commands:add(KEY_F, MOD_ALT, "F",
 		"toggle font-weight: bold <> normal",
 		function(self)
-			InfoMessage:inform("Changing font-weight...", DINFO_NODELAY, 1, MSG_AUX)
-			local prev_xpointer = self.doc:getXPointer()
-			self.doc:toggleFontBolder()
-			self:goto(prev_xpointer, nil, "xpointer")
+			self:toggleBoldNormal()
 		end
 	)
 	self.commands:add(KEY_B, MOD_ALT, "B",
