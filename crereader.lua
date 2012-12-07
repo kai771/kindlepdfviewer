@@ -444,6 +444,10 @@ function CREReader:showMenu()
 	end
 end
 
+function CREReader:modBBox()
+	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+end	
+
 function CREReader:adjustCreReaderCommands()
 	self.commands:delGroup("[joypad]")
 	self.commands:delGroup(MOD_ALT.."H/J")
