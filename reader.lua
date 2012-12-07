@@ -124,8 +124,13 @@ G_screen_saver_mode = false
 G_charging_mode = false
 fb = einkfb.open("/dev/fb0")
 -- read current rotation mode
-Screen:updateRotationMode()
-Screen.native_rotation_mode = Screen.cur_rotation_mode
+local dev_model = Device:getModel()
+if dev_model == "Kindle2" or dev_model == "KindleDXG" or dev_model == "Kindle3" then
+	Screen:updateRotationMode()
+	Screen.native_rotation_mode = Screen.cur_rotation_mode
+else
+	Screen.native_rotation_mode = 0
+end		
 
 -- force portrait mode
 if DFORCE_PORTRAIT then
