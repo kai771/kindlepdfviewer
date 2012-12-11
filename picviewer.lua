@@ -66,4 +66,5 @@ function PICViewer:adjustCommands()
 	self.commands:delGroup(MOD_ALT.."H/J")
 	self.commands:delGroup(MOD_ALT.."K/L")
 	self.commands:del(KEY_P, nil, "P")	
+	self.commands:del(KEY_P, MOD_ALT, "P")	
 end
