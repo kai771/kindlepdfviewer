@@ -2801,7 +2801,7 @@ end
 
 function UniReader:fpOffsetInput()
 	local fpo = NumInputBox:input(G_height-100, 100,
-		"First page is page no. ", self.fp_offset + 1, true)
+		"First page is page no. ", (self.fp_offset + 1).." ("..self.pageno..")", true)
 	-- convert string to number
 	if pcall(function () count = math.floor(fpo) end) then
 		self.fp_offset = fpo - 1
