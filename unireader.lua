@@ -2697,7 +2697,7 @@ function UniReader:toggleOverlap()
 	self.settings:saveSetting("show_overlap_enable", self.show_overlap_enable)
 	self:redrawCurrentPage()
 	if DINFO_OVERLAP_SHOW then
-		InfoMessage:inform("Overlap "..(self.show_overlap_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
+		InfoMessage:inform("Overlap shading "..(self.show_overlap_enable and "on " or "off "), DINFO_TOGGLES, 1, MSG_AUX)
 	end	
 end
 
@@ -2951,7 +2951,7 @@ end
 
 function UniReader:showSettingsMenu()
 	local settings_menu_list = {
-		"Turn overlap "..(self.show_overlap_enable and "off" or "on"),
+		"Turn overlap shading "..(self.show_overlap_enable and "off" or "on"),
 		"Turn comics mode "..(self.comics_mode_enable and "off" or "on"),
 		"Turn right-to-left mode "..(self.rtl_mode_enable and "off" or "on"),
 		"Turn link underlines "..(self.show_links_enable and "off" or "on"),
