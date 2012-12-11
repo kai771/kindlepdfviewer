@@ -2487,7 +2487,7 @@ function UniReader:showInfo()
 		local ev = input.saveWaitForEvent()
 		ev.code = adjustKeyEvents(ev)
 		if ev.type == EV_KEY and ev.value == EVENT_VALUE_KEY_PRESS then
-			if ev.code == KEY_BACK or ev.code == KEY_MENU then
+			if ev.code == KEY_BACK or ev.code == KEY_HOME then
 				return
 			elseif ev.code == KEY_C then
 				self:clearCache()
@@ -3359,7 +3359,7 @@ function UniReader:addAllCommands()
 			end
 		end)
 
-	self.commands:add(KEY_MENU, MOD_ALT, "Menu",
+	self.commands:add(KEY_HOME, nil, "Home",
 		"toggle info box",
 		function(unireader)
 			unireader:showInfo()

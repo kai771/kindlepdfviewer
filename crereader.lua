@@ -438,7 +438,7 @@ function CREReader:showInfo()
 		local ev = input.saveWaitForEvent()
 		ev.code = adjustKeyEvents(ev)
 		if ev.type == EV_KEY and ev.value == EVENT_VALUE_KEY_PRESS then
-			if ev.code == KEY_BACK or ev.code == KEY_MENU then
+			if ev.code == KEY_BACK or ev.code == KEY_HOME then
 				return
 			end
 		end
