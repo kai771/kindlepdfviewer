@@ -18,6 +18,9 @@ DGAMMA_STEP = 0.2
 -- See comments in djvureader.lua:DJVUReader:select_render_mode()
 DRENDER_MODE = 0 -- COLOUR
 
+-- supported view mode includes: "scroll" and "page"
+DCREREADER_VIEW_MODE = "page"
+
 -- set panning distance
 DSHIFT_X = 100
 DSHIFT_Y = 100
