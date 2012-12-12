@@ -1569,7 +1569,6 @@ end
 -- return nil if page already marked
 -- otherwise, return true
 function UniReader:addBookmark(pageno)
-Debug("My pageno=", pageno)
 	for k,v in ipairs(self.bookmarks) do
 		if v.page == pageno then
 			return nil
@@ -2933,7 +2932,8 @@ function UniReader:showMainMenu()
 	elseif re == 8 then
 		self:showHighLight()
 	elseif re == 9 then
-		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
+		self:redrawCurrentPage()
+		self:doFollowLink()
 	elseif re == 10 then
 		self:showZoomModeMenu()
 	elseif re == 11 then
@@ -2984,7 +2984,6 @@ function UniReader:showSettingsMenu()
 	elseif re == 5 then
 		self:togglePageMode()
 	elseif re == 6 then
---		InfoMessage:inform("Not implemented yet", DINFO_DELAY, 1, MSG_BUG)
 		self:fpOffsetInput()
 	elseif re == 7 then
 		self:redrawCurrentPage()
@@ -3025,6 +3024,131 @@ function UniReader:doAdjustGamma()
 			end
 		end	
 	end	
+end
+
+function UniReader:doFollowLink()
+	local links = self:getPageLinks(self.pageno)
+	if links == nil or next(links) == nil then
+		InfoMessage:inform("No links on this page ", DINFO_DELAY, 1, MSG_WARN)
+	else
+		Debug("shortcuts",SelectMenu.item_shortcuts)
+
+		local page_links = 0
+		local visible_links = {}
+		local need_refresh = false
+
+		for i, link in ipairs(links) do
+			if link.page then -- from mupdf
+				local x,y,w,h = self:zoomedRectCoordTransform(link.x0,link.y0, link.x1,link.y1)
+				if x > 0 and y > 0 and x < G_width and y < G_height then -- link on screen?
+					link.x0 = x
+					link.y0 = y
+					link.x1 = w
+					link.y1 = h
+					page_links = page_links + 1
+					visible_links[page_links] = link
+				end
+			elseif link.section and string.sub(link.section,1,1) == "#" then -- from crengine
+				if link.start_y >= self.pos and link.start_y <= self.pos + G_height then
+					link.start_y = link.start_y - self.pos -- top of screen
+					link.x0 = link.start_x
+					link.y0 = link.start_y
+					link.y1 = self.doc:zoomFont(0)
+					page_links = page_links + 1
+					visible_links[page_links] = link
+					need_refresh = true
+				end -- if
+			end -- elseif
+		end -- for
+
+		if page_links == 0 then
+			InfoMessage:inform("No page links on this page ", DINFO_DELAY, 1, MSG_WARN)
+			return
+		end
+		Debug("visible_links", visible_links)
+		
+		if need_refresh then
+			self:redrawCurrentPage() -- show links
+			need_refresh = false
+		end
+		
+		self.cursor = Cursor:new {
+			x_pos = visible_links[1].x0,
+			y_pos = visible_links[1].y0,
+			h = visible_links[1].y1,
+			line_width_factor = 4,
+		}
+		self.cursor:draw(true)
+
+		local goto_page = nil
+		local onlink = 1
+
+		while not goto_page do
+
+			local ev = input.saveWaitForEvent()
+			ev.code = adjustKeyEvents(ev)
+			Debug("ev",ev)
+
+			local link = nil
+
+			if ev.type == EV_KEY and ev.value ~= EVENT_VALUE_KEY_RELEASE then
+				if ev.code == KEY_FW_DOWN then
+					Debug("pressed KEY_FW_DOWN")
+					onlink = onlink + 1
+					if onlink > #visible_links then onlink = 1 end
+					self.cursor:moveToAndDraw(visible_links[onlink].x0, visible_links[onlink].y0)
+					fb:refresh(1)
+
+				elseif ev.code == KEY_FW_UP then
+					Debug("pressed KEY_FW_UP")
+					onlink = onlink - 1
+					if onlink < 1 then onlink = #visible_links end
+					self.cursor:moveToAndDraw(visible_links[onlink].x0, visible_links[onlink].y0)
+					fb:refresh(1)
+
+				elseif ev.code == KEY_FW_RIGHT then
+					Debug("pressed KEY_FW_RIGHT")
+					onlink = onlink + 5
+					if onlink > #visible_links then onlink = #visible_links end
+					self.cursor:moveToAndDraw(visible_links[onlink].x0, visible_links[onlink].y0)
+					fb:refresh(1)
+
+				elseif ev.code == KEY_FW_LEFT then
+					Debug("pressed KEY_FW_LEFT")
+					onlink = onlink - 5
+					if onlink < 1 then onlink = 1 end
+					self.cursor:moveToAndDraw(visible_links[onlink].x0, visible_links[onlink].y0)
+					fb:refresh(1)
+
+				elseif ev.code == KEY_FW_PRESS then
+					Debug("pressed KEY_FW_PRESS")
+					if visible_links[onlink] ~= nil then
+						if visible_links[onlink].page ~= nil then
+							goto_page = visible_links[onlink].page + 1
+						elseif visible_links[onlink].section ~= nil then
+							goto_page = visible_links[onlink].section
+						else
+							Debug("Unknown link target in", link)
+						end
+					else
+						Debug("missing link", link)
+					end
+					self.cursor:clear(true)
+					self:clearSelection()
+					Debug("goto_page", goto_page, "now on", self.pageno, "link", visible_links[onlink])
+					self:gotoJump(goto_page, false, "link")
+					return
+
+				elseif ev.code == KEY_BACK then
+					Debug("pressed KEY_BACK")
+					self.cursor:clear(true)
+					self:clearSelection()
+					fb:refresh(1)
+					return
+				end
+			end -- if
+		end -- while	
+	end -- else
 end
 
 -- command definitions
@@ -3266,6 +3390,12 @@ function UniReader:addAllCommands()
 		"toggle showing page overlap areas",
 		function(unireader)
 			unireader:toggleOverlap()
+		end)
+
+	self.commands:add(KEY_O, MOD_SHIFT, "O",
+		"Follow link",
+		function(unireader)
+			unireader:doFollowLink()
 		end)
 
 	self.commands:add(KEY_P, nil, "P",
