@@ -874,8 +874,8 @@ function CREReader:adjustCreReaderCommands()
 			InfoMessage:inform("Viewmode: "..self.view_mode.." (needs re-open)", DINFO_DELAY, 1, MSG_AUX)
 		end
 	)
-end
 --]]
+end
 
 ----------------------------------------------------
 --- search
