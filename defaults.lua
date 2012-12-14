@@ -19,7 +19,7 @@ DGAMMA_STEP = 0.2
 DRENDER_MODE = 0 -- COLOUR
 
 -- supported view mode includes: "scroll" and "page"
-DCREREADER_VIEW_MODE = "page"
+DCREREADER_VIEW_MODE = "scroll"
 
 -- set panning distance
 DSHIFT_X = 100

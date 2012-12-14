@@ -861,6 +861,7 @@ function CREReader:adjustCreReaderCommands()
 			self:goto(self.pos + self.shift_y)
 		end
 	)
+--[[
 	self.commands:add(KEY_V, nil, "V",
 		"toggle view mode (requires re-open)",
 		function(self)
@@ -874,6 +875,7 @@ function CREReader:adjustCreReaderCommands()
 		end
 	)
 end
+--]]
 
 ----------------------------------------------------
 --- search
