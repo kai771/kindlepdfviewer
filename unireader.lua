@@ -3143,7 +3143,7 @@ function UniReader:doFollowLink()
 					Debug("pressed KEY_BACK")
 					self.cursor:clear(true)
 					self:clearSelection()
-					fb:refresh(1)
+					self:redrawCurrentPage()
 					return
 				end
 			end -- if
