@@ -1,4 +1,5 @@
 require "unireader"
+require "lbrstrings"
 
 DJVUReader = UniReader:new{}
 
@@ -24,7 +25,7 @@ end
 -- DJVU does not support password yet
 function DJVUReader:open(filename)
 	if not validDJVUFile(filename) then
-		return false, "Not a valid DjVu file"
+		return false, SNot_a_valid_DjVu_file
 	end
 
 	local ok
@@ -44,7 +45,7 @@ function DJVUReader:adjustDjvuReaderCommand()
 	self.commands:del(KEY_J, MOD_SHIFT, "J")
 	self.commands:del(KEY_K, MOD_SHIFT, "K")
 	self.commands:add(KEY_R, nil, "R",
-		"select djvu page rendering mode",
+		Sselect_djvu_page_rendering_mode,
 		function(self)
 			self:select_render_mode()
 	end) 
@@ -55,14 +56,14 @@ end
 -- then we should update our values here also. This is a bit risky, but these values never change, so it should be ok :)
 function DJVUReader:select_render_mode()
 	local mode_menu = SelectMenu:new{
-		menu_title = "Select DjVu page rendering mode",
+		menu_title = SSelect_DjVu_page_rendering_mode_,
 		item_array = {
-			"COLOUR (works for both colour and b&w pages)",		--  0  (colour page or stencil)
-			"BLACK & WHITE (for b&w pages only, much faster)",	--  1  (stencil or colour page)
-			"COLOUR ONLY (slightly faster than COLOUR)",		--  2  (colour page or fail)
-			"MASK ONLY (for b&w pages only)",					--  3  (stencil or fail)
-			"COLOUR BACKGROUND (show only background)",			--  4  (colour background layer)
-			"COLOUR FOREGROUND (show only foreground)"			--  5  (colour foreground layer)
+			SCOLOUR_works_for_both_colour_and_bw_pages_,		--  0  (colour page or stencil)
+			SBLACK_N_WHITE_for_bw_pages_only_much_faster_,	--  1  (stencil or colour page)
+			SCOLOUR_ONLY_slightly_faster_than_colour_,			--  2  (colour page or fail)
+			SMASK_ONLY_for_bw_pages_only_,									--  3  (stencil or fail)
+			SCOLOUR_BACKGROUND_show_only_background_,				--  4  (colour background layer)
+			SCOLOUR_FOREGROUND_show_only_foreground_,				--  5  (colour foreground layer)
 			},
 		current_entry = self.render_mode,
 	}

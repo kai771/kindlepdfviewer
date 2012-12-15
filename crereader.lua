@@ -3,6 +3,7 @@ require "unireader"
 require "inputbox"
 require "selectmenu"
 require "dialog"
+require "lbrstrings"
 
 CREReader = UniReader:new{
 	pos = nil,

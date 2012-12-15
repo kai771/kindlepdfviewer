@@ -225,3 +225,28 @@ Span_ = "pan "
 Stoggle_view_mode_requires_re_open_ = "toggle view mode (requires re-open)"
 SViewmode_ = "Viewmode: "
 
+
+-- djvureader --
+----------------
+SNot_a_valid_DjVu_file = "Not a valid DjVu file"
+Sselect_djvu_page_rendering_mode = "select djvu page rendering mode"
+
+SSelect_DjVu_page_rendering_mode_ = "Select DjVu page rendering mode" -- menu title
+SCOLOUR_works_for_both_colour_and_bw_pages_ = "COLOUR (works for both colour and b&w pages)"
+SBLACK_N_WHITE_for_bw_pages_only_much_faster_ = "BLACK & WHITE (for b&w pages only, much faster)"
+SCOLOUR_ONLY_slightly_faster_than_colour_ = "COLOUR ONLY (slightly faster than COLOUR)"
+SMASK_ONLY_for_bw_pages_only_ = "MASK ONLY (for b&w pages only)"
+SCOLOUR_BACKGROUND_show_only_background_ = "COLOUR BACKGROUND (show only background)"
+SCOLOUR_FOREGROUND_show_only_foreground_ = "COLOUR FOREGROUND (show only foreground)"
+
+
+
+
+
+
+
+
+
+
+
+
