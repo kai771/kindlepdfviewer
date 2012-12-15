@@ -69,11 +69,11 @@ function CREReader:open(filename)
 		file_type = self:ZipContentExt(filename)
 	end
 	if not file_type then
-		return false, "Error unzipping file. "
+		return false, SError_unzipping_file_
 	end
 	-- if the zip entry is not cre-document
 	if ReaderChooser:getReaderByType(file_type) ~= CREReader then
-		return false, "Zip contains improper content. "
+		return false, SZip_contains_improper_content_
 	end
 	-- these two format use the same css file
 	if file_type == "html" then
@@ -92,7 +92,7 @@ function CREReader:open(filename)
 	end
 	ok, self.doc = pcall(cre.openDocument, filename, style_sheet, G_width, G_height, view_mode)
 	if not ok then
-		return false, "Error opening cre-document. " -- self.doc, will contain error message
+		return false, SError_opening_cre_document_ -- self.doc, will contain error message
 	end
 	self.doc:setDefaultInterlineSpace(self.line_space_percent)
 	return true
@@ -270,16 +270,16 @@ function CREReader:showJumpHist()
 	end
 
 	if #menu_items == 0 then
-		InfoMessage:inform("No jump history found ", DINFO_DELAY, 1, MSG_WARN)
+		InfoMessage:inform(SNo_jump_history_found_, DINFO_DELAY, 1, MSG_WARN)
 	else
 		-- if cur points to head, draw entry for current page
 		if self.jump_history.cur > #self.jump_history then
 			table.insert(menu_items,
-				"Current Page "..self.pageno)
+				SCurrent_page_..self.pageno)
 		end
 
 		jump_menu = SelectMenu:new{
-			menu_title = "Jump History",
+			menu_title = SJump_History,
 			item_array = menu_items,
 		}
 		item_no = jump_menu:choose(0, G_height)
@@ -331,15 +331,15 @@ function CREReader:showBookMarks()
 	-- build menu items
 	for k,v in ipairs(self.bookmarks) do
 		table.insert(menu_items,
-			"Page "..self.doc:getPageFromXPointer(v.page)
+			SPage_..self.doc:getPageFromXPointer(v.page)
 			.." "..v.notes.." @ "..v.datetime)
 	end
 	if #menu_items == 0 then
-		return InfoMessage:inform("No bookmark found ", DINFO_DELAY, 1, MSG_WARN)
+		return InfoMessage:inform(SNo_bookmarks_found_, DINFO_DELAY, 1, MSG_WARN)
 	end
 	while true do
 		local bkmk_menu = SelectMenu:new{
-			menu_title = "Bookmarks ("..tostring(#menu_items).." items)",
+			menu_title = SBookmarks.." ("..tostring(#menu_items)..S_items..")",
 			item_array = menu_items,
 			deletable = true,
 		}
@@ -385,7 +385,7 @@ function CREReader:gotoPrevNextTocEntry(direction)
 		self:fillToc()
 	end
 	if #self.toc == 0 then
-		InfoMessage:inform("No Table of Contents ", DINFO_DELAY, 1, MSG_WARN)
+		InfoMessage:inform(SNo_Table_of_Contents_, DINFO_DELAY, 1, MSG_WARN)
 		return
 	end
 	-- search for current TOC-entry
@@ -469,48 +469,48 @@ end
 
 function CREReader:startHighLightMode()
 	self:redrawCurrentPage()
-	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:showHighLight()
 	self:redrawCurrentPage()
-	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:showZoomModeMenu()
 	self:redrawCurrentPage()
-	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:fpOffsetInput()
 	self:redrawCurrentPage()
-	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:modBBox()
 	self:redrawCurrentPage()
-	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:removeBBox()
 	self:redrawCurrentPage()
-	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:doAdjustGamma()
 	self:redrawCurrentPage()
-	InfoMessage:inform("Not supported for this doc type", DINFO_DELAY, 1, MSG_WARN)
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:showFontsMenu()
 	local fonts_menu_list = {
-		"Change document font...",
-		"Font size & spacing...",
-		"Toggle bold/normal",
-		"Set document font as default",
+		SChange_document_font_,
+		SFont_size_n_spacing_,
+		SToggle_bold_normal,
+		SSet_document_font_as_default,
 		}
 	local fonts_menu = SelectMenu:new{
-		menu_title = "Librerator - Fonts Menu",
+		menu_title = SLibrerator_Fonts_Menu,
 		item_array = fonts_menu_list,
 		current_entry = self.fonts_menu_cur
 		}
@@ -540,7 +540,7 @@ function CREReader:changeDocFont()
 		item_no = item_no + 1 
 	end
 	local fonts_menu = SelectMenu:new{
-		menu_title = "Fonts Menu ",
+		menu_title = SFonts_Menu_,
 		item_array = face_list, 
 		current_entry = item_no - 1,
 	}
@@ -548,7 +548,7 @@ function CREReader:changeDocFont()
 	local prev_xpointer = self.doc:getXPointer()
 	if item_no then
 		Debug(face_list[item_no])
-		InfoMessage:inform("Redrawing with "..face_list[item_no].." ", DINFO_NODELAY, 1, MSG_AUX)
+		InfoMessage:inform(SRedrawing_with_..face_list[item_no].." ", DINFO_NODELAY, 1, MSG_AUX)
 		self.doc:setFontFace(face_list[item_no])
 		self.font_face = face_list[item_no]
 	end
@@ -558,18 +558,18 @@ end
 function CREReader:setDocFontAsDefault()
 	self.default_font = self.font_face
 	G_reader_settings:saveSetting("cre_font", self.font_face)
-	InfoMessage:inform("Default document font set ", DINFO_DELAY, 1, MSG_WARN)
+	InfoMessage:inform(SDefault_document_font_set_, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:toggleBoldNormal()
-	InfoMessage:inform("Changing font-weight...", DINFO_NODELAY, 1, MSG_AUX)
+	InfoMessage:inform(SChanging_font_weight_, DINFO_NODELAY, 1, MSG_AUX)
 	local prev_xpointer = self.doc:getXPointer()
 	self.doc:toggleFontBolder()
 	self:goto(prev_xpointer, nil, "xpointer")
 end
 
 function CREReader:doIncDecFontSizeSpacing()
-	InfoMessage:inform("left/right spacing, up/down size", DINFO_NODELAY, 1, MSG_AUX)
+	InfoMessage:inform(Sleft_right_spacing_up_down_size, DINFO_NODELAY, 1, MSG_AUX)
 	while true do
 		local ev = input.saveWaitForEvent()
 		ev.code = adjustKeyEvents(ev)
@@ -580,7 +580,7 @@ function CREReader:doIncDecFontSizeSpacing()
 			elseif ev.code == KEY_FW_LEFT then self:incDecFontSpacing(-10)
 			elseif ev.code == KEY_FW_RIGHT then self:incDecFontSpacing(10)
 			else 
-				InfoMessage:inform("Font size and spacing adjusted", DINFO_DELAY, 1, MSG_AUX)
+				InfoMessage:inform(SFont_size_and_spacing_adjusted, DINFO_DELAY, 1, MSG_AUX)
 				return nil 
 			end
 		end	
@@ -589,15 +589,15 @@ end
 
 function CREReader:incDecFontSize(delta)
 	local change
-	if delta > 0 then change = "Increasing"
-	else change = "Decreasing" end
+	if delta > 0 then change = SIncreasing
+	else change = SDecreasing end
 	
 	self.font_zoom = self.font_zoom + delta
 	self.font_zoom = math.max(self.font_zoom, -3)
 	self.font_zoom = math.min(self.font_zoom, 4)
 
 	if DINFO_FONT_SIZE_CHANGE_SHOW then
-		InfoMessage:inform(change.." font size to "..self.font_zoom..". ", DINFO_NODELAY, 1, MSG_AUX)
+		InfoMessage:inform(change..S_font_size_to_..self.font_zoom..". ", DINFO_NODELAY, 1, MSG_AUX)
 	end	
 	Debug("font zoomed to", self.font_zoom)
 	local prev_xpointer = self.doc:getXPointer()
@@ -611,7 +611,7 @@ function CREReader:incDecFontSpacing(factor)
 	self.line_space_percent = math.min(self.line_space_percent, 200)
 
 	if DINFO_LINE_SPACING_CHANGE_SHOW then
-		InfoMessage:inform("Changing line space to "..self.line_space_percent.."% ", DINFO_NODELAY, 1, MSG_AUX)
+		InfoMessage:inform(SChange_line_space_to_..self.line_space_percent.."% ", DINFO_NODELAY, 1, MSG_AUX)
 	end	
 	Debug("line spacing set to", self.line_space_percent)
 	local prev_xpointer = self.doc:getXPointer()
@@ -622,7 +622,7 @@ end
 function CREReader:gotoInput()
 	local height = self.doc:getFullHeight()
 	local position = NumInputBox:input(G_height-100, 100,
-		"Position in percent:", "current: "..math.floor((self.pos / height)*100), true)
+		SPosition_in_percent_, Scurrent_..math.floor((self.pos / height)*100), true)
 	-- convert string to number
 	if position and pcall(function () position = position + 0 end) then
 		if position >= 0 and position <= 100 then
@@ -666,7 +666,7 @@ function CREReader:adjustCreReaderCommands()
 	
 	-- CCW-rotation
 	self.commands:add(KEY_K, nil, "K",
-		"rotate screen counterclockwise",
+		Srotate_screen_90_counterclockwise,
 		function(self)
 			local prev_xpointer = self.doc:getXPointer()
 			Screen:screenRotate("anticlockwise")
@@ -677,7 +677,7 @@ function CREReader:adjustCreReaderCommands()
 	)
 	-- CW-rotation
 	self.commands:add(KEY_J, nil, "J",
-		"rotate screen clockwise",
+		Srotate_screen_90_clockwise,
 		function(self)
 			local prev_xpointer = self.doc:getXPointer()
 			Screen:screenRotate("clockwise")
@@ -689,7 +689,7 @@ function CREReader:adjustCreReaderCommands()
 	-- navigate between chapters by Shift+Up & Shift-Down
 	self.commands:addGroup(MOD_SHIFT.."up/down",{
 		Keydef:new(KEY_FW_UP,MOD_SHIFT), Keydef:new(KEY_FW_DOWN,MOD_SHIFT)},
-		"scroll to previous/next chapter",
+		Sskip_to_previous_next_chapter,
 		function(self)
 			if keydef.keycode == KEY_FW_UP then
 				self:gotoPrevNextTocEntry(-1)
@@ -700,9 +700,9 @@ function CREReader:adjustCreReaderCommands()
 	)
 	-- fast navigation by Shift+Left & Shift-Right
 	local scrollpages = 10
-	self.commands:addGroup(MOD_SHIFT.."left/right",
+	self.commands:addGroup(MOD_SHIFT..Sleft_right,
 		{Keydef:new(KEY_FW_LEFT,MOD_SHIFT),Keydef:new(KEY_FW_RIGHT,MOD_SHIFT)},
-		"scroll "..scrollpages.." pages backwards/forward",
+		Smove_..scrollpages..S_pages_backwards_forward,
 		function(self)
 			if keydef.keycode == KEY_FW_LEFT then
 				self:goto(math.max(0, self.pos - scrollpages*G_height))
@@ -714,7 +714,7 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:addGroup(MOD_SHIFT.."< >",{
 		Keydef:new(KEY_PGBCK,MOD_SHIFT),Keydef:new(KEY_PGFWD,MOD_SHIFT),
 		Keydef:new(KEY_LPGBCK,MOD_SHIFT),Keydef:new(KEY_LPGFWD,MOD_SHIFT)},
-		"increase/decrease font size",
+		Sincrease_decrease_font_size,
 		function(self)
 			if keydef.keycode == KEY_PGBCK or keydef.keycode == KEY_LPGBCK then
 				self:incDecFontSize(-1)
@@ -726,7 +726,7 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:addGroup(MOD_ALT.."< >",{
 		Keydef:new(KEY_PGBCK,MOD_ALT),Keydef:new(KEY_PGFWD,MOD_ALT),
 		Keydef:new(KEY_LPGBCK,MOD_ALT),Keydef:new(KEY_LPGFWD,MOD_ALT)},
-		"increase/decrease line spacing",
+		Sincrease_decrease_line_spacing,
 		function(self)
 			if keydef.keycode == KEY_PGBCK or keydef.keycode == KEY_LPGBCK then
 				self:incDecFontSpacing(-10)
@@ -740,7 +740,7 @@ function CREReader:adjustCreReaderCommands()
 		numeric_keydefs[i]=Keydef:new(KEY_1+i-1, nil, tostring(i%10))
 	end
 	self.commands:addGroup("[1, 2 .. 9, 0]",numeric_keydefs,
-		"jump to 0%, 10% .. 90%, 100% of document",
+		Sjump_to_0_10__90_100_of_document,
 		function(self, keydef)
 			Debug('jump to position: '..
 				math.floor(self.doc:getFullHeight()*(keydef.keycode-KEY_1)/9)..
@@ -749,51 +749,51 @@ function CREReader:adjustCreReaderCommands()
 		end
 	)
 	self.commands:add(KEY_G,nil,"G",
-		"open 'go to position' input box",
+		Sopen_go_to_position_input_box,
 		function(unireader)
 			self:gotoInput()
 		end
 	)
 	self.commands:add({KEY_F, KEY_AA}, nil, "F",
-		"change document font",
+		Schange_document_font,
 		function(self)
 			self:changeDocFont()
 		end
 	)
 	self.commands:add(KEY_F, MOD_SHIFT, "F",
-		"use document font as default font",
+		Suse_document_font_as_default_font,
 		function(self)
 			self:setDocFontAsDefault()
 		end
 	)
 	self.commands:add(KEY_F, MOD_ALT, "F",
-		"toggle font-weight: bold <> normal",
+		Stoggle_font_weight_bold_normal,
 		function(self)
 			self:toggleBoldNormal()
 		end
 	)
 	self.commands:add(KEY_B, MOD_ALT, "B",
-		"add bookmark to current page",
+		Sadd_bookmark_to_current_page,
 		function(self)
 			ok = self:addBookmark(self.doc:getXPointer())
 			if DKPV_STYLE_BOOKMARKS then
 				if not ok then
-					InfoMessage:drawTopMsg("Bookmark already exists")
+					InfoMessage:drawTopMsg(SBookmark_already_exists_)
 				else
-					InfoMessage:drawTopMsg("Bookmark added")
+					InfoMessage:drawTopMsg(SBookmark_added_)
 				end
 			else	-- not DKPV_STYLE_BOOKMARKS
 				if not ok then
-					InfoMessage:inform("Bookmark already exists ", DINFO_DELAY, 1, MSG_WARN)
+					InfoMessage:inform(SBookmark_already_exists_, DINFO_DELAY, 1, MSG_WARN)
 				else
-					InfoMessage:inform("Bookmark added ", DINFO_DELAY, 1, MSG_WARN)
+					InfoMessage:inform(SBookmark_added_, DINFO_DELAY, 1, MSG_WARN)
 				end
 			end	
 		end -- function
 	)
 	self.commands:addGroup(MOD_ALT.."K/L",{
 		Keydef:new(KEY_K,MOD_ALT), Keydef:new(KEY_L,MOD_ALT)},
-		"Jump between bookmarks",
+		Sjump_between_bookmarks,
 		function(unireader,keydef)
 			local bm = nil
 			if keydef.keycode == KEY_K then
@@ -804,7 +804,7 @@ function CREReader:adjustCreReaderCommands()
 			if bm then self:goto(bm.page, true, "xpointer") end
 		end)
 	self.commands:add(KEY_BACK, nil, "Back",
-		"go backward in jump history",
+		Sgo_backward_in_jump_history,
 		function(self)
 			local prev_jump_no = 0
 			if self.jump_history.cur > #self.jump_history then
@@ -819,25 +819,25 @@ function CREReader:adjustCreReaderCommands()
 				self.jump_history.cur = prev_jump_no
 				self:goto(self.jump_history[prev_jump_no].page, true, "xpointer")
 			else
-				InfoMessage:inform("Already first jump ", DINFO_DELAY, 1, MSG_WARN)
+				InfoMessage:inform(SAlready_first_jump_, DINFO_DELAY, 1, MSG_WARN)
 			end
 		end
 	)
 	self.commands:add(KEY_BACK, MOD_SHIFT, "Back",
-		"go forward in jump history",
+		Sgo_forward_in_jump_history,
 		function(self)
 			local next_jump_no = self.jump_history.cur + 1
 			if next_jump_no <= #self.jump_history then
 				self.jump_history.cur = next_jump_no
 				self:goto(self.jump_history[next_jump_no].page, true, "xpointer")
 			else
-				InfoMessage:inform("Already last jump ", DINFO_DELAY, 1, MSG_WARN)
+				InfoMessage:inform(SAlready_last_jump_, DINFO_DELAY, 1, MSG_WARN)
 			end
 		end
 	)
 	self.commands:addGroup("vol-/+",
 		{Keydef:new(KEY_VPLUS,nil), Keydef:new(KEY_VMINUS,nil)},
-		"decrease/increase gamma",
+		Sdecrease_increase_gamma,
 		function(self, keydef)
 			local delta = 1
 			if keydef.keycode == KEY_VMINUS then
@@ -845,25 +845,25 @@ function CREReader:adjustCreReaderCommands()
 			end
 			cre.setGammaIndex(self.gamma_index+delta)
 			self.gamma_index = cre.getGammaIndex()
-			InfoMessage:inform("Changing gamma to "..self.gamma_index..". ", DINFO_NODELAY, 1, MSG_AUX)
+			InfoMessage:inform(SChanging_gamma_to_..self.gamma_index..". ", DINFO_NODELAY, 1, MSG_AUX)
 			self:redrawCurrentPage()
 		end
 	)
-	self.commands:add(KEY_FW_UP, nil, "joypad up",
-		"pan "..self.shift_y.." pixels upwards",
+	self.commands:add(KEY_FW_UP, nil, Sjoypad_up,
+		Span_..self.shift_y..S_pixels_upwards,
 		function(self)
 			self:goto(self.pos - self.shift_y)
 		end
 	)
-	self.commands:add(KEY_FW_DOWN, nil, "joypad down",
-		"pan "..self.shift_y.." pixels downwards",
+	self.commands:add(KEY_FW_DOWN, nil, Sjoypad_down,
+		Span_..self.shift_y..S_pixels_downwards,
 		function(self)
 			self:goto(self.pos + self.shift_y)
 		end
 	)
 --[[
 	self.commands:add(KEY_V, nil, "V",
-		"toggle view mode (requires re-open)",
+		Stoggle_view_mode_requires_re_open_,
 		function(self)
 			if self.view_mode == "page" then
 				self.view_mode = "scroll"
@@ -871,7 +871,7 @@ function CREReader:adjustCreReaderCommands()
 				self.view_mode = "page"
 			end
 			self.settings:saveSetting("view_mode", self.view_mode)
-			InfoMessage:inform("Viewmode: "..self.view_mode.." (needs re-open)", DINFO_DELAY, 1, MSG_AUX)
+			InfoMessage:inform(SViewmode_..self.view_mode.." (needs re-open)", DINFO_DELAY, 1, MSG_AUX)
 		end
 	)
 --]]
@@ -904,9 +904,9 @@ function CREReader:searchHighLight(search)
 	if found then
 		self.pos = pos -- first metch position
 		self:redrawCurrentPage()
-		InfoMessage:inform( found.." hits '"..search.."' pos "..pos, DINFO_DELAY, 1, MSG_WARN)
+		InfoMessage:inform( found..S_hits_.."'"..search.."'"..S_pos_..pos, DINFO_DELAY, 1, MSG_WARN)
 	else
-		InfoMessage:inform( "'"..search.."' not found in document ", DINFO_DELAY, 1, MSG_WARN)
+		InfoMessage:inform( "'"..search.."'"..S_not_found_in_document_, DINFO_DELAY, 1, MSG_WARN)
 	end
 
 	self.last_search.search = search
