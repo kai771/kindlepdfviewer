@@ -178,6 +178,7 @@ S_bounding_box = " bounding box"
 SNew_page_bbox_ = "New page bbox "
 SNew_page_bounding_box = "New page bounding box"
 
+
 -- crereader --
 ---------------
 SError_unzipping_file_ = "Error unzipping file. "
@@ -240,13 +241,15 @@ SCOLOUR_BACKGROUND_show_only_background_ = "COLOUR BACKGROUND (show only backgro
 SCOLOUR_FOREGROUND_show_only_foreground_ = "COLOUR FOREGROUND (show only foreground)"
 
 
-
-
-
-
-
-
-
-
-
+-- pdfreader --
+---------------
+SPass_ = "Pass:"
+Swrong_or_missing_password = "wrong or missing password"
+Sdamaged_page_tree = "damaged page tree"
+Ssave_all_attachments_on_this_page = "save all attachments on this page"
+SSaving_attachments_ = "Saving attachments..."
+SNo_attachments_found_ = "No attachments found "
+S_attachment_s_ = " attachment(s)"
+S_saved_ = " saved "
+SFailed_to_save_attachments_ = "Failed to save attachments "
 

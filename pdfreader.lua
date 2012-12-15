@@ -1,5 +1,6 @@
 require "unireader"
 require "inputbox"
+require "lbrstrings"
 
 PDFReader = UniReader:new{
 	filename -- stores the absolute pathname of the open file
@@ -15,11 +16,11 @@ function PDFReader:open(filename)
 		return false, self.doc -- will contain error message
 	end
 	if self.doc:needsPassword() then
-		local password = InputBox:input(G_height-100, 100, "Pass:")
+		local password = InputBox:input(G_height-100, 100, SPass_)
 		if not password or not self.doc:authenticatePassword(password) then
 			self.doc:close()
 			self.doc = nil
-			return false, "wrong or missing password"
+			return false, Swrong_or_missing_password
 		end
 		-- password wrong or not entered
 	end
@@ -28,7 +29,7 @@ function PDFReader:open(filename)
 		-- for PDFs, they might trigger errors later when accessing page tree
 		self.doc:close()
 		self.doc = nil
-		return false, "damaged page tree"
+		return false, Sdamaged_page_tree
 	end
 	self.filename = filename
 	return true
@@ -68,7 +69,7 @@ end
 
 function PDFReader:adjustCommands()
 	self.commands:add(KEY_S, MOD_ALT, "S",
-		"save all attachments on this page",
+		Ssave_all_attachments_on_this_page,
 		function(self)
 			self:saveAttachments()
 	end) 
@@ -77,7 +78,7 @@ end
 -- saves all attachments on the current page in the same directory
 -- as the file itself (see extr.c utility)
 function PDFReader:saveAttachments()
-	InfoMessage:inform("Saving attachments...", DINFO_NODELAY, 1, MSG_AUX)
+	InfoMessage:inform(SSaving_attachments_, DINFO_NODELAY, 1, MSG_AUX)
 	local p = io.popen('./extr "'..self.filename..'" '..tostring(self.pageno), "r")
 	local count = p:read("*a")
 	p:close()
@@ -85,13 +86,13 @@ function PDFReader:saveAttachments()
 		-- double braces are needed because string.gsub() returns more than one value
 		count = tonumber((string.gsub(count, "[\n\r]+", "")))
 		if count == 0 then
-			InfoMessage:inform("No attachments found ", DINFO_DELAY, 1, MSG_WARN)
+			InfoMessage:inform(SNo_attachments_found_, DINFO_DELAY, 1, MSG_WARN)
 		else
-			InfoMessage:inform(count.." attachment"..(count > 1 and "s" or "").." saved ",
+			InfoMessage:inform(count..S_attachment_s_..S_saved_,
 				DINFO_DELAY, 1, MSG_AUX)
 		end
 	else
-		InfoMessage:inform("Failed to save attachments ", DINFO_DELAY, 1, MSG_WARN)
+		InfoMessage:inform(SFailed_to_save_attachments_, DINFO_DELAY, 1, MSG_WARN)
 	end
 	-- needed because of inform(..DINFO_NODELAY..) above
 	self:redrawCurrentPage()
