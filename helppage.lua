@@ -5,6 +5,7 @@ require "font"
 require "inputbox"
 require "selectmenu"
 require "commands"
+require "lbrstrings"
 
 HelpPage = {
 	-- Other Class vars:
@@ -94,7 +95,7 @@ function HelpPage:show(ypos, height, commands, title)
 				end
 			end
 			-- draw footer
-			local footer = "Page "..self.page.." of "..math.ceil(self.items / perpage).."  - Back to close this page"
+			local footer = SPage_..self.page..S_of_..math.ceil(self.items / perpage)..S__Back_to_close_this_page
 			renderUtf8Text(fb.bb, self.margin_H, height-7, fface, footer, true)
 		end
 		if is_pagedirty then

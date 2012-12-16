@@ -500,3 +500,7 @@ SFonts_Menu = "Fonts Menu"
 S_for_ = " for "
 
 
+-- helppage.lua --
+------------------
+S__Back_to_close_this_page = "  - Back to close this page" -- footer
+
