@@ -504,3 +504,23 @@ S_for_ = " for "
 ------------------
 S__Back_to_close_this_page = "  - Back to close this page" -- footer
 
+
+-- readerchooser.lua --
+-----------------------
+SComplete_action_using = "Complete action using"
+SRemember_this_type_T_ = "Remember this type(T)"
+SRemember_this_file_F_ = "Remember this file(F)"
+Sremember_reader_choice_for_this_type = "remember reader choice for this type"
+Sremember_reader_choice_for_this_file = "remember reader choice for this file"
+Schoose_reader = "choose reader"
+
+
+
+
+
+
+
+
+
+
+

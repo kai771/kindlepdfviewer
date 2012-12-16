@@ -7,6 +7,7 @@ require "djvureader"
 require "koptreader"
 require "picviewer"
 require "crereader"
+require "lbrstrings"
 require "defaults"
 
 registry = {
@@ -36,10 +37,10 @@ ReaderChooser = {
 	option_font_size = 17, -- option font size
 	
 	-- title text
-	TITLE = "Complete action using",
+	TITLE = SComplete_action_using,
 	-- options text
-	OPTION_TYPE = "Remember this type(T)",
-	OPTION_FILE = "Remember this file(F)",
+	OPTION_TYPE = SRemember_this_type_T_,
+	OPTION_FILE = SRemember_this_file_F_,
 	
 	-- data variables
 	readers = {},
@@ -249,8 +250,8 @@ end
 -- add available commands
 function ReaderChooser:addAllCommands()
 	self.commands = Commands:new{}
-	self.commands:add(KEY_FW_DOWN, nil, "joypad down",
-		"next item",
+	self.commands:add(KEY_FW_DOWN, nil, Sjoypad_down,
+		Snext_item,
 		function(self)
 			self.last_item = self.current_item
 			self.current_item = (self.current_item + #self.readers + 1)%#self.readers
@@ -261,8 +262,8 @@ function ReaderChooser:addAllCommands()
 			self.markerdirty = true
 		end
 	)
-	self.commands:add(KEY_FW_UP, nil, "joypad up",
-		"previous item",
+	self.commands:add(KEY_FW_UP, nil, Sjoypad_up,
+		Sprevious_item,
 		function(self)
 			self.last_item = self.current_item
 			self.current_item = (self.current_item + #self.readers - 1)%#self.readers
@@ -275,7 +276,7 @@ function ReaderChooser:addAllCommands()
 	)
 	
 	self.commands:add(KEY_T, nil, "T",
-		"remember reader choice for this type",
+		Sremember_reader_choice_for_this_type,
 		function(self)
 			self.remember_preference = not self.remember_preference
 			self.optiondirty = true
@@ -283,7 +284,7 @@ function ReaderChooser:addAllCommands()
 	)
 	
 	self.commands:add(KEY_F, nil, "F",
-		"remember reader choice for this file",
+		Sremember_reader_choice_for_this_file,
 		function(self)
 			self.remember_association = not self.remember_association
 			self.optiondirty = true
@@ -291,14 +292,14 @@ function ReaderChooser:addAllCommands()
 	)
 	
 	self.commands:add({KEY_ENTER, KEY_FW_PRESS}, nil, "Enter",
-		"choose reader",
+		Schoose_reader,
 		function(self)
 			self.final_choice = self.current_item
 			return "break"
 		end
 	)
 	self.commands:add(KEY_BACK, nil, "Back",
-		"back",
+		Sback,
 		function(self)
 			return "break"
 		end
