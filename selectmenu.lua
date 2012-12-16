@@ -3,6 +3,7 @@ require "keys"
 require "graphics"
 require "font"
 require "commands"
+require "lbrstrings"
 require "defaults"
 
 SelectMenu = {
@@ -17,8 +18,8 @@ SelectMenu = {
 	shortcut_width = DSM_SHORTCUT_WIDTH, -- width used to draw shortcut key
 	current_entry = 0,
 
-	menu_title = "No Title",
-	no_item_msg = "No items found.",
+	menu_title = SNo_Title,
+	no_item_msg = SNo_items_found_,
 	item_array = {},
 	items = 0,
 
@@ -80,7 +81,7 @@ function SelectMenu:addAllCommands()
 	local numeric_keydefs, i = {}
 	for i=1, 10 do numeric_keydefs[i]=Keydef:new(KEY_1+i-1, nil, tostring(i%10)) end
 	self.commands:addGroup("[1, 2 .. 9, 0]", numeric_keydefs,
-		"item at position 0%, 10% .. 90%, 100%",
+		Sitem_at_position_0_10__90_100_,
 		function(sm)
 			local target_item = math.ceil(sm.items * (keydef.keycode-KEY_1) / 9)
 			sm.current, sm.page, sm.markerdirty, sm.pagedirty =
@@ -88,8 +89,8 @@ function SelectMenu:addAllCommands()
 		end
 	)
 
-	self.commands:add(KEY_FW_UP, nil, "joypad up",
-		"previous item",
+	self.commands:add(KEY_FW_UP, nil, Sjoypad_up,
+		Sprevious_item,
 		function(sm)
 			if sm.current == 1 then
 				sm.current = sm.onpage
@@ -100,8 +101,8 @@ function SelectMenu:addAllCommands()
 			end
 		end
 	)
-	self.commands:add(KEY_FW_UP, MOD_SHIFT, "joypad up",
-		"previous "..DSM_SHIFT_UP_DOWN.." items",
+	self.commands:add(KEY_FW_UP, MOD_SHIFT, Sjoypad_up,
+		Sprevious_..DSM_SHIFT_UP_DOWN..S_items,
 		function(sm)
 			if sm.current > DSM_SHIFT_UP_DOWN then
 				sm.current = sm.current - DSM_SHIFT_UP_DOWN
@@ -111,8 +112,8 @@ function SelectMenu:addAllCommands()
 			sm.markerdirty = true
 		end
 	)
-	self.commands:add(KEY_FW_DOWN, nil, "joypad down",
-		"next item",
+	self.commands:add(KEY_FW_DOWN, nil, Sjoypad_down,
+		Snext_item,
 		function(sm)
 			if sm.current == sm.onpage then
 				sm.current = 1
@@ -123,8 +124,8 @@ function SelectMenu:addAllCommands()
 			end
 		end
 	)
-	self.commands:add(KEY_FW_DOWN, MOD_SHIFT, "joypad down",
-		"next "..DSM_SHIFT_UP_DOWN.." items",
+	self.commands:add(KEY_FW_DOWN, MOD_SHIFT, Sjoypad_down,
+		Snext_..DSM_SHIFT_UP_DOWN..S_items,
 		function(sm)
 			if sm.page < (sm.items / sm.perpage) then
 				if sm.current <= sm.perpage - DSM_SHIFT_UP_DOWN then
@@ -145,7 +146,7 @@ function SelectMenu:addAllCommands()
 		end
 	)
 	self.commands:add({KEY_PGFWD, KEY_LPGFWD}, nil, ">",
-		"next page",
+		Snext_page,
 		function(sm)
 			if sm.page < (sm.items / sm.perpage) then
 				if sm.current + sm.page * sm.perpage > sm.items then
@@ -160,7 +161,7 @@ function SelectMenu:addAllCommands()
 		end
 	)
 	self.commands:add({KEY_PGBCK, KEY_LPGBCK}, nil, "<",
-		"previous page",
+		Sprevious_page,
 		function(sm)
 			if sm.page > 1 then
 				sm.page = sm.page - 1
@@ -171,8 +172,8 @@ function SelectMenu:addAllCommands()
 			end
 		end
 	)
-	self.commands:add(KEY_FW_PRESS, nil, "joypad center",
-		"select item",
+	self.commands:add(KEY_FW_PRESS, nil, Sjoypad_press,
+		Sselect_item,
 		function(sm)
 			if sm.items == 0 then
 				return "break"
@@ -183,7 +184,7 @@ function SelectMenu:addAllCommands()
 	)
 	if self.deletable then
 		self.commands:add(KEY_DEL, nil, "Del",
-			"delete item",
+			Sdelete_item,
 			function(sm)
 				self.selected_item = (sm.perpage * (sm.page - 1) + sm.current)
 				return "delete"
@@ -191,22 +192,22 @@ function SelectMenu:addAllCommands()
 		)
 	end
 	if self.expandable then
-		self.commands:add(KEY_FW_RIGHT, nil, "joypad right",
-			"expand item",
+		self.commands:add(KEY_FW_RIGHT, nil, Sjoypad_right,
+			Sexpand_item,
 			function(sm)
 				self.selected_item = (sm.perpage * (sm.page - 1) + sm.current)
 				return "expand"
 			end
 		)
-		self.commands:add(KEY_FW_LEFT, nil, "joypad left",
-			"collapse item",
+		self.commands:add(KEY_FW_LEFT, nil, Sjoypad_left,
+			Scollapse_item,
 			function(sm)
 				self.selected_item = (sm.perpage * (sm.page - 1) + sm.current)
 				return "collapse"
 			end
 		)
-		self.commands:add(KEY_FW_RIGHT, MOD_SHIFT, "joypad right",
-			"expand all subitems",
+		self.commands:add(KEY_FW_RIGHT, MOD_SHIFT, Sjoypad_right,
+			Sexpand_all_subitems,
 			function(sm)
 				self.selected_item = (sm.perpage * (sm.page - 1) + sm.current)
 				return "expand all"
@@ -221,7 +222,7 @@ function SelectMenu:addAllCommands()
 		table.insert(KEY_Q_to_P, Keydef:new(i, nil, ""))
 	end
 	self.commands:addGroup("Q to P", KEY_Q_to_P, 
-		"select item with Q to P key as shortcut",
+		Sselect_item_with_Q_to_P_key_as_shortcut,
 		function(sm, keydef)
 			sm.selected_item = sm:getItemIndexByShortCut(
 				sm.item_shortcuts[ keydef.keycode - KEY_Q + 1 ], sm.perpage)
@@ -232,7 +233,7 @@ function SelectMenu:addAllCommands()
 		table.insert(KEY_A_to_L, Keydef:new(i, nil, ""))
 	end
 	self.commands:addGroup("A to L", KEY_A_to_L, 
-		"select item with A to L key as shortcut",
+		Sselect_item_with_A_to_L_key_as_shortcut,
 		function(sm, keydef)
 			sm.selected_item = sm:getItemIndexByShortCut(
 				sm.item_shortcuts[ keydef.keycode - KEY_A + 11 ], sm.perpage)
@@ -250,25 +251,25 @@ function SelectMenu:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_SLASH, nil, "/",
-		"select item with / key as shortcut",
+		Sselect_item_with_Z_to_M_key_as_shortcut,
 		function(sm)
 			sm.selected_item = sm:getItemIndexByShortCut("/", sm.perpage)
 		end
 	)
 	self.commands:add(KEY_DOT, nil, ".",
-		"select item with dot key as shortcut",
+		Sselect_item_with_dot_key_as_shortcut,
 		function(sm)
 			sm.selected_item = sm:getItemIndexByShortCut(".", sm.perpage)
 		end
 	)
 	self.commands:add(KEY_SYM, nil, "Sym",
-		"select item with Sym key as shortcut",
+		Sselect_item_with_Sym_key_as_shortcut,
 		function(sm)
 			sm.selected_item = sm:getItemIndexByShortCut("Sym", sm.perpage)
 		end
 	)
 	self.commands:add(KEY_ENTER, nil, "Enter",
-		"select item with Enter key as shortcut",
+		Sselect_item_with_Enter_key_as_shortcut,
 		function(sm)
 			sm.selected_item = sm:getItemIndexByShortCut("Ent", sm.perpage)
 		end
@@ -277,13 +278,13 @@ function SelectMenu:addAllCommands()
 	-- ^^Left out if not DKPV_STYLE_LISTS ---------------
 	
 	self.commands:add(KEY_H,MOD_ALT,"H",
-		"show help page",
+		Sshow_help_page,
 		function(sm)
 		HelpPage:show(0, G_height, sm.commands)
 		sm.pagedirty = true
 	end)
 	self.commands:add(KEY_BACK, nil, "Back",
-		"exit menu",
+		Sexit_menu,
 		function(sm)
 			return "break"
 		end
@@ -294,7 +295,7 @@ function SelectMenu:clearCommands()
 	self.commands = Commands:new{}
 
 	self.commands:add(KEY_BACK, nil, "Back",
-		"exit menu",
+		Sexit_menu,
 		function(sm)
 			return "break"
 		end)

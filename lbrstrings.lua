@@ -520,3 +520,21 @@ Schoose_reader = "choose reader"
 SScreenshot_is_ready_in_ = "Screenshot is ready in "
 S_milliseconds = " milliseconds"
 
+
+-- selectmenu.lua --
+--------------------
+SNo_Title = "No Title"
+SNo_items_found_ = "No items found."
+Sselect_item = "select item"
+Sdelete_item = "delete item"
+Sexpand_item = "expand item"
+Scollapse_item = "collapse item"
+Sexpand_all_subitems = "expand all subitems"
+Sselect_item_with_Q_to_P_key_as_shortcut = "select item with Q to P key as shortcut"
+Sselect_item_with_A_to_L_key_as_shortcut = "select item with A to L key as shortcut"
+Sselect_item_with_Z_to_M_key_as_shortcut = "select item with Z to M key as shortcut"
+Sselect_item_with_dot_key_as_shortcut = "select item with dot key as shortcut"
+Sselect_item_with_Sym_key_as_shortcut = "select item with Sym key as shortcut"
+Sselect_item_with_Enter_key_as_shortcut = "select item with Enter key as shortcut"
+Sexit_menu = "exit menu"
+
