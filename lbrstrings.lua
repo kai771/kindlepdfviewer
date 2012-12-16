@@ -208,7 +208,6 @@ Scurrent_ = "current: "
 
 -- commands
 Sskip_to_previous_next_chapter = "skip to previous/next chapter"
-Sleft_right = "left/right"
 Smove_ = "move "
 S_pages_backwards_forward = " pages backwards/forward"
 Sincrease_decrease_font_size = "increase/decrease font size"
@@ -223,6 +222,12 @@ Sjoypad_down = "joypad down"
 Sjoypad_left = "joypad left"
 Sjoypad_right = "joypad right"
 Sjoypad_press = "joypad press"
+Sleft = "left"
+Sright = "right"
+Sup = "up"
+Sdown = "down"
+Sup_down = "up/down"
+Sleft_right = "left/right"
 S_pixels_upwards = " pixels upwards"
 S_pixels_downwards = " pixels downwards"
 Span_ = "pan "
@@ -288,9 +293,7 @@ Shigh = "high"
 SAuto_Straighten = "Auto Straighten"
 SJustification = "Justification"
 Sauto = "auto"
-Sleft = "left"
 Scenter = "center"
-Sright = "right"
 Sfull = "full"
 SColumns = "Columns"
 SContrast = "Contrast"
@@ -365,4 +368,45 @@ SChange_font__ = "Change font..."
 SCalclulator = "Calculator"
 STurn_battery_logging_ = "Turn battery logging "
 SFile_Manager_mode__ = "File Manager mode..."
+
+
+-- Inputbox --
+--------------
+SSelect_keyboard_layout = "Select keyboard layout" -- menu title
+SEnglish_upper_case = "English - upper case"
+SEnglish_lower_case = "English - lower case"
+SEnglish_numbers = "English - numbers"
+SEnglish_symbols = "English - symbols"
+SNational_upper_case = "National - upper case"
+SNational_lower_case = "National - lower case"
+SNational_numbers = "National - numbers"
+SNational_symbols = "National - symbols"
+
+Senter_character_from_virtual_keyboard_VK_ = "enter character from virtual keyboard (VK)"
+Senter_capitalized_VK_character = "enter capitalized VK-character"
+Smove_cursor_left = "move cursor left"
+Smove_cursor_right = "move cursor right"
+Smove_cursor_to_the_first_position = "move cursor to the first position"
+Smove_cursor_to_the_last_position = "move cursor to the last position"
+Sdelete_one_character = "delete one character"
+Sdelete_all_characters_empty_inputbox_ = "delete all characters (empty inputbox)"
+Sprevious_next_VK_layout = "previous/next VK-layout"
+Spress_virtual_key = "press virtual key"
+Stoggle_VK_layout_english_national = "toggle VK-layout: english <> national"
+Stoggle_VK_layout_chars_symbols = "toggle VK-layout: chars <> symbols"
+Sshow_Layout_Menu = "show Layout Menu"
+Sback = "back"
+SNo_user_input_ = "No user input "
+SInvalid_user_input_ = "Invalid user input "
+Scalculate_the_result = "calculate the result"
+Smath_functions_available_in_calculator = "math functions available in calculator"
+SMath_Functions_for_Calculator = "Math Functions for Calculator"
+Ssubmit_input_content = "submit input content"
+
+
+
+
+
+
+
 

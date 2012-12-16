@@ -3,6 +3,7 @@ require "rendertext"
 require "keys"
 require "graphics"
 require "screen"
+require "lbrstrings"
 
 MODE_CALC = 1
 MODE_TERM = 2
@@ -402,17 +403,17 @@ end
 
 function InputBox:showLayoutMenu()
 	local layout_menu_list = {
-		"English - upper case",
-		"English - lower case",
-		"English - numbers",
-		"English - symbols",
-		"National - upper case",
-		"National - lower case",
-		"National - numbers",
-		"National - symbols",
+		SEnglish_upper_case,
+		SEnglish_lower_case,
+		SEnglish_numbers,
+		SEnglish_symbols,
+		SNational_upper_case,
+		SNational_lower_case,
+		SNational_numbers,
+		SNational_symbols,
 		}
 	local layout_menu = SelectMenu:new{
-		menu_title = "Select keyboard layout",
+		menu_title = SSelect_keyboard_layout,
 		item_array = layout_menu_list,
 		current_entry = self.layout - 2
 		}
@@ -451,13 +452,13 @@ function InputBox:addCharCommands(layout)
 	-- adding the commands
 	for k,v in ipairs(self.INPUT_KEYS) do
 		-- just redefining existing
-		self.commands:add(v[1], nil, "A..Z", "enter character from virtual keyboard (VK)",
+		self.commands:add(v[1], nil, "A..Z", Senter_character_from_virtual_keyboard_VK_,
 			function(self)
 				self:addChar(v[self.layout])
 			end
 		)
 		-- and commands for chars pressed with Shift
-		self.commands:add(v[1], MOD_SHIFT, "A..Z", "enter capitalized VK-character",
+		self.commands:add(v[1], MOD_SHIFT, "A..Z", Senter_capitalized_VK_character,
 			function(self)
 				self:addChar(v[shift_layout])
 			end
@@ -504,13 +505,13 @@ function InputBox:addAllCommands()
 	self:addCharCommands(self.layout)
 	-- adding the rest commands (independent of the selected layout)
 	self.commands:add(KEY_H, MOD_ALT, "H",
-		"show help page",
+		Sshow_help_page,
 		function(self)
 			self:showHelpPage(self.commands)
 		end
 	)
-	self.commands:add(KEY_FW_LEFT, nil, "joypad left",
-		"move cursor left",
+	self.commands:add(KEY_FW_LEFT, nil, Sjoypad_left,
+		Smove_cursor_left,
 		function(self)
 			if vk_cursor_y == INTEXT then
 				if self.charpos > 1 then 
@@ -534,16 +535,16 @@ function InputBox:addAllCommands()
 			end	
 		end
 	)
-	self.commands:add(KEY_FW_LEFT, MOD_SHIFT, "left",
-		"move cursor to the first position",
+	self.commands:add(KEY_FW_LEFT, MOD_SHIFT, Sleft,
+		Smove_cursor_to_the_first_position,
 		function(self)
 			if self.charpos > 1 then
 				self:resetCursorPosAndRedraw()
 			end
 		end
 	)
-	self.commands:add(KEY_FW_RIGHT, nil, "joypad right",
-		"move cursor right",
+	self.commands:add(KEY_FW_RIGHT, nil, Sjoypad_right,
+		Smove_cursor_right,
 		function(self)
 			if vk_cursor_y == INTEXT then
 				if self.charpos <= #self.charlist then
@@ -567,8 +568,8 @@ function InputBox:addAllCommands()
 			end	
 		end
 	)
-	self.commands:add(KEY_FW_RIGHT, MOD_SHIFT, "right",
-		"move cursor to the last position",
+	self.commands:add(KEY_FW_RIGHT, MOD_SHIFT, Sright,
+		Smove_cursor_to_the_last_position,
 		function(self)
 			if self.charpos < #self.charlist then
 				self.cursor:clear()
@@ -589,19 +590,19 @@ function InputBox:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_DEL, nil, "Del",
-		"delete one character",
+		Sdelete_one_character,
 		function(self)
 			self:delChar()
 		end
 	)
 	self.commands:add(KEY_DEL, MOD_SHIFT, "Del",
-		"delete all characters (empty inputbox)",
+		Sdelete_all_characters_empty_inputbox_,
 		function(self)
 			self:clearText()
 		end
 	)
-	self.commands:addGroup("up/down", { Keydef:new(KEY_FW_DOWN, nil), Keydef:new(KEY_FW_UP, nil) },
-		"previous/next VK-layout",
+	self.commands:addGroup(Sup_down, { Keydef:new(KEY_FW_DOWN, nil), Keydef:new(KEY_FW_UP, nil) },
+		Sprevious_next_VK_layout,
 		function(self, keydef)
 			if keydef.keycode == KEY_FW_DOWN then
 				if vk_cursor_y > 0 then 
@@ -616,8 +617,8 @@ function InputBox:addAllCommands()
 			end
 		end
 	)
-	self.commands:add(KEY_FW_PRESS, nil, "fw_press",
-		"press virtual key",
+	self.commands:add(KEY_FW_PRESS, nil, Sjoypad_press,
+		Spress_virtual_key,
 		function(self)
 			local k
 			if vk_cursor_y < INTEXT then
@@ -655,14 +656,14 @@ function InputBox:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_AA, nil, "Aa",
-		"toggle VK-layout: english <> national",
+		Stoggle_VK_layout_english_national,
 		function(self)
 			self.utf8mode = not self.utf8mode
 			self:addCharCommands()
 		end
 	)
 	self.commands:add(KEY_SYM, nil, "Sym",
-		"toggle VK-layout: chars <> symbols",
+		Stoggle_VK_layout_chars_symbols,
 		function(self)
 			self.symbolmode = not self.symbolmode
 			self:addCharCommands()
@@ -670,7 +671,7 @@ function InputBox:addAllCommands()
 	)
 
 	self.commands:add(KEY_MENU, nil, "Menu",
-		"show Layout Menu",
+		Sshow_Layout_Menu,
 		function(self)
 			self:showLayoutMenu()
 		end		
@@ -680,7 +681,7 @@ function InputBox:addAllCommands()
 	self:ModeDependentCommands() -- here
 
 	self.commands:add(KEY_BACK, nil, "Back",
-		"back",
+		Sback,
 		function(self)
 			self.input_string = nil
 			return "break"
@@ -810,7 +811,7 @@ end
 
 function InputBox:EnterCalculate()
 	if #self.input_string == 0 then
-		InfoMessage:inform("No user input ", DINFO_DELAY, 1, MSG_WARN)
+		InfoMessage:inform(SNo_user_input_, DINFO_DELAY, 1, MSG_WARN)
 	else
 		local s = self:PrepareStringToCalc()
 		if pcall(function () f = assert(loadstring("r = tostring("..s..")")) end) and pcall(f) then
@@ -827,7 +828,7 @@ function InputBox:EnterCalculate()
 			self.cursor:draw()
 			fb:refresh(1, self.input_start_x-5, self.input_start_y-25, self.input_slot_w, self.h-25)
 		else
-			InfoMessage:inform("Invalid user input ", DINFO_DELAY, 1, MSG_WARN)
+			InfoMessage:inform(SInvalid_user_input_, DINFO_DELAY, 1, MSG_WARN)
 		end -- if pcall
 	end
 end
@@ -837,7 +838,7 @@ function InputBox:ModeDependentCommands()
 	if self.inputmode == MODE_CALC then
 		-- define what to do with the input_string
 		self.commands:add(KEY_ENTER, nil, "Enter",
-			"calculate the result",
+			Scalculate_the_result,
 			function(self)
 				self:EnterCalculate()
 			end -- function
@@ -845,15 +846,15 @@ function InputBox:ModeDependentCommands()
 		-- add the calculator help (short list of available functions)
 		-- or, might be better, to make some help document and open it in reader ??
 		self.commands:add(KEY_M, MOD_ALT, "M",
-			"math functions available in calculator",
+			Smath_functions_available_in_calculator,
 			function(self)
 				self:defineCalcFunctions()
-				self:showHelpPage(self.calcfunctions, "Math Functions for Calculator")
+				self:showHelpPage(self.calcfunctions, SMath_Functions_for_Calculator)
 			end
 			)
 	else 	-- return input_string & close input box
 		self.commands:add(KEY_ENTER, nil, "Enter",
-			"submit input content",
+			Ssubmit_input_content,
 			function(self)
 				return self:EnterSubmit()
 			end
