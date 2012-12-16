@@ -404,9 +404,22 @@ SMath_Functions_for_Calculator = "Math Functions for Calculator"
 Ssubmit_input_content = "submit input content"
 
 
+-- dialog.lua --
+----------------
+SEvent_notifications = "Event notifications" -- menu title
+SAvoid_any_notifications = "Avoid any notifications"
+SShow_popup_window = "Show popup window"
+SUse_TTS_voice = "Use TTS-voice"
+SPopup_window_and_TTS_voice = "Popup window and TTS-voice"
 
+SSelect_the_event_type = "Select the event type" -- menu title
+SMessages_eg_Battery_logging_on_ = "Messages (e.g. 'Battery logging on')"
+SWarnings_eg_Already_first_jump_ = "Warnings (e.g. 'Already first jump!')"
+SErrors_eg_Zip_contains_improper_content_ = "Errors (e.g. 'Zip contains improper content!')"
+SConfirmations_eg_Press_Y_to_confirm_ = "Confirmations (e.g. 'Press Y to confirm')"
+SBugs = "Bugs"
 
-
-
-
+SThe_current_voice_speed_is_ = "The current voice speed is "
+S_percent = " percent."
+SThe_current_sound_volume_is_ = "The current sound volume is "
 

@@ -134,11 +134,12 @@ end
 function InfoMessage:chooseMethodForEvent(event)
 	local popup, voice = self:getMethodForEvent(event)
 	local items_menu = SelectMenu:new{
-		menu_title = "Event notifications",
-		item_array = {"Avoid any notifications", 
-					"Show popup window",
-					"Use TTS-voice",
-					"Popup window and TTS-voice",
+		menu_title = SEvent_notifications,
+		item_array = {
+					SAvoid_any_notifications, 
+					SShow_popup_window,
+					SUse_TTS_voice,
+					SPopup_window_and_TTS_voice,
 					},
 		current_entry = (popup and 1 or 0) + (voice and 1 or 0) * 2,
 		}
@@ -155,17 +156,17 @@ function InfoMessage:chooseEventForMethod(event)
 	event = event or 0
 	local item_no = 0
 	local event_list = {
-		"Messages (e.g. 'Battery logging on')",
-		"Warnings (e.g. 'Already first jump!')",
-		"Errors (e.g. 'Zip contains improper content!')",
-		"Confirmations (e.g. 'Press Y to confirm')",
-		"Bugs",
+		SMessages_eg_Battery_logging_on_,
+		SWarnings_eg_Already_first_jump_,
+		SErrors_eg_Zip_contains_improper_content_,
+		SConfirmations_eg_Press_Y_to_confirm_,
+		SBugs,
 		}
 	while item_no ~= event and item_no < #event_list do
 		item_no = item_no + 1 
 	end
 	local event_menu = SelectMenu:new{
-		menu_title = "Select the event type",
+		menu_title = SSelect_the_event_type,
 		item_array = event_list,
 		current_entry = item_no - 1,
 		}
@@ -189,7 +190,7 @@ function InfoMessage:incrTTSspeed(direction) -- either +1 or -1
 	self.TTSspeed = math.min(self.TTSspeed, 200) -- max = 200%
 	-- set new value & give an example for more convenient tuning
 	os.execute('lipc-set-prop com.lab126.tts TtsISpeed '..self.TTSspeed)
-	say("The current voice speed is "..self.TTSspeed.." percent.")
+	say(SThe_current_voice_speed_is_..self.TTSspeed..S_percent)
 end
 
 function InfoMessage:getTTSspeed()
@@ -211,7 +212,7 @@ function InfoMessage:incrSoundVolume(direction) -- either +1 or -1
 	-- that is not exactly the volume percents, but more conventional values,
 	-- than abstract units returned by 'lipc-get-prop com.lab126.audio Volume'
 	local percents = math.floor(100*self.VolumeLevels[self.SoundVolume]/self.VolumeLevels[#self.VolumeLevels])
-	say("The current sound volume is "..percents.." percent.")
+	say(SThe_current_sound_volume_is_..percents..S_percent)
 end
 
 function InfoMessage:getSoundVolume()
