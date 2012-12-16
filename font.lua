@@ -1,3 +1,5 @@
+require "lbrstrings"
+
 Font = {
 	fontmap = {
 		cfont = "droid/DroidSansFallback.ttf",		-- filemanager: for menu contents
@@ -77,16 +79,16 @@ function Font:chooseItemForFont(initial)
 	local description -- additional info to display in menu
 	-- define auxilary function
 	function add_element(_index)
-		if	_index == "cfont" 	then	description = "filemanager: menu contents"
-		elseif	_index == "tfont"	then	description = "filemanager: header title"
-		elseif	_index == "ffont"	then	description = "filemanager: footer"
-		elseif	_index == "rifont"	then	description = "readers: reading position info"
-		elseif	_index == "scfont"	then	description = "selectmenu: item shortcuts"
-		elseif	_index == "hpkfont"	then	description = "help page: hotkeys"
-		elseif	_index == "hfont"	then	description = "help page: description"
-		elseif	_index == "infont"	then	description = "inputbox: on-screen keyboard & user input"
-		elseif	_index == "infofont" then	description = "info messages"
-		else	--[[ not included in Font.fontmap ]] description = "nothing; not used anymore"
+		if	_index == "cfont" 	then	description = Sfilemanager_menu_contents
+		elseif	_index == "tfont"	then	description = Sfilemanager_header_title
+		elseif	_index == "ffont"	then	description = Sfilemanager_footer
+		elseif	_index == "rifont"	then	description = Sreaders_reading_position_info
+		elseif	_index == "scfont"	then	description = Sselectmenu_item_shortcuts
+		elseif	_index == "hpkfont"	then	description = Shelp_page_hotkeys
+		elseif	_index == "hfont"	then	description = Shelp_page_description
+		elseif	_index == "infont"	then	description = Sinputbox_on_screen_keyboard_n_user_input
+		elseif	_index == "infofont" then	description = Sinfo_messages
+		else	--[[ not included in Font.fontmap ]] description = Snothing_not_used_anymore
 		end
 		-- then, search for number of initial item in the list Font.fontmap
 		if not item_found then
@@ -96,13 +98,13 @@ function Font:chooseItemForFont(initial)
 				item_found = true
 			end
 		end
-		table.insert(items_list, "[".._index.."] for "..description)
+		table.insert(items_list, "[".._index.."]"..S_for_..description)
 	end
 	table.foreach(Font.fontmap, add_element)
 
 	-- goto menu to select the item which font should be changed
 	local items_menu = SelectMenu:new{
-		menu_title = "Select item to change",
+		menu_title = SSelect_item_to_change,
 		item_array = items_list,
 		current_entry = item_no - 1,
 		own_glyph = 2, -- use Font.fontmap-values to render 'items_menu'-items
@@ -124,7 +126,7 @@ function Font:chooseFontForItem(item_font)
 		item_no = item_no + 1 
 	end
 	local fonts_menu = SelectMenu:new{
-		menu_title = "Fonts Menu",
+		menu_title = SFonts_Menu,
 		item_array = face_list,
 		current_entry = item_no - 1,
 		own_glyph = 1, -- use the item from item_array to render 'fonts_menu'-items

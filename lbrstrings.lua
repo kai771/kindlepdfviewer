@@ -482,8 +482,21 @@ Sopen_selected_item = "open selected item"
 S_hits = " hits"
 
 
+-- font.lua --
+--------------
+Sfilemanager_menu_contents = "filemanager: menu contents"
+Sfilemanager_header_title = "filemanager: header title"
+Sfilemanager_footer = "filemanager: footer"
+Sreaders_reading_position_info = "readers: reading position info"
+Sselectmenu_item_shortcuts = "selectmenu: item shortcuts"
+Shelp_page_hotkeys = "help page: hotkeys"
+Shelp_page_description = "help page: description"
+Sinputbox_on_screen_keyboard_n_user_input = "inputbox: on-screen keyboard & user input"
+Sinfo_messages = "info messages"
+Snothing_not_used_anymore = "nothing; not used anymore"
 
-
-
+SSelect_item_to_change = "Select item to change"
+SFonts_Menu = "Fonts Menu"
+S_for_ = " for "
 
 
