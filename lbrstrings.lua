@@ -476,8 +476,10 @@ SPage_1_of_1 = "Page 1 of 1" -- footer
 Slast_documents = "last documents"
 
 
-
-
+-- filesearcher.lua --
+----------------------
+Sopen_selected_item = "open selected item"
+S_hits = " hits"
 
 
 

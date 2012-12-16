@@ -5,6 +5,7 @@ require "font"
 require "inputbox"
 require "dialog"
 require "readerchooser"
+require "lbrstrings"
 
 FileSearcher = {
 	title_H = 40,	-- title height
@@ -113,14 +114,14 @@ end
 
 function FileSearcher:addAllCommands()
 	self.commands = Commands:new{}
-	self.commands:add(KEY_FW_UP, nil, "joypad up",
-		"previous item",
+	self.commands:add(KEY_FW_UP, nil, Sjoypad_up,
+		Sprevious_item,
 		function(self)
 			self:prevItem()
 		end
 	)
-	self.commands:add(KEY_FW_DOWN, nil, "joypad down",
-		"next item",
+	self.commands:add(KEY_FW_DOWN, nil, Sjoypad_down,
+		Snext_item,
 		function(self)
 			self:nextItem()
 		end
@@ -129,7 +130,7 @@ function FileSearcher:addAllCommands()
 	local numeric_keydefs, i = {}
 	for i=1, 10 do numeric_keydefs[i]=Keydef:new(KEY_1+i-1, nil, tostring(i%10)) end
 	self.commands:addGroup("[1, 2 .. 9, 0]", numeric_keydefs,
-		"item at position 0%, 10% .. 90%, 100%",
+		Sitem_at_position_0_10__90_100_,
 		function(self)
 			local target_item = math.ceil(self.items * (keydef.keycode-KEY_1) / 9)
 			self.current, self.page, self.markerdirty, self.pagedirty = 
@@ -137,7 +138,7 @@ function FileSearcher:addAllCommands()
 		end
 	)
 	self.commands:add({KEY_PGFWD, KEY_LPGFWD}, nil, ">",
-		"next page",
+		Snext_page,
 		function(self)
 			if self.page < (self.items / self.perpage) then
 				if self.current + self.page*self.perpage > self.items then
@@ -152,7 +153,7 @@ function FileSearcher:addAllCommands()
 		end
 	)
 	self.commands:add({KEY_PGBCK, KEY_LPGBCK}, nil, "<",
-		"previous page",
+		Sprevious_page,
 		function(self)
 			if self.page > 1 then
 				self.page = self.page - 1
@@ -164,10 +165,10 @@ function FileSearcher:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_G, nil, "G",
-		"goto page",
+		Sgoto_page,
 		function(self)
 			local n = math.ceil(self.items / self.perpage)
-			local page = NumInputBox:input(G_height-100, 100, "Page:", "current page "..self.page.." of "..n, true)
+			local page = NumInputBox:input(G_height-100, 100, SPage..":", Scurrent_page_..self.page..S_of_..n, true)
 			if pcall(function () page = math.floor(page) end) -- convert string to number
 			and page ~= self.page and page > 0 and page <= n then
 				self.page = page
@@ -179,7 +180,7 @@ function FileSearcher:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_L, nil, "L",
-		"last documents",
+		Slast_documents,
 		function(self)
 			FileHistory:init()
 			FileHistory:choose("")
@@ -187,14 +188,14 @@ function FileSearcher:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_H, nil, "H",
-		"show help page",
+		Sshow_help_page,
 		function(self)
 			HelpPage:show(0, G_height, self.commands)
 			self.pagedirty = true
 		end
 	) 
-	self.commands:add(KEY_FW_RIGHT, nil, "joypad right",
-		"document details",
+	self.commands:add(KEY_FW_RIGHT, nil, Sjoypad_right,
+		Sdocument_details,
 		function(self)
 			local file_entry = self.result[self.perpage*(self.page-1)+self.current]
 			FileInfo:show(file_entry.dir,file_entry.name)
@@ -202,16 +203,16 @@ function FileSearcher:addAllCommands()
 		end
 	) 
 	self.commands:add(KEY_S, nil, "S",
-		"invoke search inputbox",
+		Sinvoke_search_inputbox,
 		function(self)
 			local old_keywords = self.keywords
-			self.keywords = InputBox:input(G_height - 100, 100, "Search:", old_keywords)
+			self.keywords = InputBox:input(G_height - 100, 100, SSearch_, old_keywords)
 			if self.keywords then
 				local old_data = self.result -- be sure that something is found, otherwise restore
 				local old_page, old_current = self.page, self.current
 				self:setSearchResult(self.keywords)
 				if #self.result < 1 then
-					InfoMessage:inform("No search hits ", DINFO_DELAY, 1, MSG_WARN)
+					InfoMessage:inform(SNo_search_hits, DINFO_DELAY, 1, MSG_WARN)
 					-- restoring the original data
 					self.result = old_data
 					self.items = #self.result
@@ -226,14 +227,14 @@ function FileSearcher:addAllCommands()
 		end
 	)
 	self.commands:add({KEY_F, KEY_AA}, nil, "F, Aa",
-		"change font faces",
+		Schange_font_faces,
 		function(self)
 			Font:chooseFonts()
 			self.pagedirty = true
 		end
 	)
 	self.commands:add({KEY_ENTER, KEY_FW_PRESS}, nil, "Enter",
-		"open selected item",
+		Sopen_selected_item,
 		function(self)
 			local file_entry = self.result[self.perpage*(self.page-1)+self.current]
 			file_full_path = file_entry.dir .. "/" .. file_entry.name
@@ -249,7 +250,7 @@ function FileSearcher:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_DEL, nil, "Del",
-		"delete document",
+		Sdelete_selected_item,
 		function(self)
 			local pos = self.perpage*(self.page-1)+self.current
 			local file_entry = self.result[pos]
@@ -257,7 +258,7 @@ function FileSearcher:addAllCommands()
 			if InfoMessage.InfoMethod[MSG_CONFIRM] == 0 then -- silent regime
 				self:deleteFoundFile(file_to_del)
 			else
-				InfoMessage:inform("Press 'Y' to confirm ", DINFO_NODELAY, 0, MSG_CONFIRM)
+				InfoMessage:inform(SPress_Y_to_confirm_, DINFO_NODELAY, 0, MSG_CONFIRM)
 				if ReturnKey() == KEY_Y then
 					self:deleteFoundFile(file_to_del)
 				end
@@ -266,13 +267,13 @@ function FileSearcher:addAllCommands()
 		end
 	)
 	self.commands:add(KEY_SPACE, nil, "Space",
-		"refresh page manually",
+		Srefresh_page_manually,
 		function(self)
 			self.pagedirty = true
 		end
 	)
 	self.commands:add(KEY_BACK, nil, "Back",
-		"back",
+		Sback,
 		function(self)
 			return "break"
 		end
@@ -291,7 +292,7 @@ function FileSearcher:choose(keywords)
 	end
 	-- NuPogodi, 30.09.12: immediate quit (no redraw), if empty -- there is nothing to do in empty list anyway
 	if #self.result < 1 then
-		InfoMessage:inform("No search hits found ", DINFO_DELAY, 1, MSG_WARN)
+		InfoMessage:inform(SNo_search_hits, DINFO_DELAY, 1, MSG_WARN)
 		return nil
 	end
 
@@ -304,7 +305,7 @@ function FileSearcher:choose(keywords)
 			self.markerdirty = true
 			fb.bb:paintRect(0, 0, G_width, G_height, 0)
 
-			DrawTitle("Search Results for \'"..self.keywords.."\'".." ("..tostring(self.items).." hits)",self.margin_H,0,self.title_H,3,tface)
+			DrawTitle(SSearch_results_for.." \'"..self.keywords.."\'".." ("..tostring(self.items)..S_hits..")",self.margin_H,0,self.title_H,3,tface)
 			-- draw results
 			local c
 			for c = 1, self.perpage do
@@ -317,7 +318,7 @@ function FileSearcher:choose(keywords)
 			end
 			-- draw footer
 			all_page = math.ceil(self.items/self.perpage)
-			DrawFooter("Page "..self.page.." of "..all_page,fface,self.foot_H)
+			DrawFooter(SPage_..self.page..S_of_..all_page,fface,self.foot_H)
 		end
 
 		if self.markerdirty then
