@@ -253,3 +253,19 @@ S_attachment_s_ = " attachment(s)"
 S_saved_ = " saved "
 SFailed_to_save_attachments_ = "Failed to save attachments "
 
+
+-- koptreader --
+----------------
+SRendering_in_background_ = "Rendering in background..."
+
+
+
+
+
+
+
+
+
+
+
+

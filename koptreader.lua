@@ -1,6 +1,7 @@
 require "unireader"
 require "inputbox"
 require "koptconfig"
+require "lbrstrings"
 
 Configurable = {}
 
@@ -84,7 +85,7 @@ function KOPTReader:open(filename)
 			if not password or not self.doc:authenticatePassword(password) then
 				self.doc:close()
 				self.doc = nil
-				return false, "wrong or missing password"
+				return false, Swrong_or_missing_password
 			end
 			-- password wrong or not entered
 		end
@@ -93,13 +94,13 @@ function KOPTReader:open(filename)
 			-- for PDFs, they might trigger errors later when accessing page tree
 			self.doc:close()
 			self.doc = nil
-			return false, "damaged page tree"
+			return false, Sdamaged_page_tree
 		end
 		return true
 		
 	elseif file_type == "djvu" then
 		if not validDJVUFile(filename) then
-			return false, "Not a valid DjVu file"
+			return false, SNot_a_valid_DjVu_file
 		end
 
 		local ok
@@ -296,7 +297,7 @@ function KOPTReader:drawOrCache(no, preCache)
 	else
 		if use_threads and self.precache_kc ~= nil then
 			if self.precache_kc:isPreCache() == 1 and self.cache[self.cached_pagehash] then
-				InfoMessage:inform("Rendering in background...", DINFO_DELAY, 1, MSG_WARN)
+				InfoMessage:inform(SRendering_in_background_, DINFO_DELAY, 1, MSG_WARN)
 				return self.cached_pagehash, self.cached_offset_x, self.cached_offset_y
 			elseif self.precache_kc:isPreCache() == 0 then -- cache is ready to be written
 				Debug("write cache", self.precache_pagehash)
@@ -307,7 +308,7 @@ function KOPTReader:drawOrCache(no, preCache)
 				page:reflow(kc, self.render_mode)
 				return self:writeToCache(kc, page, pagehash, false)
 			else 
-				Debug("ERROR something wrong happens .. why cached page is missing?")
+				Debug("ERROR something wrong happens .. why is cached page missing?")
 				return nil
 			end
 		else
