@@ -449,3 +449,39 @@ SNo_reading_history = "No reading history "
 SLast_Documents = "Last Documents"
 SSearch_results_for = "Search results for"
 
+
+-- fileinfo.lua --
+------------------
+SContents = "Contents"
+S_sub_folder_s_ = " sub-folder(s)"
+S_file_s_ = " file(s)"
+S_book_s_ = " book(s)"
+SSize = "Size"
+SName = "Name"
+SPath = "Path"
+Sopen_document = "open document"
+Sgoto_folder = "goto folder"
+SUnpacked = "Unpacked"
+SFree_space = "Free space"
+SStatus_changed = "Status changed"
+SModified = "Modified"
+SAccessed = "Accessed"
+SLast_read = "Last read"
+SNever = "Never"
+S_pages = " pages"
+SCompleted = "Completed"
+SDocument_Information = "Document Information"
+SFolder_Information = "Folder Information"
+SPage_1_of_1 = "Page 1 of 1" -- footer
+Slast_documents = "last documents"
+
+
+
+
+
+
+
+
+
+
+
