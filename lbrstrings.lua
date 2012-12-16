@@ -134,7 +134,7 @@ SExternal_links_unsupported_ = "External links unsupported "
 S_Cur_ = "*(Cur) " -- current sign in jumpHist
 SPage_ = "Page "
 SNo_jump_history_found_ = "No jump history found "
-SCurrent_page_ = "Current Page "
+SCurrent_page_ = "Current page "
 SJump_History = "Jump History" -- menu title
 SNo_Highlights_found_ = "No HighLights found "
 SHighlights = "Highlights"
@@ -151,7 +151,7 @@ SNo_page_links_on_this_page_ = "No page links on this page "
 -- Input dialogs
 SZoom_ = "Zoom:" -- Zoom input dialog
 Scurrent_zoom_ = "current zoom: " -- Zoom input dialog
-SPage_ = "Page:" -- Goto input dialog
+SPage = "Page" -- Goto input dialog
 Scurrent_page_ = "current page " -- Goto input dialog
 SSearch_ = "Search:" -- Search input dialog
 SFull_refresh_every_N_pages_0_200_ = "Full refresh every N pages (0-200)" -- refresh count input dialog
@@ -308,7 +308,61 @@ Slast_item = "last item"
 Spreview = "preview"
 
 
+-- FileChooser --
+-----------------
+S___Press_H_for_help = " - Press H for help" -- footer
+S_of_ = " of "
+SPress_Y_to_confirm_ = "Press 'Y' to confirm "
+SNew_filename_ = "New filename:"
+SNew_Folder_ = "New Folder:"
+SSearching___ = "Searching... "
+SFile_copied_to_clipboard_ = "File copied to clipboard "
+SFile_moved_to_clipboard_ = "File moved to clipboard "
+SMoving_files_from_clipboard_ = "Moving files from clipboard..."
+SCalc_ = "Calc "
 
+-- commands
+Srefresh_file_list = "refresh file list"
+Snext_ = "next "
+Sprevious_ = "previous "
+Sitem_at_position_0_10__90_100_ = "item at position 0%, 10% .. 90%, 100%"
+Snext_page = "next page"
+Sprevious_page = "previous page"
+Sgoto_page = "goto page"
+Sshow_document_information = "show document information"
+Sopen_document_goto_folder = "open document / goto folder"
+Sdelete_selected_item = "delete selected item"
+Srename_file = "rename file"
+Sset_file_manager_mode = "set file manager mode"
+Sdecrease_increase_sound_volume = "decrease/increase sound volume"
+Sdecrease_increase_TTS_engine_speed = "decrease/increase TTS-engine speed"
+Schange_font_faces = "change font faces"
+Sshow_last_documents = "show last documents"
+Ssearch_files_single_space_matches_all_ = "search files (single space matches all)"
+Scopy_file_to_clipboard = "copy file to 'clipboard'"
+Smove_file_to_clipboard = "move file to 'clipboard'"
+Spaste_file_s_from_clipboard = "paste file(s) from 'clipboard'"
+Sshow_content_of_clipboard = "show content of 'clipboard'"
+Smake_new_folder = "make new folder"
+Srun_calculator = "run calculator"
+Sshow_FileChooser_menu = "show FileChooser menu"
+SSet_File_Manager_mode = "Set file manager mode" -- menu title
+SRestricted = "Restricted"
+SUnrestricted = "Unrestricted"
+SDirectory_not_empty_ = "Directory not empty "
+SUnsupported_function_ = "Unsupported function "
 
-
+-- FileChooser Menu
+SLibrerator_File_Chooser_Menu = "Librerator - File Chooser Menu" -- menu title
+SShow_last_documents__ = "Show last documents..."
+SCut = "Cut"
+SCopy = "Copy"
+SPaste = "Paste"
+SDelete = "Delete"
+SRename__ = "Rename..."
+SNew_folder__ = "New folder..."
+SChange_font__ = "Change font..."
+SCalclulator = "Calculator"
+STurn_battery_logging_ = "Turn battery logging "
+SFile_Manager_mode__ = "File Manager mode..."
 

@@ -2754,7 +2754,7 @@ function UniReader:gotoInput()
 	local numpages = self.doc:getPages()
 	local fpo = self.fp_offset
 	local page = NumInputBox:input(G_height-100, 100,
-		SPage_, Scurrent_page_..(self.pageno - fpo).." of "..(numpages - fpo).." (fpo="..fpo..")", true)
+		SPage..":", Scurrent_page_..(self.pageno - fpo).." of "..(numpages - fpo).." (fpo="..fpo..")", true)
 	-- convert string to number
 		if not pcall(function () page = math.floor(page) end) then
 			self:redrawCurrentPage()
