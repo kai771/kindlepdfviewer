@@ -515,12 +515,8 @@ Sremember_reader_choice_for_this_file = "remember reader choice for this file"
 Schoose_reader = "choose reader"
 
 
-
-
-
-
-
-
-
-
+-- screen.lua --
+----------------
+SScreenshot_is_ready_in_ = "Screenshot is ready in "
+S_milliseconds = " milliseconds"
 
