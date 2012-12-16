@@ -435,3 +435,17 @@ SThe_current_voice_speed_is_ = "The current voice speed is "
 S_percent = " percent."
 SThe_current_sound_volume_is_ = "The current sound volume is "
 
+
+-- filehistory.lua --
+---------------------
+Sdocument_details = "document details"
+Sinvoke_search_inputbox = "invoke search inputbox"
+SNo_search_hits = "No search hits "
+Sopen_selected_document = "open selected document"
+SFile_not_found_ = "File not found "
+Sdelete_history_entry = "delete history entry"
+Srefresh_page_manually = "refresh page manually"
+SNo_reading_history = "No reading history "
+SLast_Documents = "Last Documents"
+SSearch_results_for = "Search results for"
+
