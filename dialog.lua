@@ -1,5 +1,6 @@
 require "widget"
 require "font"
+require "lbrstrings"
 
 -- some definitions for developers
 MSG_AUX = 1

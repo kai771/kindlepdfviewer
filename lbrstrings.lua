@@ -404,6 +404,18 @@ SMath_Functions_for_Calculator = "Math Functions for Calculator"
 Ssubmit_input_content = "submit input content"
 
 
+-- commands.lua --
+------------------
+S_no_help_defined_ = "<no help defined>"
+SSlider = "Slider"
+Stoggle_screen_saver = "toggle screen saver"
+SGoing_into_screensaver__ = "Going into screensaver... "
+Splugin_out_usb = "plugin/out usb"
+Stoggle_usb_drive_mode = "toggle usb drive mode"
+SGoing_into_USB_mode__ = "Going into USB mode... "
+Smake_screenshot = "make screenshot"
+
+
 -- dialog.lua --
 ----------------
 SEvent_notifications = "Event notifications" -- menu title

@@ -1,5 +1,6 @@
 require "keys"
 require "battery"
+require "lbrstrings"
 
 Keydef = {
 	keycode = nil,
@@ -62,7 +63,7 @@ function Command:new(keydef, func, help, keygroup, order)
 end
 
 function Command:tostring()
-	return tostring(self.keydef)..": "..(self.help or "<no help defined>")
+	return tostring(self.keydef)..": "..(self.help or S_no_help_defined_)
 end
 
 
@@ -163,14 +164,14 @@ function Commands:new(obj)
 	end
 	setmetatable(obj.map, mt)
 
-	obj:add(KEY_INTO_SCREEN_SAVER, nil, "Slider",
-		"toggle screen saver",
+	obj:add(KEY_INTO_SCREEN_SAVER, nil, SSlider,
+		Stoggle_screen_saver,
 		function()
 			--os.execute("echo 'screensaver in' >> /mnt/us/event_test.txt")
 			if G_charging_mode == false and G_screen_saver_mode == false then
 				logBatteryLevel("SLEEP")
 				Screen:saveCurrentBB()
-				InfoMessage:inform("Going into screensaver... ", DINFO_NODELAY, 0, MSG_AUX)
+				InfoMessage:inform(SGoing_into_screensaver__, DINFO_NODELAY, 0, MSG_AUX)
 				Screen.kpv_rotation_mode = Screen.cur_rotation_mode
 				fb:setOrientation(Screen.native_rotation_mode)
 				util.sleep(1)
@@ -179,8 +180,8 @@ function Commands:new(obj)
 			end
 		end
 	)
-	obj:add(KEY_OUTOF_SCREEN_SAVER, nil, "Slider",
-		"toggle screen saver",
+	obj:add(KEY_OUTOF_SCREEN_SAVER, nil, SSlider,
+		Stoggle_screen_saver,
 		function()
 			--os.execute("echo 'screensaver out' >> /mnt/us/event_test.txt")
 			if G_screen_saver_mode == true and G_charging_mode == false then
@@ -194,8 +195,8 @@ function Commands:new(obj)
 			G_screen_saver_mode = false
 		end
 	)
-	obj:add(KEY_CHARGING, nil, "plugin/out usb",
-		"toggle usb drive mode",
+	obj:add(KEY_CHARGING, nil, Splugin_out_usb,
+		Stoggle_usb_drive_mode,
 		function()
 			--os.execute("echo 'usb in' >> /mnt/us/event_test.txt")
 			if G_charging_mode == false and G_screen_saver_mode == false then
@@ -203,15 +204,15 @@ function Commands:new(obj)
 				Screen:saveCurrentBB()
 				Screen.kpv_rotation_mode = Screen.cur_rotation_mode
 				fb:setOrientation(Screen.native_rotation_mode)
-				InfoMessage:inform("Going into USB mode... ", DINFO_NODELAY, 0, MSG_AUX)
+				InfoMessage:inform(SGoing_into_USB_mode__, DINFO_NODELAY, 0, MSG_AUX)
 				util.sleep(1)
 				os.execute("killall -cont cvm")
 			end
 			G_charging_mode = true
 		end
 	)
-	obj:add(KEY_NOT_CHARGING, nil, "plugin/out usb",
-		"toggle usb drive mode",
+	obj:add(KEY_NOT_CHARGING, nil, Splugin_out_usb,
+		Stoggle_usb_drive_mode,
 		function()
 			--os.execute("echo 'usb out' >> /mnt/us/event_test.txt")
 			if G_charging_mode == true and G_screen_saver_mode == false then
@@ -229,7 +230,7 @@ function Commands:new(obj)
 	)
 	-- Shift+P would be overwritten in inputbox by entering char 'P'
 	-- I suggest one should probably change the hotkey to, say, Alt+Space
-	obj:add(KEY_P, MOD_SHIFT, "P", "make screenshot",
+	obj:add(KEY_P, MOD_SHIFT, "P", Smake_screenshot,
 		function()
 			logBatteryLevel("SCREENSHOT")
 			Screen:screenshot()
