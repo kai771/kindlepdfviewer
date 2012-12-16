@@ -1,6 +1,7 @@
 require "font"
 require "keys"
 require "settings"
+require "lbrstrings"
 require "defaults"
 
 KOPTOptions =  {
@@ -18,8 +19,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="text_wrap",
-	option_text="Reflow",
-	items_text={"on","off"},
+	option_text=SReflow,
+	items_text={Son, Soff},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true},
@@ -29,8 +30,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="trim_page",
-	option_text="Trim Page",
-	items_text={"auto","manual"},
+	option_text=STrim_Page,
+	items_text={Sauto, Smanual},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true},
@@ -40,8 +41,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="detect_indent",
-	option_text="Indentation",
-	items_text={"enable","disable"},
+	option_text=SIdentation,
+	items_text={Senable, Sdisable},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true},
@@ -51,8 +52,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="defect_size",
-	option_text="Defect Size",
-	items_text={"small","medium","large"},
+	option_text=SDefect_Size,
+	items_text={Ssmall, Smedium, Slarge},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true, true},
@@ -62,8 +63,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="page_margin",
-	option_text="Page Margin",
-	items_text={"small","medium","large"},
+	option_text=SPage_Margin,
+	items_text={Ssmall, Smedium, Slarge},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true, true},
@@ -73,8 +74,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="line_spacing",
-	option_text="Line Spacing",
-	items_text={"small","medium","large"},
+	option_text=SLine_Spacing,
+	items_text={Ssmall, Smedium, Slarge},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true, true},
@@ -84,8 +85,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="word_spacing",
-	option_text="Word Spacing",
-	items_text={"small","medium","large"},
+	option_text=SWord_Spacing,
+	items_text={Ssmall, Smedium, Slarge},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true, true},
@@ -95,8 +96,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="multi_threads",
-	option_text="Multi Threads",
-	items_text={"on","off"},
+	option_text=SMulti_Threads,
+	items_text={Son, Soff},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true},
@@ -106,8 +107,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="quality",
-	option_text="Render Quality",
-	items_text={"low","medium","high"},
+	option_text=SRender_Quality,
+	items_text={Slow, Smedium, Shigh},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true, true},
@@ -117,7 +118,7 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="auto_straighten",
-	option_text="Auto Straighten",
+	option_text=SAuto_Straighten,
 	items_text={"0","5","10"},
 	current_item=nil,
 	text_dirty=true,
@@ -128,8 +129,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="justification",
-	option_text="Justification",
-	items_text={"auto","left","center","right","full"},
+	option_text=SJustification,
+	items_text={Sauto, Sleft, Scenter, Sright, Sfull},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true, true, true, true},
@@ -139,7 +140,7 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="max_columns",
-	option_text="Columns",
+	option_text=SColumns,
 	items_text={"1","2","3","4"},
 	current_item=nil,
 	text_dirty=true,
@@ -150,8 +151,8 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="contrast",
-	option_text="Contrast",
-	items_text={"lightest","lighter","default","darker","darkest"},
+	option_text=SContrast,
+	items_text={Slightest, Slighter, Sdefault, Sdarker, Sdarkest},
 	current_item=nil,
 	text_dirty=true,
 	marker_dirty={true, true, true, true, true},
@@ -161,7 +162,7 @@ KOPTOptions =  {
 	draw_index = nil,},
 	{
 	name="screen_rotation",
-	option_text="Screen Rotation",
+	option_text=SScreen_Rotation,
 	items_text={"0","90","180","270"},
 	current_item=nil,
 	text_dirty=true,
@@ -368,8 +369,8 @@ end
 -- add available commands
 function KOPTConfig:addAllCommands()
 	self.commands = Commands:new{}
-	self.commands:add(KEY_FW_DOWN, nil, "joypad down",
-		"next item",
+	self.commands:add(KEY_FW_DOWN, nil, Sjoypad_down,
+		Snext_item,
 		function(self)
 			local last_option = self.current_option
 			repeat
@@ -383,8 +384,8 @@ function KOPTConfig:addAllCommands()
 			KOPTOptions[self.current_option].marker_dirty[current_option_item] = true
 		end
 	)
-	self.commands:add(KEY_FW_UP, nil, "joypad up",
-		"previous item",
+	self.commands:add(KEY_FW_UP, nil, Sjoypad_up,
+		Sprevious_item,
 		function(self)
 			local last_option = self.current_option
 			repeat
@@ -398,8 +399,8 @@ function KOPTConfig:addAllCommands()
 			KOPTOptions[self.current_option].marker_dirty[current_option_item] = true
 		end
 	)
-	self.commands:add(KEY_FW_LEFT, nil, "joypad left",
-		"last item",
+	self.commands:add(KEY_FW_LEFT, nil, Sjoypad_left,
+		Slast_item,
 		function(self)
 			local last_item = KOPTOptions[self.current_option].current_item
 			local item_count = #KOPTOptions[self.current_option].items_text
@@ -412,8 +413,8 @@ function KOPTConfig:addAllCommands()
 			self.config_change = true
 		end
 	)
-	self.commands:add(KEY_FW_RIGHT, nil, "joypad right",
-		"next item",
+	self.commands:add(KEY_FW_RIGHT, nil, Sjoypad_right,
+		Snext_item,
 		function(self)
 			local last_item = KOPTOptions[self.current_option].current_item
 			local item_count = #KOPTOptions[self.current_option].items_text
@@ -432,14 +433,14 @@ function KOPTConfig:addAllCommands()
 			return "break"
 		end
 	)
-	self.commands:add(KEY_FW_PRESS, nil, "joypad press",
-		"preview",
+	self.commands:add(KEY_FW_PRESS, nil, Sjoypad_press,
+		Spreview,
 		function(self)
 			self.confirm_change = true
 			if KOPTOptions[self.current_option].name == "trim_page" then
 				local option = KOPTOptions[self.current_option]
 				local trim_mode = option.current_item
-				if option.items_text[trim_mode] == 'manual' then
+				if option.items_text[trim_mode] == Smanual then
 					self:modBBox(self.koptreader)
 					self.config_change = true
 				end

@@ -220,6 +220,9 @@ Stoggle_font_weight_bold_normal = "toggle font-weight: bold <> normal"
 SChanging_gamma_to_ = "Changing gamma to "
 Sjoypad_up = "joypad up"
 Sjoypad_down = "joypad down"
+Sjoypad_left = "joypad left"
+Sjoypad_right = "joypad right"
+Sjoypad_press = "joypad press"
 S_pixels_upwards = " pixels upwards"
 S_pixels_downwards = " pixels downwards"
 Span_ = "pan "
@@ -259,10 +262,50 @@ SFailed_to_save_attachments_ = "Failed to save attachments "
 SRendering_in_background_ = "Rendering in background..."
 
 
+-- koptconfig --
+----------------
+SReflow = "Reflow"
+Son = "on"
+Soff = "off"
+STrim_Page = "Trim Page"
+Sauto = "auto"
+Smanual = "manual"
+SIdentation = "Indentation"
+Senable = "enable"
+Sdisable = "disable"
+SDefect_Size = "Defect Size"
+Ssmall = "small"
+Smedium = "medium"
+Slarge = "large"
+SPage_Margin = "Page Margin"
+SLine_Spacing = "Line Spacing"
+SWord_Spacing = "Word Spacing"
+SMulti_Threads = "Multi Threads"
+SRender_Quality = "Render Quality"
+Slow = "low"
+Smedium = "medium"
+Shigh = "high"
+SAuto_Straighten = "Auto Straighten"
+SJustification = "Justification"
+Sauto = "auto"
+Sleft = "left"
+Scenter = "center"
+Sright = "right"
+Sfull = "full"
+SColumns = "Columns"
+SContrast = "Contrast"
+Slightest = "lightest"
+Slighter = "lighter"
+Sdefault = "default"
+Sdarker = "darker"
+Sdarkest = "darkest"
+SScreen_Rotation = "Screen Rotation"
 
-
-
-
+-- commands
+Snext_item = "next item"
+Sprevious_item = "previous item"
+Slast_item = "last item"
+Spreview = "preview"
 
 
 
