@@ -240,6 +240,7 @@ function ReaderChooser:choose(readers)
 				if self.final_choice then
 					return self.readers[self.final_choice]
 				else
+					keep_running = true
 					return nil
 				end
 			end
