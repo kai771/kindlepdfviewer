@@ -472,6 +472,11 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_FW_DOWN, nil, Sjoypad_down,
 		Snext_item,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
+
 			if self.current == self.onpage then
 				self.current = 1
 				self.markerdirty = true
@@ -505,6 +510,12 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_FW_UP, nil, Sjoypad_up,
 		Sprevious_item,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				self:doSearch()
+				return
+			end
+
 			if self.current == 1 then
 				self.current = self.onpage
 				self.markerdirty = true
@@ -536,9 +547,38 @@ function FileChooser:addAllCommands()
 				gotoTargetItem(target_item, self.items, self.current, self.page, self.perpage)
 		end
 	)
+	self.commands:add(KEY_HOME, nil, "Home" , Sgo_to_first_page,
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return "break"
+			end
+			self.page =  1
+			self.current = 1
+			self.pagedirty = true
+		end
+	)
+	self.commands:add(KEY_BACK, nil, "Back", Sgo_to_last_page,
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
+			local tmp = math.floor(self.items / self.perpage)
+			if tmp < (self.items / self.perpage) then tmp = tmp + 1 end
+			self.page =  tmp
+			self.current = 1
+			self.pagedirty = true
+		end
+	)
 	self.commands:add({KEY_PGFWD, KEY_LPGFWD}, nil, ">",
 		Snext_page,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
+
 			if self.page < (self.items / self.perpage) then
 				if self.current + self.page*self.perpage > self.items then
 					self.current = self.items - self.page*self.perpage
@@ -554,6 +594,11 @@ function FileChooser:addAllCommands()
 	self.commands:add({KEY_PGBCK, KEY_LPGBCK}, nil, "<",
 		Sprevious_page,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
+
 			if self.page > 1 then
 				self.page = self.page - 1
 				self.pagedirty = true
@@ -572,12 +617,22 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_FW_RIGHT, nil, Sjoypad_right,
 		Sshow_document_information,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				self:gotoInput()
+				return
+			end
 			self:showFileInfo()
 		end
 	)
 	self.commands:add({KEY_ENTER, KEY_FW_PRESS}, nil, "Enter",
 		Sopen_document_goto_folder,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
+
 			local newdir = self.dirs[self.perpage*(self.page-1)+self.current]
 			if newdir == ".." then
 				local path = string.gsub(self.path, "(.*)/[^/]+/?$", "%1")
@@ -701,6 +756,11 @@ function FileChooser:addAllCommands()
 	self.commands:add(KEY_MENU, nil, "Menu",
 		Sshow_FileChooser_menu,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				self:showLastDocuments()
+				return
+			end
 			local re = self:showFileMenu()
 			if re == "break" then
 				return "break"
@@ -709,9 +769,28 @@ function FileChooser:addAllCommands()
 			end
 	end
 	)
+	self.commands:add(KEY_SCREENKB, nil, "ScreenKB",
+		Sstart_cancel_K4NT_shortcut,
+		function(unireader)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				InfoMessage:inform(SScreenKB_shortcut_canceled, DINFO_TOGGLES, 1, MSG_AUX)
+			else
+				G_ScreenKB_pressed = true
+			end	
+		end
+	)	
 	self.commands:add(KEY_HOME, MOD_ALT, "Home", Sexit_Librerator,
 		function(self)
 			return "break"
+		end
+	)
+	self.commands:add(KEY_FW_LEFT, nil, nil, nil,  -- fw_left invisible - just to clear G_ScreenKB_pressed flag
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
 		end
 	)
 end
