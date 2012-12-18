@@ -133,6 +133,18 @@ function setK3Keycodes()
 	KEY_FW_PRESS = 194
 end
 
+function setK4Keycodes()
+	KEY_HOME = 102
+	KEY_BACK = 158
+	KEY_PGFWD = 191
+	KEY_LPGBCK = 193
+	KEY_LPGFWD = 104
+	KEY_FW_UP = 103
+	KEY_FW_DOWN = 108
+	KEY_FW_PRESS = 194
+	KEY_SCREENKB = 29
+end
+
 function setEmuKeycodes()
 	KEY_PGFWD = 117
 	KEY_PGBCK = 112
@@ -142,6 +154,7 @@ function setEmuKeycodes()
 	KEY_BACK = 22 -- backspace
 	KEY_DEL = 119 -- Delete
 	KEY_MENU = 67 -- F1
+	KEY_SCREENKB = 68 -- F2
 	KEY_FW_UP = 111
 	KEY_FW_DOWN = 116
 	KEY_FW_LEFT = 113

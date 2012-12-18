@@ -2217,7 +2217,7 @@ function UniReader:showBookMarks()
 	end
 	while true do
 		local bm_menu = SelectMenu:new{
-			menu_title = Bookmarks.." ("..tostring(#menu_items)..S_items..")",
+			menu_title = SBookmarks.." ("..tostring(#menu_items)..S_items..")",
 			item_array = menu_items,
 			deletable = true,
 		}
@@ -3180,6 +3180,23 @@ function UniReader:addAllCommands()
 		Keydef:new(KEY_PGFWD, nil), Keydef:new(KEY_LPGFWD, nil)},
 		Sprevious_next_page,
 		function(unireader, keydef)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				local bm = nil
+				if keydef.keycode == KEY_PGFWD then
+					self:gotoPrevNextTocEntry(1)
+				elseif keydef.keycode == KEY_PGBCK then
+					self:gotoPrevNextTocEntry(-1)
+				elseif keydef.keycode == KEY_LPGFWD then
+					bm = self:nextBookMarkedPage()
+					if bm then self:gotoJump(bm.page + self.fp_offset, true) end
+				elseif keydef.keycode == KEY_LPGBCK then
+					bm = self:prevBookMarkedPage()
+					if bm then self:gotoJump(bm.page + self.fp_offset, true) end
+				end
+				return
+			end
+			
 			unireader:goto(
 			(keydef.keycode == KEY_PGBCK or keydef.keycode == KEY_LPGBCK)
 			and unireader:prevView() or unireader:nextView())
@@ -3222,6 +3239,11 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_BACK, nil, "Back",
 		Sgo_backward_in_jump_history,
 		function(unireader)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				unireader:jumpForward()
+				return
+			end	
 			unireader:jumpBack()
 		end)
 		
@@ -3489,6 +3511,12 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_MENU, nil, "Menu",
 		Sshow_Main_Menu,
 		function(unireader)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				unireader:showZoomModeMenu()
+				return
+			end	
+		
 			local re = unireader:showMainMenu()
 			if re == "break" then
 				return "break"
@@ -3502,6 +3530,11 @@ function UniReader:addAllCommands()
 	self.commands:add(KEY_HOME, nil, "Home",
 		Stoggle_info_box,
 		function(unireader)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				keep_running = false
+				return "break"
+			end	
 			unireader:showInfo()
 			unireader:redrawCurrentPage()
 		end)
@@ -3515,6 +3548,23 @@ function UniReader:addAllCommands()
 	self.commands:addGroup("[joypad]",panning_keys,
 		Span_the_active_view,
 		function(unireader,keydef)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				if keydef.keycode == KEY_FW_UP then
+					unireader:addBookmarkCommand()
+				elseif keydef.keycode == KEY_FW_DOWN then
+					keep_running = true
+					return "break"
+				elseif keydef.keycode == KEY_FW_LEFT then
+					unireader:modBBox()
+				elseif keydef.keycode == KEY_FW_RIGHT then
+					unireader:gotoInput()
+				elseif keydef.keycode == KEY_FW_PRESS then
+					unireader:doFollowLink()
+				end
+				return
+			end	
+			
 			unireader.show_overlap = 0
 			if keydef.keycode ~= KEY_FW_PRESS then
 				if unireader.globalzoom_mode ~= unireader.ZOOM_BY_VALUE then
@@ -3940,6 +3990,17 @@ function UniReader:addAllCommands()
 			InfoMessage:chooseNotificatonMethods()
 			self:redrawCurrentPage()
 		end)
+		
+	self.commands:add(KEY_SCREENKB, nil, "ScreenKB",
+		Sstart_cancel_K4NT_shortcut,
+		function(unireader)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				InfoMessage:inform(SScreenKB_shortcut_canceled, DINFO_TOGGLES, 1, MSG_AUX)
+			else
+				G_ScreenKB_pressed = true
+			end	
+		end)	
 
 	self.commands:add(KEY_BACK, MOD_ALT, "Back",
 		Sclose_document,

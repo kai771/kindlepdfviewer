@@ -33,6 +33,8 @@ require "readerchooser"
 require "device"
 require "defaults"
 
+G_ScreenKB_pressed = false
+
 function openFile(filename)
 	local reader = ReaderChooser:getReaderByName(filename)
 	if reader then
@@ -116,7 +118,7 @@ else
 	-- check if we are running on Kindle 4 (as far as I can tell, K4NT has the same key codes as K3)
 	if Device:getModel() == "Kindle4" then
 		Debug("Auto-detected Kindle 4")
-		setK3Keycodes()
+		setK4Keycodes()
 	end	
 end
 
