@@ -638,6 +638,23 @@ function CREReader:gotoInput()
 	self:redrawCurrentPage()
 end
 
+function CREReader:addBookmarkCommand()
+	ok = self:addBookmark(self.doc:getXPointer())
+	if DKPV_STYLE_BOOKMARKS then
+		if not ok then
+			InfoMessage:drawTopMsg(SBookmark_already_exists_)
+		else
+			InfoMessage:drawTopMsg(SBookmark_added_)
+		end
+	else	-- not DKPV_STYLE_BOOKMARKS
+		if not ok then
+			InfoMessage:inform(SBookmark_already_exists_, DINFO_DELAY, 1, MSG_WARN)
+		else
+			InfoMessage:inform(SBookmark_added_, DINFO_DELAY, 1, MSG_WARN)
+		end
+	end	
+end
+
 function CREReader:adjustCreReaderCommands()
 	self.commands:delGroup("[joypad]")
 	self.commands:delGroup(MOD_ALT.."H/J")
@@ -780,20 +797,7 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:add(KEY_B, MOD_ALT, "B",
 		Sadd_bookmark_to_current_page,
 		function(self)
-			ok = self:addBookmark(self.doc:getXPointer())
-			if DKPV_STYLE_BOOKMARKS then
-				if not ok then
-					InfoMessage:drawTopMsg(SBookmark_already_exists_)
-				else
-					InfoMessage:drawTopMsg(SBookmark_added_)
-				end
-			else	-- not DKPV_STYLE_BOOKMARKS
-				if not ok then
-					InfoMessage:inform(SBookmark_already_exists_, DINFO_DELAY, 1, MSG_WARN)
-				else
-					InfoMessage:inform(SBookmark_added_, DINFO_DELAY, 1, MSG_WARN)
-				end
-			end	
+			self:addBookmarkCommand()
 		end -- function
 	)
 	self.commands:addGroup(MOD_ALT.."K/L",{
@@ -811,6 +815,18 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:add(KEY_BACK, nil, "Back",
 		Sgo_backward_in_jump_history,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				local next_jump_no = self.jump_history.cur + 1
+				if next_jump_no <= #self.jump_history then
+					self.jump_history.cur = next_jump_no
+					self:goto(self.jump_history[next_jump_no].page, true, "xpointer")
+				else
+					InfoMessage:inform(SAlready_last_jump_, DINFO_DELAY, 1, MSG_WARN)
+				end
+				return
+			end
+
 			local prev_jump_no = 0
 			if self.jump_history.cur > #self.jump_history then
 				-- if cur points to head, put current page in history
@@ -857,13 +873,71 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:add(KEY_FW_UP, nil, Sjoypad_up,
 		Span_..self.shift_y..S_pixels_upwards,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				self:addBookmarkCommand()
+				return
+			end
 			self:goto(self.pos - self.shift_y)
 		end
 	)
 	self.commands:add(KEY_FW_DOWN, nil, Sjoypad_down,
 		Span_..self.shift_y..S_pixels_downwards,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				keep_running = true
+				return "break"
+			end
 			self:goto(self.pos + self.shift_y)
+		end
+	)
+	self.commands:add(KEY_FW_LEFT, nil, nil, nil, -- hiden from help screen - only usable on K4NT
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
+		end
+	)
+	self.commands:add(KEY_FW_RIGHT, nil, nil, nil, -- hiden from help screen - only usable on K4NT
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				self:gotoInput()
+				return
+			end
+		end
+	)
+	self.commands:add(KEY_FW_PRESS, nil, nil, nil, -- hiden from help screen - only usable on K4NT
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				self:doFollowLink()
+				return
+			end
+		end
+	)
+	self.commands:add(KEY_LPGBCK, nil, nil, nil, -- hiden from help screen - only usable on K4NT
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				local bm = nil
+				bm = self:prevBookMarkedPage()
+				if bm then self:goto(bm.page, true, "xpointer") end
+				return
+			end
+		end
+	)
+	self.commands:add(KEY_LPGFWD, nil, nil, nil, -- hiden from help screen - only usable on K4NT
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				local bm = nil
+				bm = self:nextBookMarkedPage()
+				if bm then self:goto(bm.page, true, "xpointer") end
+				return
+			end
 		end
 	)
 --[[
