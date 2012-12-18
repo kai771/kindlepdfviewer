@@ -2962,6 +2962,7 @@ function UniReader:showSettingsMenu()
 		SRemove_manually_set_BBox,
 		SAdjust_gamma,
 		SFonts_,
+		SReflow_settings_,
 		SConfigure_event_notifications,
 		SReset_default_reader_preferences,
 		SClear_reader_association_with_this_document,
@@ -2997,10 +2998,13 @@ function UniReader:showSettingsMenu()
 	elseif re == 10 then
 		self:showFontsMenu()
 	elseif re == 11 then
-		InfoMessage:chooseNotificatonMethods()
+		self:redrawCurrentPage()
+		self:doKOPTConfig()
 	elseif re == 12 then
-		self:resetDefaultReader()
+		InfoMessage:chooseNotificatonMethods()
 	elseif re == 13 then
+		self:resetDefaultReader()
+	elseif re == 14 then
 		self:clearReaderAssociation()
 	end
 end
@@ -3150,6 +3154,11 @@ function UniReader:doFollowLink()
 			end -- if
 		end -- while	
 	end -- else
+end
+
+function UniReader:doKOPTConfig()
+	self:redrawCurrentPage()
+	InfoMessage:inform(SOnly_available_in_Reflow_Readers, DINFO_DELAY, 1, MSG_WARN)
 end
 
 -- command definitions

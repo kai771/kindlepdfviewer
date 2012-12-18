@@ -608,8 +608,12 @@ function KOPTReader:adjustCommands()
 	self.commands:add({KEY_F,KEY_AA}, nil, "F",
 		"change koptreader configuration",
 		function(self)
-			KOPTConfig:config(self)
-			self:redrawCurrentPage()
+			self:doKOPTConfig()
 		end
 	)
+end
+
+function KOPTReader:doKOPTConfig()
+	KOPTConfig:config(self)
+	self:redrawCurrentPage()
 end
