@@ -3506,6 +3506,7 @@ function UniReader:addAllCommands()
 	self.commands:addGroup("[joypad]",panning_keys,
 		Span_the_active_view,
 		function(unireader,keydef)
+			unireader.show_overlap = 0
 			if keydef.keycode ~= KEY_FW_PRESS then
 				if unireader.globalzoom_mode ~= unireader.ZOOM_BY_VALUE then
 					Debug("save last_globalzoom_mode=", unireader.globalzoom_mode);
