@@ -276,7 +276,7 @@ function ReaderChooser:addAllCommands()
 		end
 	)
 	
-	self.commands:add(KEY_T, nil, "T",
+	self.commands:add({KEY_T,KEY_FW_LEFT}, nil, "T",
 		Sremember_reader_choice_for_this_type,
 		function(self)
 			self.remember_preference = not self.remember_preference
@@ -284,7 +284,7 @@ function ReaderChooser:addAllCommands()
 		end
 	)
 	
-	self.commands:add(KEY_F, nil, "F",
+	self.commands:add({KEY_F,KEY_FW_RIGHT}, nil, "F",
 		Sremember_reader_choice_for_this_file,
 		function(self)
 			self.remember_association = not self.remember_association
