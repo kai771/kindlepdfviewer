@@ -183,7 +183,7 @@ function SelectMenu:addAllCommands()
 		end
 	)
 	if self.deletable then
-		self.commands:add(KEY_DEL, nil, "Del",
+		self.commands:add({KEY_DEL, KEY_SCREENKB}, nil, "Del",
 			Sdelete_item,
 			function(sm)
 				self.selected_item = (sm.perpage * (sm.page - 1) + sm.current)

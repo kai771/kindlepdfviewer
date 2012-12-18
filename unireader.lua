@@ -2285,7 +2285,7 @@ function UniReader:showHighLight()
 
 	while true do
 		local hl_menu = SelectMenu:new{
-			menu_title = SHighLights.." ("..tostring(#menu_items)..S_items..")",
+			menu_title = SHighlights.." ("..tostring(#menu_items)..S_items..")",
 			item_array = menu_items,
 			deletable = true,
 		}
