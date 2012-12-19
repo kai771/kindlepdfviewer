@@ -13,9 +13,11 @@ CREReader = UniReader:new{
 	font_face = nil,
 	default_font = "Droid Sans",
 	font_zoom = 0,
+	default_font_zoom = 0,
 	fonts_menu_cur = 0,
 
 	line_space_percent = 100,
+	default_line_space_percent = 100,
 	view_mode = DCREREADER_VIEW_MODE,
 }
 
@@ -39,6 +41,16 @@ function CREReader:init()
 	local default_font = G_reader_settings:readSetting("cre_font")
 	if default_font then
 		self.default_font = default_font
+	end
+
+	local default_font_zoom = G_reader_settings:readSetting("font_zoom")
+	if default_font_zoom then
+		self.default_font_zoom = default_font_zoom
+	end
+
+	local default_line_space_percent = G_reader_settings:readSetting("line_space_percent")
+	if default_line_space_percent then
+		self.default_line_space_percent = default_line_space_percent
 	end
 end
 
@@ -95,7 +107,7 @@ function CREReader:open(filename)
 	if not ok then
 		return false, SError_opening_cre_document_ -- self.doc, will contain error message
 	end
-	self.doc:setDefaultInterlineSpace(self.line_space_percent)
+--	self.doc:setDefaultInterlineSpace(self.line_space_percent)
 	return true
 end
 
@@ -129,9 +141,11 @@ function CREReader:loadSpecialSettings()
 	cre.setGammaIndex(self.gamma_index)
 
 	local line_space_percent = self.settings:readSetting("line_space_percent")
-	self.line_space_percent = line_space_percent or self.line_space_percent
+	self.line_space_percent = line_space_percent or self.default_line_space_percent
+	self.doc:setDefaultInterlineSpace(self.line_space_percent)
 
-	self.font_zoom = self.settings:readSetting("font_zoom") or 0
+	local font_zoom = self.settings:readSetting("font_zoom")
+	self.font_zoom = font_zoom or self.default_font_zoom
 	if self.font_zoom ~= 0 then
 		local i = math.abs(self.font_zoom)
 		local step = self.font_zoom / i
@@ -512,7 +526,7 @@ function CREReader:showFontsMenu()
 		SChange_document_font_,
 		SFont_size_n_spacing_,
 		SToggle_bold_normal,
-		SSet_document_font_as_default,
+		SSet_current_settings_as_default,
 		}
 	local fonts_menu = SelectMenu:new{
 		menu_title = SLibrerator_Fonts_Menu,
@@ -563,7 +577,12 @@ end
 function CREReader:setDocFontAsDefault()
 	self.default_font = self.font_face
 	G_reader_settings:saveSetting("cre_font", self.font_face)
-	InfoMessage:inform(SDefault_document_font_set_, DINFO_DELAY, 1, MSG_WARN)
+	G_reader_settings:saveSetting("font_zoom", self.font_zoom)
+	G_reader_settings:saveSetting("line_space_percent", self.line_space_percent)
+	self.default_font = self.font_face
+	self.default_font_zoom = self.font_zoom
+	self.default_line_space_percent = self.line_space_percent
+	InfoMessage:inform(SDefault_font_n_spacing_set_, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:toggleBoldNormal()

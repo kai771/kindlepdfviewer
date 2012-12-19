@@ -194,11 +194,11 @@ SLibrerator_Fonts_Menu = "Librerator - Fonts Menu" -- menu title
 SChange_document_font_ = "Change document font..."
 SFont_size_n_spacing_ = "Font size & spacing..."
 SToggle_bold_normal = "Toggle bold/normal"
-SSet_document_font_as_default = "Set document font as default"
+SSet_current_settings_as_default = "Set current settings as default"
 
 SFonts_Menu_ = "Fonts Menu "
 SRedrawing_with_ = "Redrawing with "
-SDefault_document_font_set_ = "Default document font set "
+SDefault_font_n_spacing_set_ = "Default font & spacing set "
 SChanging_font_weight_ = "Changing font-weight..."
 Sleft_right_spacing_up_down_size = "left/right spacing, up/down size"
 SFont_size_and_spacing_adjusted = "Font size and spacing adjusted"
