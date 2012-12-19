@@ -2975,6 +2975,7 @@ function UniReader:showSettingsMenu()
 		SAdjust_gamma,
 		SFonts_,
 		SReflow_settings_,
+		SRefresh_count_,
 		SConfigure_event_notifications,
 		SReset_default_reader_preferences,
 		SClear_reader_association_with_this_document,
@@ -3013,10 +3014,13 @@ function UniReader:showSettingsMenu()
 		self:redrawCurrentPage()
 		self:doKOPTConfig()
 	elseif re == 12 then
-		InfoMessage:chooseNotificatonMethods()
+		self:redrawCurrentPage()
+		self:refreshCountInput()
 	elseif re == 13 then
-		self:resetDefaultReader()
+		InfoMessage:chooseNotificatonMethods()
 	elseif re == 14 then
+		self:resetDefaultReader()
+	elseif re == 15 then
 		self:clearReaderAssociation()
 	end
 end
