@@ -674,6 +674,11 @@ function CREReader:addBookmarkCommand()
 	end	
 end
 
+function CREReader:doZoomOrFont()
+	self:showFontsMenu()
+	self:redrawCurrentPage()
+end
+
 function CREReader:adjustCreReaderCommands()
 	self.commands:delGroup("[joypad]")
 	self.commands:delGroup(MOD_ALT.."H/J")

@@ -3173,6 +3173,10 @@ function UniReader:doKOPTConfig()
 	InfoMessage:inform(SOnly_available_in_Reflow_Readers, DINFO_DELAY, 1, MSG_WARN)
 end
 
+function UniReader:doZoomOrFont()
+	self:showZoomModeMenu()
+end	
+
 -- command definitions
 function UniReader:addAllCommands()
 	self.commands = Commands:new()
@@ -3525,7 +3529,7 @@ function UniReader:addAllCommands()
 		function(unireader)
 			if G_ScreenKB_pressed then
 				G_ScreenKB_pressed = false
-				unireader:showZoomModeMenu()
+				unireader:doZoomOrFont()
 				return
 			end	
 		
