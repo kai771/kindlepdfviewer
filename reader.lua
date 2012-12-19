@@ -166,6 +166,7 @@ DJVUReader:init()
 KOPTReader:init()
 PICViewer:init()
 CREReader:init()
+FileChooser:init()
 
 -- display directory or open file
 local patharg = G_reader_settings:readSetting("lastfile")

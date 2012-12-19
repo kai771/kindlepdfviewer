@@ -29,6 +29,10 @@ FileChooser = {
 	oldcurrent = 0,
 	exception_message = nil,
 	onpage = 0, -- number of items displayed on the current page - added by Kai771
+	
+	dir_pos1 = "",
+	dir_pos2 = "",
+	dir_pos3 = "",
 
 	pagedirty = true,
 	markerdirty = false,
@@ -45,6 +49,16 @@ FileChooser = {
 	RESTRICTED = 1, -- the filemanager content is restricted by files with reader-related extensions; safe renaming (no extension)
 	UNRESTRICTED = 2, -- no extension-based filtering; renaming with extensions; appreciable danger to crash crengine by improper docs
 }
+
+function FileChooser:init()
+	local tmp
+	tmp = G_reader_settings:readSetting("dir_pos1")
+	if tmp then self.dir_pos1 = tmp end
+	tmp = G_reader_settings:readSetting("dir_pos2")
+	if tmp then self.dir_pos2 = tmp end
+	tmp = G_reader_settings:readSetting("dir_pos3")
+	if tmp then self.dir_pos3 = tmp end
+end
 
 -- NuPogodi, 29.09.12: simplified the code
 function getProperTitleLength(txt, font_face, max_width)
@@ -751,6 +765,54 @@ function FileChooser:addAllCommands()
 		Srun_calculator,
 		function(self)
 			self:doCalculator()
+		end
+	)
+	self.commands:add(KEY_I, MOD_SHIFT, "I",
+		Ssave_position_1,
+		function(self)
+			self.dir_pos1 = self.path
+			G_reader_settings:saveSetting("dir_pos1", self.dir_pos1)
+			Debug("dir_pos1=", self.dir_pos1)
+		end
+	)
+	self.commands:add(KEY_I, nil, "I",
+		Sgo_to_position_1,
+		function(self)
+			self:setPath(self.dir_pos1)
+			self.pagedirty = true
+			Debug("dir_pos1=", self.dir_pos1)
+		end
+	)
+	self.commands:add(KEY_O, MOD_SHIFT, "O",
+		Ssave_position_2,
+		function(self)
+			self.dir_pos2 = self.path
+			G_reader_settings:saveSetting("dir_pos2", self.dir_pos2)
+			Debug("dir_pos2=", self.dir_pos2)
+		end
+	)
+	self.commands:add(KEY_O, nil, "O",
+		Sgo_to_position_2,
+		function(self)
+			self:setPath(self.dir_pos2)
+			self.pagedirty = true
+			Debug("dir_pos2=", self.dir_pos2)
+		end
+	)
+	self.commands:add(KEY_P, MOD_SHIFT, "P",
+		Ssave_position_3,
+		function(self)
+			self.dir_pos3 = self.path
+			G_reader_settings:saveSetting("dir_pos3", self.dir_pos3)
+			Debug("dir_pos3=", self.dir_pos3)
+		end
+	)
+	self.commands:add(KEY_P, nil, "P",
+		Sgo_to_position_3,
+		function(self)
+			self:setPath(self.dir_pos3)
+			self.pagedirty = true
+			Debug("dir_pos3=", self.dir_pos3)
 		end
 	)
 	self.commands:add(KEY_MENU, nil, "Menu",
