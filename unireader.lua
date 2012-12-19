@@ -955,7 +955,7 @@ function UniReader:initGlobalSettings(settings)
 	self.cache_max_memsize = settings:readSetting("cache_max_memsize") or self.cache_max_memsize
 	self.cache_max_ttl = settings:readSetting("cache_max_ttl") or self.cache_max_ttl
 	self.rcountmax = settings:readSetting("rcountmax") or self.rcountmax
-	self.fp_offset = settings:readSetting("fp_offset") or self.fp_offset
+--	self.fp_offset = settings:readSetting("fp_offset") or self.fp_offset
 end
 
 -- Method to load settings before document open
@@ -1036,6 +1036,8 @@ function UniReader:loadSettings(filename)
 			self.fp_offset = tmp
 		end
 
+		Screen.cur_rotation_mode = self.settings:readSetting("cur_rotation_mode") or 0
+		self:setRotationMode(Screen.cur_rotation_mode)
 
 		-- other parameters are reader-specific --> @TODO: move to proper place, like loadSpecialSettings()
 		-- since DJVUReader still has no loadSpecialSettings(), just a quick solution is
@@ -1052,6 +1054,10 @@ function UniReader:loadSettings(filename)
 			self.shift_x = self.settings:readSetting("shift_x") or self.shift_x
 			self.shift_y = self.settings:readSetting("shift_y") or self.shift_y
 			self.step_manual_zoom = self.settings:readSetting("step_manual_zoom") or self.step_manual_zoom
+
+			-- the following is added to be able to open documents "as you left them"
+			self.offset_x = self.settings:readSetting("offset_x") or 0
+			self.offset_y = self.settings:readSetting("offset_y") or 0
 		end
 
 		self:loadSpecialSettings()
@@ -2541,6 +2547,37 @@ function UniReader:inputLoop()
 		end
 	end
 
+--	if self.globalzoom_mode == self.ZOOM_FIT_TO_CONTENT_WIDTH_PAN then
+--		self.globalzoom_mode = self.ZOOM_FIT_TO_CONTENT_WIDTH
+--	elseif self.pan_by_page then
+--		self.globalzoom_mode = self.pan_by_page	
+--	end	
+	if self.settings ~= nil then
+		self:saveLastPageOrPos()
+		self.settings:saveSetting("jump_history", self.jump_history)
+		self.settings:saveSetting("bookmarks", self.bookmarks)
+		self.settings:saveSetting("highlight", self.highlight)
+		-- other parameters are reader-specific --> @TODO: move to a proper place, like saveSpecialSettings()
+		self.settings:saveSetting("gamma", self.globalgamma)
+		self.settings:saveSetting("bbox", self.bbox)
+		self.settings:saveSetting("globalzoom", self.globalzoom)
+		self.settings:saveSetting("globalzoom_mode", self.globalzoom_mode)
+		self.settings:saveSetting("render_mode", self.render_mode)	-- djvu-related only
+		-- the following is added to be able to open documents "as you left them"
+		self.settings:saveSetting("offset_x", self.offset_x)
+		self.settings:saveSetting("offset_y", self.offset_y)
+		self.settings:saveSetting("cur_rotation_mode", Screen.cur_rotation_mode)
+		
+		--[[ the following parameters were already stored when user changed defaults
+		self.settings:saveSetting("shift_x", self.shift_x)
+		self.settings:saveSetting("shift_y", self.shift_y)
+		self.settings:saveSetting("step_manual_zoom", self.step_manual_zoom)
+		self.settings:saveSetting("rcountmax", self.rcountmax)
+		]]
+		self:saveSpecialSettings()
+		self.settings:close()
+	end
+
 	-- do clean up stuff
 	self:clearCache()
 	self.toc = nil
@@ -2556,31 +2593,6 @@ function UniReader:inputLoop()
 	self:setDefaults()
 	if self.doc ~= nil then
 		self.doc:close()
-	end
-	if self.globalzoom_mode == self.ZOOM_FIT_TO_CONTENT_WIDTH_PAN then
-		self.globalzoom_mode = self.ZOOM_FIT_TO_CONTENT_WIDTH
-	elseif self.pan_by_page then
-		self.globalzoom_mode = self.pan_by_page	
-	end	
-	if self.settings ~= nil then
-		self:saveLastPageOrPos()
-		self.settings:saveSetting("jump_history", self.jump_history)
-		self.settings:saveSetting("bookmarks", self.bookmarks)
-		self.settings:saveSetting("highlight", self.highlight)
-		-- other parameters are reader-specific --> @TODO: move to a proper place, like saveSpecialSettings()
-		self.settings:saveSetting("gamma", self.globalgamma)
-		self.settings:saveSetting("bbox", self.bbox)
-		self.settings:saveSetting("globalzoom", self.globalzoom)
-		self.settings:saveSetting("globalzoom_mode", self.globalzoom_mode)
-		self.settings:saveSetting("render_mode", self.render_mode)	-- djvu-related only
-		--[[ the following parameters were already stored when user changed defaults
-		self.settings:saveSetting("shift_x", self.shift_x)
-		self.settings:saveSetting("shift_y", self.shift_y)
-		self.settings:saveSetting("step_manual_zoom", self.step_manual_zoom)
-		self.settings:saveSetting("rcountmax", self.rcountmax)
-		]]
-		self:saveSpecialSettings()
-		self.settings:close()
 	end
 	self.bbox.enabled = false
 
