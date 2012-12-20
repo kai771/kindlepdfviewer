@@ -11,6 +11,7 @@ CREReader = UniReader:new{
 
 	gamma_index = 15,
 	font_face = nil,
+	page_header_font = DCREREADER_PAGE_HEADER_FONT,
 	default_font = DCREREADER_DEFAULT_FONT,
 	font_zoom = 0,
 	default_font_zoom = 0,
@@ -39,20 +40,17 @@ function CREReader:init()
 		end
 	end
 
+	local page_header_font = G_reader_settings:readSetting("page_header_font")
+	if page_header_font then self.page_header_font = page_header_font end
+
 	local default_font = G_reader_settings:readSetting("cre_font")
-	if default_font then
-		self.default_font = default_font
-	end
+	if default_font then self.default_font = default_font end
 
 	local default_font_zoom = G_reader_settings:readSetting("font_zoom")
-	if default_font_zoom then
-		self.default_font_zoom = default_font_zoom
-	end
+	if default_font_zoom then self.default_font_zoom = default_font_zoom end
 
 	local default_line_space_percent = G_reader_settings:readSetting("line_space_percent")
-	if default_line_space_percent then
-		self.default_line_space_percent = default_line_space_percent
-	end
+	if default_line_space_percent then self.default_line_space_percent = default_line_space_percent end
 	
 	if G_width > G_height then
 		-- in landscape mode, crengine will render in two column mode
@@ -123,23 +121,17 @@ end
 function CREReader:preLoadSettings(filename)
 	self.settings = DocSettings:open(filename)
 	local view_mode = self.settings:readSetting("view_mode")
-	if view_mode then
-		self.view_mode = view_mode
-	else
-		self.view_mode = DCREREADER_VIEW_MODE
-	end	
+	if view_mode then self.view_mode = view_mode
+	else self.view_mode = DCREREADER_VIEW_MODE end	
 end
 
 function CREReader:loadSpecialSettings()
 	local font_face = self.settings:readSetting("font_face")
-	if not font_face then
-		font_face = self.default_font
-	end
-	self.font_face = font_face
+	if font_face then self.font_face = font_face
+	else self.font_face = DCREREADER_DEFAULT_FONT end
 	self.doc:setFontFace(self.font_face)
 	
-	-- like this for now. Will implement user changable font from Librerator
-	self.doc:setCHFont(DCREREADER_PAGE_HEADER_FONT)
+	self.doc:setCHFont(self.page_header_font)
 	
 	self.doc:setCHInfo(DCREREADER_PAGE_HEADER)
 
@@ -534,6 +526,7 @@ function CREReader:showFontsMenu()
 		SFont_size_n_spacing_,
 		SToggle_bold_normal,
 		SSet_current_settings_as_default,
+		SChange_page_header_font_,
 		}
 	local fonts_menu = SelectMenu:new{
 		menu_title = SLibrerator_Fonts_Menu,
@@ -555,6 +548,9 @@ function CREReader:showFontsMenu()
 	elseif re == 4 then
 		self:redrawCurrentPage()
 		self:setDocFontAsDefault()
+	elseif re == 5 then
+		self:redrawCurrentPage()
+		self:changeHeaderFont()
 	end
 end
 
@@ -577,6 +573,29 @@ function CREReader:changeDocFont()
 		InfoMessage:inform(SRedrawing_with_..face_list[item_no].." ", DINFO_NODELAY, 1, MSG_AUX)
 		self.doc:setFontFace(face_list[item_no])
 		self.font_face = face_list[item_no]
+	end
+	self:goto(prev_xpointer, nil, "xpointer")
+end
+
+function CREReader:changeHeaderFont()
+	local face_list = cre.getFontFaces()
+	-- define the current font in face_list 
+	local item_no = 0
+	while face_list[item_no] ~= self.font_face and item_no < #face_list do 
+		item_no = item_no + 1 
+	end
+	local fonts_menu = SelectMenu:new{
+		menu_title = SFonts_Menu_,
+		item_array = face_list, 
+		current_entry = item_no - 1,
+	}
+	item_no = fonts_menu:choose(0, G_height)
+	local prev_xpointer = self.doc:getXPointer()
+	if item_no then
+		Debug(face_list[item_no])
+		self.page_header_font = face_list[item_no]
+		G_reader_settings:saveSetting("page_header_font", self.page_header_font)
+		self.doc:setCHFont(self.page_header_font)
 	end
 	self:goto(prev_xpointer, nil, "xpointer")
 end
@@ -946,10 +965,10 @@ function CREReader:adjustCreReaderCommands()
 				self.view_mode = CRE_VM_PAGE
 				view_mode = "page"
 			end
-			self.settings:saveSetting("view_mode", self.view_mode)
-			self.doc:setCREViewMode(self.view_mode)
+			local prev_xpointer = self.doc:getXPointer()
 			InfoMessage:inform(SViewmode_..view_mode, DINFO_TOGGLES, 1, MSG_AUX)
-			self:redrawCurrentPage()
+			self.doc:setCREViewMode(self.view_mode)
+			self:goto(prev_xpointer, nil, "xpointer")
 		end
 	)
 	self.commands:add(KEY_FW_LEFT, nil, nil, nil, -- hiden from help screen - only usable on K4NT

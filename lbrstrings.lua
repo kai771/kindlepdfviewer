@@ -196,6 +196,7 @@ SChange_document_font_ = "Change document font..."
 SFont_size_n_spacing_ = "Font size & spacing..."
 SToggle_bold_normal = "Toggle bold/normal"
 SSet_current_settings_as_default = "Set current settings as default"
+SChange_page_header_font_ = "Change page header font..."
 
 SFonts_Menu_ = "Fonts Menu "
 SRedrawing_with_ = "Redrawing with "
