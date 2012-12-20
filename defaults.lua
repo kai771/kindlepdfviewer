@@ -18,7 +18,7 @@ DGAMMA_STEP = 0.2
 -- See comments in djvureader.lua:DJVUReader:select_render_mode()
 DRENDER_MODE = 0 -- COLOUR
 
--- CR Engine defines. You shouldn't edit these
+-- CREngine defines. You shouldn't edit these
 PGHDR_NONE = 0
 PGHDR_PAGE_NUMBER = 1
 PGHDR_PAGE_COUNT = 2
@@ -31,7 +31,8 @@ PGHDR_PERCENT = 128
 CRE_VM_SCROLL = 0
 CRE_VM_PAGE = 1
 
--- CR Engine defines. You can edit these
+-- CREngine defines. You can edit these
+DCREREADER_DEFAULT_FONT = "Droid Sans"
 DCREREADER_PAGE_HEADER_FONT = "Droid Sans"
 DCREREADER_PAGE_HEADER = PGHDR_PAGE_NUMBER + PGHDR_PAGE_COUNT + PGHDR_AUTHOR + PGHDR_TITLE + PGHDR_CLOCK + PGHDR_BATTERY + PGHDR_CHAPTER_MARKS + PGHDR_PERCENT 
 

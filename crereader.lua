@@ -11,7 +11,7 @@ CREReader = UniReader:new{
 
 	gamma_index = 15,
 	font_face = nil,
-	default_font = "Droid Sans",
+	default_font = DCREREADER_DEFAULT_FONT,
 	font_zoom = 0,
 	default_font_zoom = 0,
 	fonts_menu_cur = 0,
@@ -19,13 +19,14 @@ CREReader = UniReader:new{
 	line_space_percent = 100,
 	default_line_space_percent = 100,
 	view_mode = DCREREADER_VIEW_MODE,
+	view_pan_step = nil,
 }
 
 function CREReader:init()
 	self:addAllCommands()
 	self:adjustCreReaderCommands()
 
-	-- initialize cache
+	-- initialize cache and hyphenation engine
 	cre.initCache(1024*1024*64)
 	-- we need to initialize the CRE font list
 	local fonts = Font:getFontList()
@@ -51,6 +52,13 @@ function CREReader:init()
 	local default_line_space_percent = G_reader_settings:readSetting("line_space_percent")
 	if default_line_space_percent then
 		self.default_line_space_percent = default_line_space_percent
+	end
+	
+	if G_width > G_height then
+		-- in landscape mode, crengine will render in two column mode
+		self.view_pan_step = G_height * 2
+	else
+		self.view_pan_step = G_height
 	end
 end
 
@@ -259,12 +267,12 @@ end
 
 function CREReader:nextView()
 	self.show_overlap = -self.pan_overlap_vertical
-	return self.pos + G_height - self.pan_overlap_vertical
+	return self.pos + self.view_pan_step - self.pan_overlap_vertical
 end
 
 function CREReader:prevView()
 	self.show_overlap = self.pan_overlap_vertical
-	return self.pos - G_height + self.pan_overlap_vertical
+	return self.pos - self.view_pan_step + self.pan_overlap_vertical
 end
 
 ----------------------------------------------------
@@ -718,6 +726,12 @@ function CREReader:adjustCreReaderCommands()
 			G_width, G_height = fb:getSize()
 			self:goto(prev_xpointer, nil, "xpointer")
 			self.pos = self.doc:getCurrentPos()
+			if G_width > G_height then
+				-- in landscape mode, crengine will render in two column mode
+				self.view_pan_step = G_height * 2
+			else
+				self.view_pan_step = G_height
+			end	
 		end
 	)
 	-- CW-rotation
@@ -729,6 +743,12 @@ function CREReader:adjustCreReaderCommands()
 			G_width, G_height = fb:getSize()
 			self:goto(prev_xpointer, nil, "xpointer")
 			self.pos = self.doc:getCurrentPos()
+			if G_width > G_height then
+				-- in landscape mode, crengine will render in two column mode
+				self.view_pan_step = G_height * 2
+			else
+				self.view_pan_step = G_height
+			end	
 		end
 	)
 	-- navigate between chapters by Shift+Up & Shift-Down
