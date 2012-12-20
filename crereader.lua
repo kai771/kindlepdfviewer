@@ -516,8 +516,30 @@ function CREReader:removeBBox()
 end
 
 function CREReader:doAdjustGamma()
+	InfoMessage:inform(SPress_left_right_to_adjust_gamma, DINFO_NODELAY, 1, MSG_AUX)
+	while true do
+		local ev = input.saveWaitForEvent()
+		ev.code = adjustKeyEvents(ev)
+		if ev.type == EV_KEY and ev.value ~= EVENT_VALUE_KEY_RELEASE then
+			Debug("key pressed: "..tostring(keydef))
+			if ev.code == KEY_FW_LEFT then self:incDecGamma(-1)
+			elseif ev.code == KEY_FW_RIGHT then self:incDecGamma(1)
+			else 
+				InfoMessage:inform(SGamma_adjusted, DINFO_DELAY, 1, MSG_AUX)
+				return nil 
+			end
+		end	
+	end	
+end
+
+function CREReader:incDecGamma(delta)
+	Debug("incDecGamma, gamma=", self.gamma_index, " delta=", delta)
+	if self.gamma_index + delta > 0 then self.gamma_index = self.gamma_index + delta end
+	if DINFO_GAMMA_CHANGE_SHOW then
+		InfoMessage:inform(SNew_gamma_is__..self.gamma_index, DINFO_NODELAY, 1, MSG_AUX)
+	end	
+	cre.setGammaIndex(self.gamma_index)
 	self:redrawCurrentPage()
-	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_WARN)
 end
 
 function CREReader:showFontsMenu()
@@ -681,6 +703,18 @@ function CREReader:gotoInput()
 		end
 	end
 	self:redrawCurrentPage()
+end
+
+function CREReader:gammaInput()
+	local new_gamma = NumInputBox:input(G_height-100, 100,
+		SGamma..":", self.gamma_index, true)
+	-- convert string to number
+		if pcall(function () new_gamma = math.floor(new_gamma) end) then
+			if new_gamma < 0 then new_gamma = 0 end
+			self.gamma_index = new_gamma
+		end
+		cre.setGammaIndex(self.gamma_index)
+		self:redrawCurrentPage()
 end
 
 function CREReader:addBookmarkCommand()

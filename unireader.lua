@@ -2780,6 +2780,17 @@ function UniReader:gotoInput()
 		end
 end
 
+function UniReader:gammaInput()
+	local new_gamma = NumInputBox:input(G_height-100, 100,
+		SGamma..":", self.globalgamma, true)
+	-- convert string to number
+		if pcall(function () new_gamma = math.floor(new_gamma) end) then
+			if new_gamma < 0 then new_gamma = 0 end
+			self.globalgamma = new_gamma
+		end
+		self:redrawCurrentPage()
+end
+
 function UniReader:searchInput()
 	Screen:saveCurrentBB()
 	local search = InputBox:input(G_height - 100, 100,
@@ -2973,6 +2984,7 @@ function UniReader:showSettingsMenu()
 		SManually_set_BBox,
 		SRemove_manually_set_BBox,
 		SAdjust_gamma,
+		SInput_gamma_value_,
 		SFonts_,
 		SReflow_settings_,
 		SRefresh_count_,
@@ -3009,18 +3021,21 @@ function UniReader:showSettingsMenu()
 		self:redrawCurrentPage()
 		self:doAdjustGamma()
 	elseif re == 10 then
-		self:showFontsMenu()
-	elseif re == 11 then
 		self:redrawCurrentPage()
-		self:doKOPTConfig()
+		self:gammaInput()
+	elseif re == 11 then
+		self:showFontsMenu()
 	elseif re == 12 then
 		self:redrawCurrentPage()
-		self:refreshCountInput()
+		self:doKOPTConfig()
 	elseif re == 13 then
-		InfoMessage:chooseNotificatonMethods()
+		self:redrawCurrentPage()
+		self:refreshCountInput()
 	elseif re == 14 then
-		self:resetDefaultReader()
+		InfoMessage:chooseNotificatonMethods()
 	elseif re == 15 then
+		self:resetDefaultReader()
+	elseif re == 16 then
 		self:clearReaderAssociation()
 	end
 end
@@ -3342,6 +3357,12 @@ function UniReader:addAllCommands()
 		Sgo_to_page,
 		function(unireader)
 			unireader:gotoInput()
+		end)
+		
+	self.commands:add(KEY_G, MOD_SHIFT, "G",
+		Sinput_gamma_value,
+		function(unireader)
+			unireader:gammaInput()
 		end)
 		
 	self.commands:add(KEY_H, nil, "H",
