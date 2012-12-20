@@ -99,10 +99,8 @@ function CREReader:open(filename)
 	local style_sheet = "./data/"..file_type..".css"
 	-- default to scroll mode, which is 0
 	-- this is defined in kpvcrlib/crengine/crengine/include/lvdocview.h
-	local view_mode = 0
-	if self.view_mode == "page" then
-		view_mode = 1
-	end
+	local view_mode = self.view_mode
+	
 	ok, self.doc = pcall(cre.openDocument, filename, style_sheet, G_width, G_height, view_mode)
 	if not ok then
 		return false, SError_opening_cre_document_ -- self.doc, will contain error message
@@ -118,13 +116,9 @@ function CREReader:preLoadSettings(filename)
 	self.settings = DocSettings:open(filename)
 	local view_mode = self.settings:readSetting("view_mode")
 	if view_mode then
-		if view_mode == "scroll" then
-			self.view_mode = "scroll"
-		else
-			self.view_mode = "page"
-		end
+		self.view_mode = view_mode
 	else
-		view_mode = DCREREADER_VIEW_MODE
+		self.view_mode = DCREREADER_VIEW_MODE
 	end	
 end
 
@@ -135,6 +129,11 @@ function CREReader:loadSpecialSettings()
 	end
 	self.font_face = font_face
 	self.doc:setFontFace(self.font_face)
+	
+	-- like this for now. Will implement user changable font from Librerator
+	self.doc:setCHFont(DCREREADER_PAGE_HEADER_FONT)
+	
+	self.doc:setCHInfo(DCREREADER_PAGE_HEADER)
 
 	local gamma_index = self.settings:readSetting("gamma_index")
 	self.gamma_index = gamma_index or self.gamma_index
@@ -916,6 +915,23 @@ function CREReader:adjustCreReaderCommands()
 			self:goto(self.pos + self.shift_y)
 		end
 	)
+	self.commands:add(KEY_V, nil, "V",
+		Stoggle_view_mode_,
+		function(self)
+			local view_mode
+			if self.view_mode == CRE_VM_PAGE then
+				self.view_mode = CRE_VM_SCROLL
+				view_mode = "scroll"
+			else
+				self.view_mode = CRE_VM_PAGE
+				view_mode = "page"
+			end
+			self.settings:saveSetting("view_mode", self.view_mode)
+			self.doc:setCREViewMode(self.view_mode)
+			InfoMessage:inform(SViewmode_..view_mode, DINFO_TOGGLES, 1, MSG_AUX)
+			self:redrawCurrentPage()
+		end
+	)
 	self.commands:add(KEY_FW_LEFT, nil, nil, nil, -- hiden from help screen - only usable on K4NT
 		function(self)
 			if G_ScreenKB_pressed then
@@ -964,20 +980,6 @@ function CREReader:adjustCreReaderCommands()
 			end
 		end
 	)
---[[
-	self.commands:add(KEY_V, nil, "V",
-		Stoggle_view_mode_requires_re_open_,
-		function(self)
-			if self.view_mode == "page" then
-				self.view_mode = "scroll"
-			else
-				self.view_mode = "page"
-			end
-			self.settings:saveSetting("view_mode", self.view_mode)
-			InfoMessage:inform(SViewmode_..self.view_mode.." (needs re-open)", DINFO_DELAY, 1, MSG_AUX)
-		end
-	)
---]]
 end
 
 ----------------------------------------------------

@@ -236,7 +236,7 @@ Sleft_right = "left/right"
 S_pixels_upwards = " pixels upwards"
 S_pixels_downwards = " pixels downwards"
 Span_ = "pan "
-Stoggle_view_mode_requires_re_open_ = "toggle view mode (requires re-open)"
+Stoggle_view_mode_= "toggle view mode "
 SViewmode_ = "Viewmode: "
 
 
