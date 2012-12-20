@@ -39,6 +39,7 @@ static int initCache(lua_State *L) {
 	int cache_size = luaL_optint(L, 1, (2 << 20) * 64); // 64Mb on disk cache for DOM
 
 	ldomDocCache::init(lString16("./cr3cache"), cache_size);
+	HyphMan::initDictionaries(lString16("data/hyph/")); // from tigran123's PR.672 
 
 	return 0;
 }
@@ -273,6 +274,33 @@ static int getFontFaces(lua_State *L) {
 	}
 
 	return 1;
+}
+
+static int setCREViewMode(lua_State *L) {
+	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
+	LVDocViewMode view_mode = (LVDocViewMode)luaL_checkint(L, 2);
+
+	doc->text_view->setViewMode(view_mode, -1);
+
+	return 0;
+}
+
+static int setCHInfo(lua_State *L) {
+	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
+	int info = luaL_checkint(L, 2);
+
+	doc->text_view->setPageHeaderInfo(info);
+
+	return 0;
+}
+
+static int setCHFont(lua_State *L) {
+	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
+	const char *face = luaL_checkstring(L, 2);
+
+	doc->text_view->setStatusFontFace(lString8(face));
+
+	return 0;
 }
 
 static int setFontFace(lua_State *L) {
@@ -608,6 +636,9 @@ static const struct luaL_Reg credocument_meth[] = {
 	{"getFullHeight", getFullHeight},
 	{"getToc", getTableOfContent},
 	/*--- set methods ---*/
+	{"setCREViewMode", setCREViewMode},	// set view mode for the document - scroll or page @Kai771
+	{"setCHInfo", setCHInfo},	// set what will be visible on cr header @Kai771
+	{"setCHFont", setCHFont},	// set crengine header font @Kai771
 	{"setFontFace", setFontFace},
 	{"setFontSize", setFontSize},
 	{"setDefaultInterlineSpace", setDefaultInterlineSpace},
