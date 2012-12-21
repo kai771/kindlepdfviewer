@@ -121,6 +121,7 @@ UniReader = {
 
 	last_search = {}
 }
+DHOFFSET = 37
 
 function UniReader:new(o)
 	o = o or {}
@@ -3113,8 +3114,11 @@ function UniReader:doFollowLink()
 			elseif link.section and string.sub(link.section,1,1) == "#" then -- from crengine
 				if link.start_y >= self.pos and link.start_y <= self.pos + G_height then
 					link.start_y = link.start_y - self.pos -- top of screen
+					local hoffset = 0
+					-- the following line is a dirty hack, but it seems to work for now
+					if self.view_mode == CRE_VM_PAGE and self.cre_header_enable then hoffset = DHOFFSET end
 					link.x0 = link.start_x
-					link.y0 = link.start_y
+					link.y0 = link.start_y + hoffset
 					link.y1 = self.doc:zoomFont(0)
 					page_links = page_links + 1
 					visible_links[page_links] = link
@@ -3964,7 +3968,10 @@ function UniReader:addAllCommands()
 						if link.page then
 							x,y,w,h = self:zoomedRectCoordTransform( link.x0,link.y0, link.x1,link.y1 )
 						elseif link.section then
-							x,y,h = link.start_x, link.start_y, self.doc:zoomFont(0) -- delta=0, return font size
+							local hoffset = 0
+							-- the following line is a dirty hack, but it seems to work for now
+							if self.view_mode == CRE_VM_PAGE and self.cre_header_enable then hoffset = DHOFFSET end
+							x,y,h = link.start_x, link.start_y + hoffset, self.doc:zoomFont(0) -- delta=0, return font size
 						end
 
 						if x and y and h then

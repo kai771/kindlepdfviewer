@@ -162,9 +162,17 @@ function CREReader:loadSpecialSettings()
 end
 
 function CREReader:getLastPageOrPos()
+--[[ Old method doesn't give as "as you left it" feel
 	local last_percent = self.settings:readSetting("last_percent")
 	if last_percent then
 		return math.floor((last_percent * self.doc:getFullHeight()) / 10000)
+	else
+		return 0
+	end
+--]]	
+	local last_pos = self.settings:readSetting("last_pos")
+	if last_pos then
+		return last_pos
 	else
 		return 0
 	end
@@ -180,6 +188,7 @@ end
 
 function CREReader:saveLastPageOrPos()
 	self.settings:saveSetting("last_percent", self.percent)
+	self.settings:saveSetting("last_pos", self.pos)
 end
 
 ----------------------------------------------------
@@ -256,6 +265,10 @@ function CREReader:goto(pos, is_ignore_jump, pos_type)
 	self.percent = self.doc:getCurrentPercent()
 end
 
+function CREReader:gotoJump(pos, is_ignore_jump, pos_type)
+	self:goto(pos, is_ignore_jump, pos_type)
+end
+
 function CREReader:gotoPercent(percent)
 	self:goto(percent * self.doc:getFullHeight() / 10000)
 end
@@ -281,7 +294,7 @@ function CREReader:prevView()
 		self.show_overlap = self.pan_overlap_vertical
 		step = self.view_pan_step - self.pan_overlap_vertical
 	else
-		step = G_height	
+		step = 10	-- arbitrary, and positive value (smaller than the screen size - header) will do
 	end	
 	return self.pos - step
 end
