@@ -216,6 +216,7 @@ function CREReader:goto(pos, is_ignore_jump, pos_type)
 		pos = math.min(pos, self.doc:getFullHeight() - height)
 		pos = math.max(pos, 0)
 		self.doc:gotoPos(pos)
+		pos = self.doc:getCurrentPos() -- added by @Kai771
 	end
 	-- add to jump history, distinguish jump from normal page turn
 	-- NOTE:
@@ -264,13 +265,25 @@ function CREReader:gotoTocEntry(entry)
 end
 
 function CREReader:nextView()
-	self.show_overlap = -self.pan_overlap_vertical
-	return self.pos + self.view_pan_step - self.pan_overlap_vertical
+	local step
+	if self.view_mode == CRE_VM_SCROLL then
+		self.show_overlap = -self.pan_overlap_vertical
+		step = self.view_pan_step - self.pan_overlap_vertical
+	else
+		step = G_height	
+	end	
+	return self.pos + step
 end
 
 function CREReader:prevView()
-	self.show_overlap = self.pan_overlap_vertical
-	return self.pos - self.view_pan_step + self.pan_overlap_vertical
+	local step
+	if self.view_mode == CRE_VM_SCROLL then
+		self.show_overlap = self.pan_overlap_vertical
+		step = self.view_pan_step - self.pan_overlap_vertical
+	else
+		step = G_height	
+	end	
+	return self.pos - step
 end
 
 ----------------------------------------------------
@@ -1032,9 +1045,10 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:add(KEY_HOME, MOD_SHIFT, "Home",
 		Stoggle_crereader_header,
 		function(self)
+			local prev_xpointer = self.doc:getXPointer()
 			self:toggleCREHeader()
 			G_reader_settings:saveSetting("cre_header_enable", self.cre_header_enable)
-			self:redrawCurrentPage()
+			self:goto(prev_xpointer, nil, "xpointer")
 		end
 	)
 	self.commands:add(KEY_FW_LEFT, nil, nil, nil, -- hiden from help screen - only usable on K4NT
