@@ -40,6 +40,9 @@ function CREReader:init()
 		end
 	end
 
+	local cre_header_enable = G_reader_settings:readSetting("cre_header_enable")
+	if cre_header_enable ~= nil then self.cre_header_enable = cre_header_enable end
+
 	local page_header_font = G_reader_settings:readSetting("page_header_font")
 	if page_header_font then self.page_header_font = page_header_font end
 
@@ -133,7 +136,10 @@ function CREReader:loadSpecialSettings()
 	
 	self.doc:setCHFont(self.page_header_font)
 	
-	self.doc:setCHInfo(DCREREADER_PAGE_HEADER)
+	local info
+	if self.cre_header_enable then info = DCREREADER_PAGE_HEADER
+	else info = PGHDR_NONE end
+	self.doc:setCHInfo(info)
 
 	local gamma_index = self.settings:readSetting("gamma_index")
 	self.gamma_index = gamma_index or self.gamma_index
@@ -483,6 +489,35 @@ function CREReader:showInfo()
 			end
 		end
 	end
+end
+
+function CREReader:toggleCREHeader()
+	if self.view_mode == CRE_VM_PAGE then
+		self.cre_header_enable = not self.cre_header_enable
+		local info
+		if self.cre_header_enable then info = DCREREADER_PAGE_HEADER
+		else info = PGHDR_NONE end
+	--	local prev_xpointer = self.doc:getXPointer()	
+		self.doc:setCHInfo(info)
+	--	self:goto(prev_xpointer, nil, "xpointer")
+	else
+		InfoMessage:inform(SView_mode_not_page_, DINFO_DELAY, 1, MSG_WARN)
+	end	
+end
+
+function CREReader:toggleViewMode()
+	local view_mode
+	if self.view_mode == CRE_VM_PAGE then
+		self.view_mode = CRE_VM_SCROLL
+		view_mode = "scroll"
+	else
+		self.view_mode = CRE_VM_PAGE
+		view_mode = "page"
+	end
+	local prev_xpointer = self.doc:getXPointer()
+	InfoMessage:inform(SViewmode_..view_mode, DINFO_TOGGLES, 1, MSG_AUX)
+	self.doc:setCREViewMode(self.view_mode)
+	self:goto(prev_xpointer, nil, "xpointer")
 end
 
 function CREReader:startHighLightMode()
@@ -991,18 +1026,15 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:add(KEY_V, nil, "V",
 		Stoggle_view_mode_,
 		function(self)
-			local view_mode
-			if self.view_mode == CRE_VM_PAGE then
-				self.view_mode = CRE_VM_SCROLL
-				view_mode = "scroll"
-			else
-				self.view_mode = CRE_VM_PAGE
-				view_mode = "page"
-			end
-			local prev_xpointer = self.doc:getXPointer()
-			InfoMessage:inform(SViewmode_..view_mode, DINFO_TOGGLES, 1, MSG_AUX)
-			self.doc:setCREViewMode(self.view_mode)
-			self:goto(prev_xpointer, nil, "xpointer")
+			self:toggleViewMode()
+		end
+	)
+	self.commands:add(KEY_HOME, MOD_SHIFT, "Home",
+		Stoggle_crereader_header,
+		function(self)
+			self:toggleCREHeader()
+			G_reader_settings:saveSetting("cre_header_enable", self.cre_header_enable)
+			self:redrawCurrentPage()
 		end
 	)
 	self.commands:add(KEY_FW_LEFT, nil, nil, nil, -- hiden from help screen - only usable on K4NT

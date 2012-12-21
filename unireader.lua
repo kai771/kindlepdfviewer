@@ -77,6 +77,7 @@ UniReader = {
 	comics_mode_enable,
 	rtl_mode_enable, -- rtl = right-to-left
 	page_mode_enable,
+	cre_header_enable = true,
 	fp_offset = 0,	-- first page offset
 	
 	-- last selections in menus:
@@ -2729,6 +2730,16 @@ function UniReader:toggleRTLMode()
 	end	
 end
 
+function UniReader:toggleCREHeader()
+	self:redrawCurrentPage()
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_AUX)
+end
+
+function UniReader:toggleViewMode()
+	self:redrawCurrentPage()
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_AUX)
+end
+
 function UniReader:togglePageMode()
 	self.page_mode_enable = not self.page_mode_enable
 	self.settings:saveSetting("page_mode_enable", self.page_mode_enable)
@@ -2979,6 +2990,8 @@ function UniReader:showSettingsMenu()
 		STurn_comics_mode_..(self.comics_mode_enable and Soff_ or Son_),
 		STurn_right_to_left_mode_..(self.rtl_mode_enable and Soff_ or Son_),
 		STurn_link_underlines_..(self.show_links_enable and Soff_ or Son_),
+		STurn_crereader_header_..(self.cre_header_enable and Soff_ or Son_),
+		SSet_crereader_view_mode_to_..((self.view_mode == 0) and Spage_ or Sscroll_),
 		SSet_page_keys_mode_to_..(self.page_mode_enable and Sviewport_ or Spage_),
 		SSet_first_page_offset_,
 		SManually_set_BBox,
@@ -3003,39 +3016,52 @@ function UniReader:showSettingsMenu()
 	if re == 1 then 
 		self:toggleOverlap()
 	elseif re == 2 then
+		self:redrawCurrentPage()
 		self:toggleComicsMode()
 	elseif re == 3 then
+		self:redrawCurrentPage()
 		self:toggleRTLMode()
 	elseif re == 4 then
 		self:toggleLinkUnderlines()
 	elseif re == 5 then
-		self:togglePageMode()
+		self:redrawCurrentPage()
+		self:toggleCREHeader()
 	elseif re == 6 then
-		self:fpOffsetInput()
+		self:redrawCurrentPage()
+		self:toggleViewMode()
 	elseif re == 7 then
 		self:redrawCurrentPage()
-		self:modBBox()
+		self:togglePageMode()
 	elseif re == 8 then
-		self:removeBBox()
+		self:redrawCurrentPage()
+		self:fpOffsetInput()
 	elseif re == 9 then
 		self:redrawCurrentPage()
-		self:doAdjustGamma()
+		self:modBBox()
 	elseif re == 10 then
 		self:redrawCurrentPage()
-		self:gammaInput()
+		self:removeBBox()
 	elseif re == 11 then
-		self:showFontsMenu()
+		self:redrawCurrentPage()
+		self:doAdjustGamma()
 	elseif re == 12 then
 		self:redrawCurrentPage()
-		self:doKOPTConfig()
+		self:gammaInput()
 	elseif re == 13 then
+		self:showFontsMenu()
+	elseif re == 14 then
+		self:redrawCurrentPage()
+		self:doKOPTConfig()
+	elseif re == 15 then
 		self:redrawCurrentPage()
 		self:refreshCountInput()
-	elseif re == 14 then
-		InfoMessage:chooseNotificatonMethods()
-	elseif re == 15 then
-		self:resetDefaultReader()
 	elseif re == 16 then
+		InfoMessage:chooseNotificatonMethods()
+	elseif re == 17 then
+		self:redrawCurrentPage()
+		self:resetDefaultReader()
+	elseif re == 18 then
+		self:redrawCurrentPage()
 		self:clearReaderAssociation()
 	end
 end
