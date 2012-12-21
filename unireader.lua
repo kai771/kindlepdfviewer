@@ -4064,6 +4064,7 @@ function UniReader:addAllCommands()
 			if G_ScreenKB_pressed then
 				G_ScreenKB_pressed = false
 				InfoMessage:inform(SScreenKB_shortcut_canceled, DINFO_TOGGLES, 1, MSG_AUX)
+				unireader:forceScreenRefresh()
 			else
 				G_ScreenKB_pressed = true
 			end	
