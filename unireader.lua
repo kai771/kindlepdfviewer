@@ -4156,11 +4156,11 @@ function UniReader:modBBox()
 			elseif ev.code == KEY_FW_DOWN then
 				y_direction =  1
 			-- comment out next lines if you want rulers and shortcut keys back	
-			elseif ev.code == KEY_Q then
+			elseif ev.code == KEY_Q or ev.code == KEY_HOME then
 				step =  DBBOX_STEP_BIG
-			elseif ev.code == KEY_A then
+			elseif ev.code == KEY_A or ev.code == KEY_MENU  then
 				step =  DBBOX_STEP_NORMAL
-			elseif ev.code == KEY_Z then
+			elseif ev.code == KEY_Z or ev.code == KEY_SCREENKB then
 				step =  DBBOX_STEP_SMALL
 			-- end of comment out	
 			elseif ev.code == KEY_FW_PRESS then
