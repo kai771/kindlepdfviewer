@@ -217,16 +217,16 @@ function CREReader:goto(pos, is_ignore_jump, pos_type)
 	
 	if pos_type == "xpointer" then
 		self.doc:gotoXPointer(pos)
-		pos = self.doc:getCurrentPos()
 	elseif pos_type == "link" then
 		self.doc:gotoLink(pos)
-		pos = self.doc:getCurrentPos()
+	elseif self.view_mode == CRE_VM_PAGE then
+		self.doc:gotoPage(pos)	
 	else -- pos_type is position within document
 		pos = math.min(pos, self.doc:getFullHeight() - height)
 		pos = math.max(pos, 0)
 		self.doc:gotoPos(pos)
-		pos = self.doc:getCurrentPos() -- added by @Kai771
 	end
+	pos = self.doc:getCurrentPos() -- added by @Kai771
 	-- add to jump history, distinguish jump from normal page turn
 	-- NOTE:
 	-- even though we have called gotoPos() or gotoXPointer() previously,
@@ -278,25 +278,21 @@ function CREReader:gotoTocEntry(entry)
 end
 
 function CREReader:nextView()
-	local step
 	if self.view_mode == CRE_VM_SCROLL then
 		self.show_overlap = -self.pan_overlap_vertical
-		step = self.view_pan_step - self.pan_overlap_vertical
+		return self.pos + self.view_pan_step - self.pan_overlap_vertical
 	else
-		step = G_height	
+		return self.pageno + 1
 	end	
-	return self.pos + step
 end
 
 function CREReader:prevView()
-	local step
 	if self.view_mode == CRE_VM_SCROLL then
 		self.show_overlap = self.pan_overlap_vertical
-		step = self.view_pan_step - self.pan_overlap_vertical
+		return self.pos - self.view_pan_step + self.pan_overlap_vertical
 	else
-		step = 10	-- arbitrary, and positive value (smaller than the screen size - header) will do
+		return self.pageno - 1
 	end	
-	return self.pos - step
 end
 
 ----------------------------------------------------
