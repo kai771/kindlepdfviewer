@@ -3507,7 +3507,7 @@ function UniReader:addAllCommands()
 			unireader:togglePageMode()
 		end)
 
-	self.commands:add(KEY_P, MOD_ALT, "P",
+	self.commands:add(KEY_P, MOD_SHIFT, "P",
 		Sset_first_page_offset,
 		function(unireader)
 			unireader:fpOffsetInput()

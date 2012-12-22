@@ -847,7 +847,7 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:del(KEY_U, nil,"U")
 	self.commands:del(KEY_C, nil, "C")
 	self.commands:del(KEY_P, nil, "P")
-	self.commands:del(KEY_P, MOD_ALT, "P")
+	self.commands:del(KEY_P, MOD_SHIFT, "P")
 	
 	-- CCW-rotation
 	self.commands:add(KEY_K, nil, "K",

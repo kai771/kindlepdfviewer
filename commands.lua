@@ -230,7 +230,7 @@ function Commands:new(obj)
 	)
 	-- Shift+P would be overwritten in inputbox by entering char 'P'
 	-- I suggest one should probably change the hotkey to, say, Alt+Space
-	obj:add(KEY_P, MOD_SHIFT, "P", Smake_screenshot,
+	obj:add(KEY_SPACE, MOD_ALT, "Space", Smake_screenshot,
 		function()
 			logBatteryLevel("SCREENSHOT")
 			Screen:screenshot()
