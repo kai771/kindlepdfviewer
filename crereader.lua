@@ -129,6 +129,9 @@ function CREReader:preLoadSettings(filename)
 end
 
 function CREReader:loadSpecialSettings()
+	
+	self.doc:setBatteryState(77)
+
 	local font_face = self.settings:readSetting("font_face")
 	if font_face then self.font_face = font_face
 	else self.font_face = DCREREADER_DEFAULT_FONT end
@@ -214,6 +217,14 @@ end
 function CREReader:goto(pos, is_ignore_jump, pos_type)
 	local prev_xpointer = self.doc:getXPointer()
 	local width, height = G_width, G_height
+	local battery_level = BatteryLevel()
+	if battery_level and pcall(function () battery_level = battery_level + 0 end) then
+		-- battery_level is a number. All is good.
+	else
+		-- battery_level is not a number. Set it to 0.
+		battery_level = 0
+	end		
+	self.doc:setBatteryState(battery_level)
 	
 	if pos_type == "xpointer" then
 		self.doc:gotoXPointer(pos)

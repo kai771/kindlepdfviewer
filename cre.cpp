@@ -303,6 +303,15 @@ static int setCHFont(lua_State *L) {
 	return 0;
 }
 
+static int setBatteryState(lua_State *L) {
+	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
+	int state = luaL_checkint(L, 2);
+
+	doc->text_view->setBatteryState(state);
+
+	return 0;
+}
+
 static int setFontFace(lua_State *L) {
 	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
 	const char *face = luaL_checkstring(L, 2);
@@ -639,6 +648,7 @@ static const struct luaL_Reg credocument_meth[] = {
 	{"setCREViewMode", setCREViewMode},	// set view mode for the document - scroll or page @Kai771
 	{"setCHInfo", setCHInfo},	// set what will be visible on cr header @Kai771
 	{"setCHFont", setCHFont},	// set crengine header font @Kai771
+	{"setBatteryState", setBatteryState},	// sets battery state @Kai771
 	{"setFontFace", setFontFace},
 	{"setFontSize", setFontSize},
 	{"setDefaultInterlineSpace", setDefaultInterlineSpace},
