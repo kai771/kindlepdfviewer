@@ -750,14 +750,27 @@ end
 
 function CREReader:gotoInput()
 	local height = self.doc:getFullHeight()
+	local inputtext, cur_pos
+	if self.view_mode == CRE_VM_SCROLL then 
+		inputtext = SPosition_in_percent_
+		cur_pos = math.floor((self.pos / height)*100)
+	else
+		inputtext = SPage_
+		cur_pos = self.doc:getCurrentPage()
+	end	
 	local position = NumInputBox:input(G_height-100, 100,
-		SPosition_in_percent_, Scurrent_..math.floor((self.pos / height)*100), true)
+		inputtext, Scurrent_..cur_pos, true)
 	-- convert string to number
 	if position and pcall(function () position = position + 0 end) then
-		if position >= 0 and position <= 100 then
-			self:goto(math.floor(height * position / 100))
+		if self.view_mode == CRE_VM_SCROLL then
+			if position >= 0 and position <= 100 then
+				self:goto(math.floor(height * position / 100))
+				return
+			end
+		else
+			self:goto(position, true, "page")
 			return
-		end
+		end		
 	end
 	self:redrawCurrentPage()
 end
