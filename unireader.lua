@@ -3264,7 +3264,7 @@ function UniReader:addAllCommands()
 			
 			unireader:goto(
 			(keydef.keycode == KEY_PGBCK or keydef.keycode == KEY_LPGBCK)
-			and unireader:prevView() or unireader:nextView())
+			and unireader:prevView() or unireader:nextView(), true, "page")
 		end)
 		
 	self.commands:addGroup(MOD_ALT.."< >", {

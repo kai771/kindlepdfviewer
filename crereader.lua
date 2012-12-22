@@ -219,7 +219,7 @@ function CREReader:goto(pos, is_ignore_jump, pos_type)
 		self.doc:gotoXPointer(pos)
 	elseif pos_type == "link" then
 		self.doc:gotoLink(pos)
-	elseif self.view_mode == CRE_VM_PAGE then
+	elseif pos_type == "page" and self.view_mode == CRE_VM_PAGE then
 		self.doc:gotoPage(pos)	
 	else -- pos_type is position within document
 		pos = math.min(pos, self.doc:getFullHeight() - height)
