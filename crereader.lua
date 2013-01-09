@@ -1117,6 +1117,7 @@ function CREReader:adjustCreReaderCommands()
 				if bm then self:goto(bm.page, true, "xpointer") end
 				return
 			end
+			self:goto(self:prevView(), true, "page")
 		end
 	)
 	self.commands:add(KEY_LPGFWD, nil, nil, nil, -- hiden from help screen - only usable on K4NT
@@ -1128,6 +1129,7 @@ function CREReader:adjustCreReaderCommands()
 				if bm then self:goto(bm.page, true, "xpointer") end
 				return
 			end
+			self:goto(self:nextView(), true, "page")
 		end
 	)
 end
