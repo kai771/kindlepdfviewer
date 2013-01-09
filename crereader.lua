@@ -1116,6 +1116,9 @@ function CREReader:adjustCreReaderCommands()
 				bm = self:prevBookMarkedPage()
 				if bm then self:goto(bm.page, true, "xpointer") end
 				return
+			else
+				CREReader:goto(CREReader:prevView(), true, "page")
+				return
 			end
 		end
 	)
@@ -1126,6 +1129,9 @@ function CREReader:adjustCreReaderCommands()
 				local bm = nil
 				bm = self:nextBookMarkedPage()
 				if bm then self:goto(bm.page, true, "xpointer") end
+				return
+			else
+				CREReader:goto(CREReader:nexView(), true, "page")
 				return
 			end
 		end
