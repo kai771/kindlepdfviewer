@@ -223,7 +223,11 @@ function FileChooser:setPath(newPath, reset_pos)
 	end
 end
 
-function FileChooser:choose(ypos, height)
+function FileChooser:choose(ypos, height, lf)
+	if lf ~= nil then 
+		openFile(lf)
+		ret_code = ""
+	end
 	self.perpage = math.floor(G_height / self.spacing) - 2
 	self.pagedirty = true
 	self.markerdirty = false

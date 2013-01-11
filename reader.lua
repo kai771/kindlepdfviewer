@@ -176,7 +176,12 @@ if ARGV[argidx] and lfs.attributes(ARGV[argidx], "mode") == "directory" then
 elseif ARGV[argidx] and lfs.attributes(ARGV[argidx], "mode") == "file" then
 	openFile(ARGV[argidx])
 elseif patharg and lfs.attributes(patharg, "mode") == "file" then
-	openFile(patharg)
+	local handle = io.popen("dirname '"..patharg.."'")
+	local lfdir = handle:read("*a")
+	handle:close()
+	lfdir = string.gsub(lfdir, "\n", "")
+	FileChooser:setPath(lfdir)
+	FileChooser:choose(0, G_height, patharg)
 else
 	return showusage()
 end
