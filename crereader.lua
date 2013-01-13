@@ -29,6 +29,7 @@ function CREReader:init()
 
 	-- initialize cache and hyphenation engine
 	cre.initCache(1024*1024*64)
+	if DCREREADER_USE_HYPHENATION then cre.initHyphDict() end
 	-- we need to initialize the CRE font list
 	local fonts = Font:getFontList()
 	for _k, _v in ipairs(fonts) do

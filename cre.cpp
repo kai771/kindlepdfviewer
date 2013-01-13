@@ -39,6 +39,12 @@ static int initCache(lua_State *L) {
 	int cache_size = luaL_optint(L, 1, (2 << 20) * 64); // 64Mb on disk cache for DOM
 
 	ldomDocCache::init(lString16("./cr3cache"), cache_size);
+//	HyphMan::initDictionaries(lString16("data/hyph/")); // from tigran123's PR.672 
+
+	return 0;
+}
+
+static int initHyphDict(lua_State *L) {
 	HyphMan::initDictionaries(lString16("data/hyph/")); // from tigran123's PR.672 
 
 	return 0;
@@ -693,6 +699,7 @@ static int findText(lua_State *L) {
 
 static const struct luaL_Reg cre_func[] = {
 	{"initCache", initCache},
+	{"initHyphDict", initHyphDict},
 	{"openDocument", openDocument},
 	{"newDocView", newDocView},
 	{"getFontFaces", getFontFaces},
