@@ -553,10 +553,11 @@ function CREReader:toggleViewMode()
 		self.view_mode = CRE_VM_PAGE
 		view_mode = "page"
 	end
-	local prev_xpointer = self.doc:getXPointer()
+--	local prev_xpointer = self.doc:getXPointer()
 	InfoMessage:inform(SViewmode_..view_mode, DINFO_TOGGLES, 1, MSG_AUX)
 	self.doc:setCREViewMode(self.view_mode)
-	self:goto(prev_xpointer, nil, "xpointer")
+--	self:goto(prev_xpointer, nil, "xpointer")
+	self:redrawCurrentPage()
 	self.toc = nil
 end
 
@@ -1112,10 +1113,11 @@ function CREReader:adjustCreReaderCommands()
 	self.commands:add(KEY_HOME, MOD_SHIFT, "Home",
 		Stoggle_crereader_header,
 		function(self)
-			local prev_xpointer = self.doc:getXPointer()
+--			local prev_xpointer = self.doc:getXPointer()
 			self:toggleCREHeader()
 			G_reader_settings:saveSetting("cre_header_enable", self.cre_header_enable)
-			self:goto(prev_xpointer, nil, "xpointer")
+--			self:goto(prev_xpointer, nil, "xpointer")
+			self:redrawCurrentPage()
 		end
 	)
 	self.commands:add(KEY_FW_PRESS, nil, nil, nil, -- hiden from help screen - only usable on K4NT
