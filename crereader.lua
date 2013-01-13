@@ -106,6 +106,7 @@ function CREReader:open(filename)
 		file_type = "cr3"
 	end
 	local style_sheet = "./data/"..file_type..".css"
+	self.style_sheet = style_sheet
 	-- default to scroll mode, which is 0
 	-- this is defined in kpvcrlib/crengine/crengine/include/lvdocview.h
 	local view_mode = self.view_mode
@@ -151,6 +152,11 @@ function CREReader:loadSpecialSettings()
 	self.line_space_percent = line_space_percent or self.default_line_space_percent
 	self.doc:setDefaultInterlineSpace(self.line_space_percent)
 
+	local style_sheet = self.settings:readSetting("style_sheet")
+	self.style_sheet = style_sheet or self.style_sheet
+	Debug("My self.style_sheet=", tostring(self.style_sheet))
+	self.doc:setStyleSheet(self.style_sheet)
+
 	local font_zoom = self.settings:readSetting("font_zoom")
 	self.font_zoom = font_zoom or self.default_font_zoom
 	if self.font_zoom ~= 0 then
@@ -187,11 +193,13 @@ function CREReader:saveSpecialSettings()
 	self.settings:saveSetting("line_space_percent", self.line_space_percent)
 	self.settings:saveSetting("font_zoom", self.font_zoom)
 	self.settings:saveSetting("view_mode", self.view_mode)
+	self.settings:saveSetting("style_sheet", self.style_sheet)
 end
 
 function CREReader:saveLastPageOrPos()
 	self.settings:saveSetting("last_percent", self.percent)
 	self.settings:saveSetting("last_pos", self.pos)
+	self.settings:saveSetting("last_xpointer", self.doc:getXPointer()) -- might increase compatibility with KPV
 end
 
 ----------------------------------------------------
