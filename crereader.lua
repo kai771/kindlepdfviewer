@@ -821,6 +821,7 @@ end
 function CREReader:adjustCreReaderCommands()
 	self.commands:delGroup("[joypad]")
 	self.commands:delGroup(MOD_ALT.."H/J")
+	self.commands:delGroup(SShift_left_right)
 	self.commands:del(KEY_G, nil, "G")
 	self.commands:del(KEY_J, MOD_SHIFT, "J")
 	self.commands:del(KEY_K, MOD_SHIFT, "K")
@@ -884,8 +885,8 @@ function CREReader:adjustCreReaderCommands()
 		end
 	)
 	-- navigate between chapters by Shift+Up & Shift-Down
-	self.commands:addGroup(MOD_SHIFT.."up/down",{
-		Keydef:new(KEY_FW_UP,MOD_SHIFT), Keydef:new(KEY_FW_DOWN,MOD_SHIFT)},
+	self.commands:addGroup(MOD_SHIFT..Sup_down,{
+		Keydef:new(KEY_FW_UP, MOD_SHIFT), Keydef:new(KEY_FW_DOWN, MOD_SHIFT)},
 		Sskip_to_previous_next_chapter,
 		function(self)
 			if keydef.keycode == KEY_FW_UP then
@@ -895,16 +896,31 @@ function CREReader:adjustCreReaderCommands()
 			end
 		end
 	)
-	-- fast navigation by Shift+Left & Shift-Right
-	local scrollpages = 10
-	self.commands:addGroup(MOD_SHIFT..Sleft_right,
-		{Keydef:new(KEY_FW_LEFT,MOD_SHIFT),Keydef:new(KEY_FW_RIGHT,MOD_SHIFT)},
+	-- fast navigation by Left & Right
+	local scrollpages = DCREREADER_FASTNAV_PAGES
+	self.commands:addGroup(Sleft_right,
+		{Keydef:new(KEY_FW_LEFT, nil),Keydef:new(KEY_FW_RIGHT, nil)},
 		Smove_..scrollpages..S_pages_backwards_forward,
 		function(self)
-			if keydef.keycode == KEY_FW_LEFT then
-				self:goto(math.max(0, self.pos - scrollpages*G_height))
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				if keydef.keycode == KEY_FW_RIGHT then
+					self:gotoInput()
+				end	
+				return
+			end
+			if self.view_mode == CRE_VM_SCROLL then
+				if keydef.keycode == KEY_FW_LEFT then
+					self:goto(math.max(0, self.pos - scrollpages*G_height))
+				else
+					self:goto(math.min(self.pos + scrollpages*G_height, self.doc:getFullHeight()-G_height))
+				end
 			else
-				self:goto(math.min(self.pos + scrollpages*G_height, self.doc:getFullHeight()-G_height))
+				if keydef.keycode == KEY_FW_LEFT then
+					self:goto(self.pageno-scrollpages, true, "page")
+				else
+					self:goto(self.pageno+scrollpages, true, "page")
+				end
 			end
 		end
 	)
@@ -1084,23 +1100,6 @@ function CREReader:adjustCreReaderCommands()
 			self:toggleCREHeader()
 			G_reader_settings:saveSetting("cre_header_enable", self.cre_header_enable)
 			self:goto(prev_xpointer, nil, "xpointer")
-		end
-	)
-	self.commands:add(KEY_FW_LEFT, nil, nil, nil, -- hiden from help screen - only usable on K4NT
-		function(self)
-			if G_ScreenKB_pressed then
-				G_ScreenKB_pressed = false
-				return
-			end
-		end
-	)
-	self.commands:add(KEY_FW_RIGHT, nil, nil, nil, -- hiden from help screen - only usable on K4NT
-		function(self)
-			if G_ScreenKB_pressed then
-				G_ScreenKB_pressed = false
-				self:gotoInput()
-				return
-			end
 		end
 	)
 	self.commands:add(KEY_FW_PRESS, nil, nil, nil, -- hiden from help screen - only usable on K4NT
