@@ -509,17 +509,22 @@ function CREReader:_drawReadingInfo()
 end
 
 function CREReader:showInfo()
-	self:_drawReadingInfo()
-	fb:refresh(1)
-	while true do
-		local ev = input.saveWaitForEvent()
-		ev.code = adjustKeyEvents(ev)
-		if ev.type == EV_KEY and ev.value == EVENT_VALUE_KEY_PRESS then
-			if ev.code == KEY_BACK or ev.code == KEY_HOME then
-				return
+	if DCREREADER_HEADER_ON_HOME then
+		self:toggleCREHeader()
+		G_reader_settings:saveSetting("cre_header_enable", self.cre_header_enable)
+	else	
+		self:_drawReadingInfo()
+		fb:refresh(1)
+		while true do
+			local ev = input.saveWaitForEvent()
+			ev.code = adjustKeyEvents(ev)
+			if ev.type == EV_KEY and ev.value == EVENT_VALUE_KEY_PRESS then
+				if ev.code == KEY_BACK or ev.code == KEY_HOME then
+					return
+				end
 			end
 		end
-	end
+	end	
 end
 
 function CREReader:toggleCREHeader()
