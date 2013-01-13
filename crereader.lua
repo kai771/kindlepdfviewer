@@ -1053,7 +1053,9 @@ function CREReader:adjustCreReaderCommands()
 				self:addBookmarkCommand()
 				return
 			end
-			self:goto(self.pos - self.shift_y)
+			if self.view_mode == CRE_VM_SCROLL then
+				self:goto(self.pos - self.shift_y)
+			end	
 		end
 	)
 	self.commands:add(KEY_FW_DOWN, nil, Sjoypad_down,
@@ -1064,7 +1066,9 @@ function CREReader:adjustCreReaderCommands()
 				keep_running = true
 				return "break"
 			end
-			self:goto(self.pos + self.shift_y)
+			if self.view_mode == CRE_VM_SCROLL then
+				self:goto(self.pos + self.shift_y)
+			end	
 		end
 	)
 	self.commands:add(KEY_V, nil, "V",
