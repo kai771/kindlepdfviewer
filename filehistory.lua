@@ -328,7 +328,7 @@ function FileHistory:addAllCommands()
 			end	
 		end
 	)	
-	self.commands:add(KEY_FW_LEFT, nil, nil, nil,	-- hiden from help screen - only usable on K4NT
+	self.commands:add(KEY_FW_LEFT, nil, nil, nil,	-- hidden from help screen - only usable on K4NT
 		function(self)
 			if G_ScreenKB_pressed then
 				G_ScreenKB_pressed = false
@@ -336,7 +336,7 @@ function FileHistory:addAllCommands()
 			end
 		end
 	)
-	self.commands:add(KEY_MENU, nil, nil, nil,	-- hiden from help screen - only usable on K4NT
+	self.commands:add(KEY_MENU, nil, nil, nil,	-- hidden from help screen - only usable on K4NT
 		function(self)
 			if G_ScreenKB_pressed then
 				G_ScreenKB_pressed = false
@@ -344,7 +344,7 @@ function FileHistory:addAllCommands()
 			end
 		end
 	)
-	self.commands:add(KEY_HOME, nil, nil, nil,	-- hiden from help screen - only usable on K4NT
+	self.commands:add(KEY_HOME, nil, nil, nil,	-- hidden from help screen - only usable on K4NT
 		function(self)
 			if G_ScreenKB_pressed then
 				G_ScreenKB_pressed = false

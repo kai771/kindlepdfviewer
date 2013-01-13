@@ -1120,7 +1120,7 @@ function CREReader:adjustCreReaderCommands()
 			self:redrawCurrentPage()
 		end
 	)
-	self.commands:add(KEY_FW_PRESS, nil, nil, nil, -- hiden from help screen - only usable on K4NT
+	self.commands:add(KEY_FW_PRESS, nil, nil, nil, -- hidden from help screen - only usable on K4NT
 		function(self)
 			if G_ScreenKB_pressed then
 				G_ScreenKB_pressed = false
@@ -1129,7 +1129,7 @@ function CREReader:adjustCreReaderCommands()
 			end
 		end
 	)
-	self.commands:add(KEY_LPGBCK, nil, nil, nil, -- hiden from help screen - only usable on K4NT
+	self.commands:add(KEY_LPGBCK, nil, nil, nil, -- hidden from help screen - only usable on K4NT
 		function(self)
 			if G_ScreenKB_pressed then
 				G_ScreenKB_pressed = false
@@ -1141,7 +1141,7 @@ function CREReader:adjustCreReaderCommands()
 			self:goto(self:prevView(), true, "page")
 		end
 	)
-	self.commands:add(KEY_LPGFWD, nil, nil, nil, -- hiden from help screen - only usable on K4NT
+	self.commands:add(KEY_LPGFWD, nil, nil, nil, -- hidden from help screen - only usable on K4NT
 		function(self)
 			if G_ScreenKB_pressed then
 				G_ScreenKB_pressed = false
