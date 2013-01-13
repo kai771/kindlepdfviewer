@@ -118,12 +118,20 @@ function FileHistory:addAllCommands()
 	self.commands:add(KEY_FW_UP, nil, Sjoypad_up,
 		Sprevious_item,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
 			self:prevItem()
 		end
 	)
 	self.commands:add(KEY_FW_DOWN, nil, Sjoypad_down,
 		Snext_item,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
 			self:nextItem()
 		end
 	)
@@ -141,6 +149,10 @@ function FileHistory:addAllCommands()
 	self.commands:add({KEY_PGFWD, KEY_LPGFWD}, nil, ">",
 		Snext_page,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
 			if self.page < (self.items / self.perpage) then
 				if self.current + self.page*self.perpage > self.items then
 					self.current = self.items - self.page*self.perpage
@@ -156,6 +168,10 @@ function FileHistory:addAllCommands()
 	self.commands:add({KEY_PGBCK, KEY_LPGBCK}, nil, "<",
 		Sprevious_page,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
 			if self.page > 1 then
 				self.page = self.page - 1
 				self.pagedirty = true
@@ -183,6 +199,10 @@ function FileHistory:addAllCommands()
 	self.commands:add(KEY_FW_RIGHT, nil, Sjoypad_right,
 		Sdocument_details,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
 			local file_entry = self.result[self.perpage*(self.page-1)+self.current]
 			if file_entry.name == ".." then 
 				warningUnsupportedFunction()
@@ -227,6 +247,10 @@ function FileHistory:addAllCommands()
 	self.commands:add({KEY_ENTER, KEY_FW_PRESS}, nil, "Enter",
 		Sopen_selected_document,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
 			local file_entry = self.result[self.perpage*(self.page-1)+self.current]
 			file_full_path = file_entry.dir .. "/" .. file_entry.name
 			if FileExists(file_full_path) then
@@ -279,6 +303,10 @@ function FileHistory:addAllCommands()
 	self.commands:add(KEY_BACK, nil, "Back",
 		Sback,
 		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
 			return "break"
 		end
 	)
@@ -287,6 +315,42 @@ function FileHistory:addAllCommands()
 		function(self)
 			keep_running = false
 			return "break"
+		end
+	)
+	self.commands:add(KEY_SCREENKB, nil, "ScreenKB",
+		Sstart_cancel_K4NT_shortcut,
+		function(unireader)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				InfoMessage:inform(SScreenKB_shortcut_canceled, DINFO_TOGGLES, 1, MSG_AUX)
+			else
+				G_ScreenKB_pressed = true
+			end	
+		end
+	)	
+	self.commands:add(KEY_FW_LEFT, nil, nil, nil,	-- hiden from help screen - only usable on K4NT
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
+		end
+	)
+	self.commands:add(KEY_MENU, nil, nil, nil,	-- hiden from help screen - only usable on K4NT
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				return
+			end
+		end
+	)
+	self.commands:add(KEY_HOME, nil, nil, nil,	-- hiden from help screen - only usable on K4NT
+		function(self)
+			if G_ScreenKB_pressed then
+				G_ScreenKB_pressed = false
+				keep_running = false
+				return "break"
+			end
 		end
 	)
 end
