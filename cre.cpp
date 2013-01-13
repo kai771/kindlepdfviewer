@@ -157,6 +157,22 @@ static int closeDocument(lua_State *L) {
 	return 0;
 }
 
+static int getTitle(lua_State *L) {
+	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
+
+	lua_pushstring(L, UnicodeToLocal(doc->text_view->getTitle()).c_str());
+
+	return 1;
+}
+
+static int getAuthors(lua_State *L) {
+	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
+
+	lua_pushstring(L, UnicodeToLocal(doc->text_view->getAuthors()).c_str());
+
+	return 1;
+}
+
 static int getNumberOfPages(lua_State *L) {
 	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
 
@@ -712,6 +728,8 @@ static const struct luaL_Reg cre_func[] = {
 static const struct luaL_Reg credocument_meth[] = {
 	{"loadDocument", loadDocument},
 	/*--- get methods ---*/
+	{"getTitle", getTitle},
+	{"getAuthors", getAuthors},
 	{"getPages", getNumberOfPages},
 	{"getCurrentPage", getCurrentPage},
 	{"getPageFromXPointer", getPageFromXPointer},

@@ -487,14 +487,18 @@ function CREReader:_drawReadingInfo()
 	local load_percent = self.percent/100
 	local rss, data, stack, lib, totalvm = memUsage()
 	local face = Font:getFace("rifont", 20)
+	local title = self.doc:getTitle()
+	local authors = self.doc:getAuthors()
 
 	-- display page number, date and memory stats at the top
-	fb.bb:paintRect(0, 0, width, 40+6*2, 0)
+	fb.bb:paintRect(0, 0, width, 22*4+5+5, 0)
 	renderUtf8Text(fb.bb, 10, 15+6, face, "p."..self.pageno.."/"..self.doc:getPages(), true)
 	local txt = os.date("%a %d %b %Y %T").." ["..BatteryLevel().."]"
 	local w = sizeUtf8Text(0, width, face, txt, true).x
 	renderUtf8Text(fb.bb, width - w - 10, 15+6, face, txt, true)
-	renderUtf8Text(fb.bb, 10, 15+6+22, face,
+	renderUtf8Text(fb.bb, 10, 15+6+22, face, "Title: "..title)
+	renderUtf8Text(fb.bb, 10, 15+6+22*2, face, "Authors: "..authors)
+	renderUtf8Text(fb.bb, 10, 15+6+22*3+5, face,
 		"RSS:"..rss.." DAT:"..data.." STK:"..stack.." LIB:"..lib.." TOT:"..totalvm.."k", true)
 
 	-- display reading progress at the bottom
@@ -523,7 +527,7 @@ function CREReader:showInfo()
 	if DCREREADER_HEADER_ON_HOME then
 		self:toggleCREHeader()
 		G_reader_settings:saveSetting("cre_header_enable", self.cre_header_enable)
-	else	
+	else
 		self:_drawReadingInfo()
 		fb:refresh(1)
 		while true do
