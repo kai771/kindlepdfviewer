@@ -44,6 +44,7 @@ static int initCache(lua_State *L) {
 	return 0;
 }
 
+// openDocument is deprecated - will be removed soon
 static int openDocument(lua_State *L) {
 	const char *file_name = luaL_checkstring(L, 1);
 	const char *style_sheet = luaL_checkstring(L, 2);
@@ -73,6 +74,31 @@ static int openDocument(lua_State *L) {
 	return 1;
 }
 
+static int newDocView(lua_State *L) {
+  const char *style_sheet = luaL_checkstring(L, 1);
+  int width = luaL_checkint(L, 2);
+  int height = luaL_checkint(L, 3);
+  LVDocViewMode view_mode = (LVDocViewMode)luaL_checkint(L, 4);
+	lString8 css;
+
+	CreDocument *doc = (CreDocument*) lua_newuserdata(L, sizeof(CreDocument));
+	luaL_getmetatable(L, "credocument");
+	lua_setmetatable(L, -2);
+
+	doc->text_view = new LVDocView();
+	//doc->text_view->setBackgroundColor(0xFFFFFF);
+	//doc->text_view->setTextColor(0x000000);
+	if (LVLoadStylesheetFile(lString16(style_sheet), css)){
+		if (!css.empty()){
+			doc->text_view->setStyleSheet(css);
+		}
+	}
+	doc->text_view->setViewMode(view_mode, -1);
+	doc->text_view->Resize(width, height);
+
+	return 1;
+}
+
 static int getGammaIndex(lua_State *L) {
 	lua_pushinteger(L, fontMan->GetGammaIndex());
 
@@ -86,6 +112,17 @@ static int setGammaIndex(lua_State *L) {
 
 	return 0;
 }
+
+static int loadDocument(lua_State *L) {
+  CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
+  const char *file_name = luaL_checkstring(L, 2);
+
+  doc->text_view->LoadDocument(file_name);
+  doc->dom_doc = doc->text_view->getDocument();
+  doc->text_view->Render();
+
+  return 0;
+}  
 
 static int closeDocument(lua_State *L) {
 	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
@@ -626,6 +663,7 @@ static int findText(lua_State *L) {
 static const struct luaL_Reg cre_func[] = {
 	{"initCache", initCache},
 	{"openDocument", openDocument},
+	{"newDocView", newDocView},
 	{"getFontFaces", getFontFaces},
 	{"getGammaIndex", getGammaIndex},
 	{"setGammaIndex", setGammaIndex},
@@ -634,6 +672,7 @@ static const struct luaL_Reg cre_func[] = {
 };
 
 static const struct luaL_Reg credocument_meth[] = {
+	{"loadDocument", loadDocument},
 	/*--- get methods ---*/
 	{"getPages", getNumberOfPages},
 	{"getCurrentPage", getCurrentPage},
