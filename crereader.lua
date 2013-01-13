@@ -112,11 +112,10 @@ function CREReader:open(filename)
 	local view_mode = self.view_mode
 	
 --	ok, self.doc = pcall(cre.openDocument, filename, style_sheet, G_width, G_height, view_mode)
-	ok, self.doc = pcall(cre.newDocView, style_sheet, G_width, G_height, view_mode)
+	ok, self.doc = pcall(cre.newDocView, G_width, G_height)
 	if not ok then
 		return false, SError_opening_cre_document_ -- self.doc, will contain error message
 	end
---	self.doc:setDefaultInterlineSpace(self.line_space_percent)
 	self.filename = filename
 	return true
 end
@@ -544,9 +543,7 @@ function CREReader:toggleCREHeader()
 		local info
 		if self.cre_header_enable then info = DCREREADER_PAGE_HEADER
 		else info = PGHDR_NONE end
-	--	local prev_xpointer = self.doc:getXPointer()	
 		self.doc:setCHInfo(info)
-	--	self:goto(prev_xpointer, nil, "xpointer")
 	else
 		InfoMessage:inform(SView_mode_not_page_, DINFO_DELAY, 1, MSG_WARN)
 	end	
@@ -561,10 +558,8 @@ function CREReader:toggleViewMode()
 		self.view_mode = CRE_VM_PAGE
 		view_mode = "page"
 	end
---	local prev_xpointer = self.doc:getXPointer()
 	InfoMessage:inform(SViewmode_..view_mode, DINFO_TOGGLES, 1, MSG_AUX)
 	self.doc:setCREViewMode(self.view_mode)
---	self:goto(prev_xpointer, nil, "xpointer")
 	self:redrawCurrentPage()
 	self.toc = nil
 end

@@ -75,6 +75,21 @@ static int openDocument(lua_State *L) {
 }
 
 static int newDocView(lua_State *L) {
+  int width = luaL_checkint(L, 1);
+  int height = luaL_checkint(L, 2);
+	lString8 css;
+
+	CreDocument *doc = (CreDocument*) lua_newuserdata(L, sizeof(CreDocument));
+	luaL_getmetatable(L, "credocument");
+	lua_setmetatable(L, -2);
+
+	doc->text_view = new LVDocView();
+	doc->text_view->Resize(width, height);
+	return 1;
+}
+
+/* Old version of newDocView. Removed by @Kai771
+static int newDocView(lua_State *L) {
   const char *style_sheet = luaL_checkstring(L, 1);
   int width = luaL_checkint(L, 2);
   int height = luaL_checkint(L, 3);
@@ -93,11 +108,11 @@ static int newDocView(lua_State *L) {
 			doc->text_view->setStyleSheet(css);
 		}
 	}
-	doc->text_view->setViewMode(view_mode, -1);
 	doc->text_view->Resize(width, height);
-
+	doc->text_view->setViewMode(view_mode, -1);
 	return 1;
 }
+*/
 
 static int getGammaIndex(lua_State *L) {
 	lua_pushinteger(L, fontMan->GetGammaIndex());
@@ -424,15 +439,17 @@ static int setDefaultInterlineSpace(lua_State *L) {
 	return 0;
 }
 
-static int setStyleSheetOld(lua_State *L) {
+/* Old version of setStyleSheet. Removed by @Kai771
+static int setStyleSheet(lua_State *L) {
 	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
 	const char* style_sheet_data = luaL_checkstring(L, 2);
 
 	doc->text_view->setStyleSheet(lString8(style_sheet_data));
 	return 0;
 }
+*/
 
-// new version by @kai771
+// new version of setStyleSheet by @Kai771
 static int setStyleSheet(lua_State *L) {
 	CreDocument *doc = (CreDocument*) luaL_checkudata(L, 1, "credocument");
 	const char* style_sheet = luaL_checkstring(L, 2);
