@@ -110,11 +110,13 @@ function CREReader:open(filename)
 	-- this is defined in kpvcrlib/crengine/crengine/include/lvdocview.h
 	local view_mode = self.view_mode
 	
-	ok, self.doc = pcall(cre.openDocument, filename, style_sheet, G_width, G_height, view_mode)
+--	ok, self.doc = pcall(cre.openDocument, filename, style_sheet, G_width, G_height, view_mode)
+	ok, self.doc = pcall(cre.newDocView, style_sheet, G_width, G_height, view_mode)
 	if not ok then
 		return false, SError_opening_cre_document_ -- self.doc, will contain error message
 	end
 --	self.doc:setDefaultInterlineSpace(self.line_space_percent)
+	self.filename = filename
 	return true
 end
 
@@ -159,6 +161,7 @@ function CREReader:loadSpecialSettings()
 			i=i-1
 		end
 	end
+	self.doc:loadDocument(self.filename)
 end
 
 function CREReader:getLastPageOrPos()
