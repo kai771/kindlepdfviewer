@@ -554,6 +554,7 @@ function CREReader:toggleViewMode()
 	InfoMessage:inform(SViewmode_..view_mode, DINFO_TOGGLES, 1, MSG_AUX)
 	self.doc:setCREViewMode(self.view_mode)
 	self:goto(prev_xpointer, nil, "xpointer")
+	self.toc = nil
 end
 
 function CREReader:startHighLightMode()
@@ -668,6 +669,7 @@ function CREReader:changeDocFont()
 		self.font_face = face_list[item_no]
 	end
 	self:goto(prev_xpointer, nil, "xpointer")
+	self.toc = nil
 end
 
 function CREReader:changeHeaderFont()
@@ -691,6 +693,7 @@ function CREReader:changeHeaderFont()
 		self.doc:setCHFont(self.page_header_font)
 	end
 	self:goto(prev_xpointer, nil, "xpointer")
+	self.toc = nil
 end
 
 function CREReader:setDocFontAsDefault()
@@ -709,6 +712,7 @@ function CREReader:toggleBoldNormal()
 	local prev_xpointer = self.doc:getXPointer()
 	self.doc:toggleFontBolder()
 	self:goto(prev_xpointer, nil, "xpointer")
+	self.toc = nil
 end
 
 function CREReader:doIncDecFontSizeSpacing()
@@ -746,6 +750,7 @@ function CREReader:incDecFontSize(delta)
 	local prev_xpointer = self.doc:getXPointer()
 	self.doc:zoomFont(delta)
 	self:goto(prev_xpointer, nil, "xpointer")
+	self.toc = nil
 end
 
 function CREReader:incDecFontSpacing(factor)
@@ -760,6 +765,7 @@ function CREReader:incDecFontSpacing(factor)
 	local prev_xpointer = self.doc:getXPointer()
 	self.doc:setDefaultInterlineSpace(self.line_space_percent)
 	self:goto(prev_xpointer, nil, "xpointer")
+	self.toc = nil
 end
 
 function CREReader:gotoInput()
@@ -869,7 +875,8 @@ function CREReader:adjustCreReaderCommands()
 				self.view_pan_step = G_height * 2
 			else
 				self.view_pan_step = G_height
-			end	
+			end
+			self.toc = nil
 		end
 	)
 	-- CW-rotation
@@ -886,7 +893,8 @@ function CREReader:adjustCreReaderCommands()
 				self.view_pan_step = G_height * 2
 			else
 				self.view_pan_step = G_height
-			end	
+			end
+			self.toc = nil
 		end
 	)
 	-- navigate between chapters by Shift+Up & Shift-Down
