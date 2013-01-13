@@ -721,6 +721,7 @@ function FileChooser:addAllCommands()
 		Sshow_last_documents,
 		function(self)
 			self:showLastDocuments()
+			if not keep_running then return "break" end
 		end
 	)
 	self.commands:add(KEY_S, nil, "S",
@@ -833,6 +834,7 @@ function FileChooser:addAllCommands()
 			else	
 				self.pagedirty = true
 			end
+			if not keep_running then return "break" end
 	end
 	)
 	self.commands:add(KEY_SCREENKB, nil, "ScreenKB",

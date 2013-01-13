@@ -282,6 +282,13 @@ function FileHistory:addAllCommands()
 			return "break"
 		end
 	)
+	self.commands:add(KEY_HOME, MOD_ALT, "Home",
+		Sexit_Librerator,
+		function(self)
+			keep_running = false
+			return "break"
+		end
+	)
 end
 
 function FileHistory:choose(keywords)
