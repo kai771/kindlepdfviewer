@@ -13,6 +13,8 @@ require "battery"
 require "lbrstrings"
 require "defaults"
 
+keep_running = true
+
 FileChooser = {
 	title_H = DFC_TITLE_H,	-- title height
 	spacing = DFC_SPACING,	-- spacing between lines
@@ -306,7 +308,9 @@ function FileChooser:choose(ypos, height, lf)
 				Debug("command not found: "..tostring(command))
 			end
 
-			if ret_code == "break" then break end
+			if ret_code == "break" and not keep_running then
+				break 
+			end
 
 			if self.selected_item ~= nil then
 				Debug("# selected "..self.selected_item)
@@ -575,6 +579,7 @@ function FileChooser:addAllCommands()
 		function(self)
 			if G_ScreenKB_pressed then
 				G_ScreenKB_pressed = false
+				keep_running = false
 				return "break"
 			end
 			self.page =  1
@@ -901,6 +906,7 @@ function FileChooser:addAllCommands()
 	)	
 	self.commands:add(KEY_HOME, MOD_ALT, "Home", Sexit_Librerator,
 		function(self)
+			keep_running = false
 			return "break"
 		end
 	)
@@ -1052,6 +1058,7 @@ function FileChooser:showFileMenu()
 	elseif re == 13 then
 		self:setFileManagerMode()
 	elseif re == 14 then
+		keep_running = false
 		return "break"
 	else
 		self.pagedirty = true	
