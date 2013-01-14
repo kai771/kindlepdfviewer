@@ -2741,6 +2741,11 @@ function UniReader:toggleViewMode()
 	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_AUX)
 end
 
+function UniReader:changeStyleSheet()
+	self:redrawCurrentPage()
+	InfoMessage:inform(SNot_supported_for_this_doc_type, DINFO_DELAY, 1, MSG_AUX)
+end
+
 function UniReader:togglePageMode()
 	self.page_mode_enable = not self.page_mode_enable
 	self.settings:saveSetting("page_mode_enable", self.page_mode_enable)
@@ -3005,6 +3010,7 @@ function UniReader:showSettingsMenu()
 		SConfigure_event_notifications,
 		SReset_default_reader_preferences,
 		SClear_reader_association_with_this_document,
+		SChange_document_style_sheet,
 		}
 	local settings_menu = SelectMenu:new{
 		menu_title = SLibrerator_Settings,
@@ -3064,6 +3070,8 @@ function UniReader:showSettingsMenu()
 	elseif re == 18 then
 		self:redrawCurrentPage()
 		self:clearReaderAssociation()
+	elseif re == 19 then
+		self:changeStyleSheet()
 	end
 end
 

@@ -154,7 +154,7 @@ function CREReader:loadSpecialSettings()
 
 	local style_sheet = self.settings:readSetting("style_sheet")
 	self.style_sheet = style_sheet or self.style_sheet
-	Debug("My self.style_sheet=", tostring(self.style_sheet))
+	Debug("Set style sheet: self.style_sheet=", tostring(self.style_sheet))
 	self.doc:setStyleSheet(self.style_sheet)
 
 	local font_zoom = self.settings:readSetting("font_zoom")
@@ -841,6 +841,35 @@ function CREReader:doZoomOrFont()
 	self:redrawCurrentPage()
 end
 
+function CREReader:changeStyleSheet()
+	local css_list = {}
+	local n = 0
+	local current = 0
+	for f in lfs.dir("./data") do
+		if lfs.attributes("./data/"..f, "mode") == "file" and string.match(f, "%.css$") then
+			table.insert(css_list, f)
+			if self.style_sheet == "./data/"..f then current = n end
+			n = n + 1
+		end	
+	end
+	local css_menu = SelectMenu:new{
+		menu_title = SCurrent_style_sheet_..string.gsub(self.style_sheet, ".*/", ""),
+		item_array = css_list,
+		current_entry = current
+		}
+	Screen:saveCurrentBB()
+	local re = css_menu:choose(0, G_height)
+	Screen:restoreFromSavedBB()
+	fb:refresh(1)
+	if re ~= nil then
+		local prev_xpointer = self.doc:getXPointer()
+		Debug("Selected style sheet: ", css_list[re])
+		self.style_sheet = "./data/"..css_list[re]
+		self.doc:setStyleSheet(self.style_sheet)
+		self:goto(prev_xpointer, nil, "xpointer")
+	end
+end
+
 function CREReader:adjustCreReaderCommands()
 	self.commands:delGroup("[joypad]")
 	self.commands:delGroup(MOD_ALT.."H/J")
@@ -1015,6 +1044,12 @@ function CREReader:adjustCreReaderCommands()
 		function(self)
 			self:addBookmarkCommand()
 		end -- function
+	)
+	self.commands:add(KEY_S, nil, "S",
+		Schange_document_style_sheet,
+		function(self)
+			self:changeStyleSheet()
+		end
 	)
 	self.commands:addGroup(MOD_ALT.."K/L",{
 		Keydef:new(KEY_K,MOD_ALT), Keydef:new(KEY_L,MOD_ALT)},

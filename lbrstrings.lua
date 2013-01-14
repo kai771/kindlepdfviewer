@@ -35,6 +35,7 @@ SRefresh_count_ = "Refresh count..."
 SConfigure_event_notifications = "Configure event notifications"
 SReset_default_reader_preferences = "Reset default reader preferences"
 SClear_reader_association_with_this_document = "Clear reader association with this document"
+SChange_document_style_sheet = "Change document style sheet"
 
 -- Zoom & Rotate Menu
 SSelect_Zoom_Mode = "Select Zoom Mode" -- Menu title
@@ -199,6 +200,7 @@ SNew_page_bounding_box = "New page bounding box"
 SError_unzipping_file_ = "Error unzipping file. "
 SZip_contains_improper_content_ = "Zip contains improper content. "
 SError_opening_cre_document_ = "Error opening cre-document. "
+SCurrent_style_sheet_ = "Current style sheet: "
 
 -- Fonts Menu
 SLibrerator_Fonts_Menu = "Librerator - Fonts Menu" -- menu title
@@ -231,7 +233,7 @@ Sincrease_decrease_line_spacing = "increase/decrease line spacing"
 Sopen_go_to_position_input_box = "open 'go to position' input box"
 Schange_document_font = "change document font"
 Suse_document_font_as_default_font = "use document font as default font"
-Stoggle_font_weight_bold_normal = "toggle font-weight: bold <> normal"
+Stoggle_font_weight_bold_normal = "toggle font-weight: bold/normal"
 SChanging_gamma_to_ = "Changing gamma to "
 Sjoypad_up = "joypad up"
 Sjoypad_down = "joypad down"
@@ -249,6 +251,7 @@ S_pixels_downwards = " pixels downwards"
 Span_ = "pan "
 Stoggle_view_mode_= "toggle view mode "
 SViewmode_ = "Viewmode: "
+Schange_document_style_sheet = "change document style sheet"
 
 
 -- djvureader --
