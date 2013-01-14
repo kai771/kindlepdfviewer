@@ -33,6 +33,8 @@ FileChooser = {
 	dir_pos1 = "",
 	dir_pos2 = "",
 	dir_pos3 = "",
+	dir_pos4 = "",
+	dir_pos5 = "",
 
 	pagedirty = true,
 	markerdirty = false,
@@ -58,6 +60,10 @@ function FileChooser:init()
 	if tmp then self.dir_pos2 = tmp end
 	tmp = G_reader_settings:readSetting("dir_pos3")
 	if tmp then self.dir_pos3 = tmp end
+	tmp = G_reader_settings:readSetting("dir_pos4")
+	if tmp then self.dir_pos4 = tmp end
+	tmp = G_reader_settings:readSetting("dir_pos5")
+	if tmp then self.dir_pos5 = tmp end
 end
 
 -- NuPogodi, 29.09.12: simplified the code
@@ -772,52 +778,97 @@ function FileChooser:addAllCommands()
 			self:doCalculator()
 		end
 	)
-	self.commands:add(KEY_I, MOD_SHIFT, "I",
-		Ssave_position_1,
+	self.commands:add(KEY_D, nil, "D",
+		Sgo_to_documents_folder,
+		function(self)
+			self:setPath("/mnt/us/documents")
+			self.pagedirty = true
+			Debug("go to documents folder")
+		end
+	)
+	self.commands:add(KEY_Y, MOD_SHIFT, "Y",
+		Ssave_location_.."1",
 		function(self)
 			self.dir_pos1 = self.path
 			G_reader_settings:saveSetting("dir_pos1", self.dir_pos1)
 			Debug("dir_pos1=", self.dir_pos1)
+			InfoMessage:inform(SLocation_saved_, DINFO_TOGGLES, 1, MSG_AUX)
 		end
 	)
-	self.commands:add(KEY_I, nil, "I",
-		Sgo_to_position_1,
+	self.commands:add(KEY_Y, nil, "Y",
+		Sgo_to_location_.."1",
 		function(self)
 			self:setPath(self.dir_pos1)
 			self.pagedirty = true
 			Debug("dir_pos1=", self.dir_pos1)
 		end
 	)
-	self.commands:add(KEY_O, MOD_SHIFT, "O",
-		Ssave_position_2,
+	self.commands:add(KEY_U, MOD_SHIFT, "U",
+		Ssave_location_.."2",
 		function(self)
 			self.dir_pos2 = self.path
 			G_reader_settings:saveSetting("dir_pos2", self.dir_pos2)
 			Debug("dir_pos2=", self.dir_pos2)
+			InfoMessage:inform(SLocation_saved_, DINFO_TOGGLES, 1, MSG_AUX)
 		end
 	)
-	self.commands:add(KEY_O, nil, "O",
-		Sgo_to_position_2,
+	self.commands:add(KEY_U, nil, "U",
+		Sgo_to_location_.."2",
 		function(self)
 			self:setPath(self.dir_pos2)
 			self.pagedirty = true
 			Debug("dir_pos2=", self.dir_pos2)
 		end
 	)
-	self.commands:add(KEY_P, MOD_SHIFT, "P",
-		Ssave_position_3,
+	self.commands:add(KEY_I, MOD_SHIFT, "I",
+		Ssave_location_.."3",
 		function(self)
 			self.dir_pos3 = self.path
 			G_reader_settings:saveSetting("dir_pos3", self.dir_pos3)
 			Debug("dir_pos3=", self.dir_pos3)
+			InfoMessage:inform(SLocation_saved_, DINFO_TOGGLES, 1, MSG_AUX)
 		end
 	)
-	self.commands:add(KEY_P, nil, "P",
-		Sgo_to_position_3,
+	self.commands:add(KEY_I, nil, "I",
+		Sgo_to_location_.."3",
 		function(self)
 			self:setPath(self.dir_pos3)
 			self.pagedirty = true
 			Debug("dir_pos3=", self.dir_pos3)
+		end
+	)
+	self.commands:add(KEY_O, MOD_SHIFT, "O",
+		Ssave_location_.."4",
+		function(self)
+			self.dir_pos4 = self.path
+			G_reader_settings:saveSetting("dir_pos4", self.dir_pos4)
+			Debug("dir_pos4=", self.dir_pos4)
+			InfoMessage:inform(SLocation_saved_, DINFO_TOGGLES, 1, MSG_AUX)
+		end
+	)
+	self.commands:add(KEY_O, nil, "O",
+		Sgo_to_location_.."4",
+		function(self)
+			self:setPath(self.dir_pos4)
+			self.pagedirty = true
+			Debug("dir_pos4=", self.dir_pos4)
+		end
+	)
+	self.commands:add(KEY_P, MOD_SHIFT, "P",
+		Ssave_location_.."5",
+		function(self)
+			self.dir_pos5 = self.path
+			G_reader_settings:saveSetting("dir_pos5", self.dir_pos5)
+			Debug("dir_pos5=", self.dir_pos5)
+			InfoMessage:inform(SLocation_saved_, DINFO_TOGGLES, 1, MSG_AUX)
+		end
+	)
+	self.commands:add(KEY_P, nil, "P",
+		Sgo_to_location_.."5",
+		function(self)
+			self:setPath(self.dir_pos5)
+			self.pagedirty = true
+			Debug("dir_pos5=", self.dir_pos5)
 		end
 	)
 	self.commands:add(KEY_MENU, nil, "Menu",

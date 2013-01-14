@@ -160,6 +160,7 @@ SPress_left_right_to_adjust_gamma = "Press left/right to adjust gamma"
 SGamma_adjusted = "Gamma adjusted"
 SNo_links_on_this_page_ = "No links on this page "
 SNo_page_links_on_this_page_ = "No page links on this page "
+SLocation_saved_ = "Location saved "
 
 -- Input dialogs
 SZoom_ = "Zoom:" -- Zoom input dialog
@@ -371,12 +372,9 @@ SDirectory_not_empty_ = "Directory not empty "
 SUnsupported_function_ = "Unsupported function "
 Sgo_to_first_page = "go to first page"
 Sgo_to_last_page = "go to last page"
-Ssave_position_1 = "save position 1"
-Ssave_position_2 = "save position 2"
-Ssave_position_3 = "save position 3"
-Sgo_to_position_1 = "go to position 1"
-Sgo_to_position_2 = "go to position 2"
-Sgo_to_position_3 = "go to position 3"
+Ssave_location_ = "save location "
+Sgo_to_location_ = "go to location "
+Sgo_to_documents_folder = "go to documents folder"
 
 -- FileChooser Menu
 SLibrerator_File_Chooser_Menu = "Librerator - File Chooser Menu" -- menu title
