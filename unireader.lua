@@ -2517,7 +2517,7 @@ end
 
 -- wait for input and handle it
 function UniReader:inputLoop()
-	local keep_running = true
+--	local keep_running = true
 	while 1 do
 		local ev = input.saveWaitForEvent()
 		ev.code = adjustKeyEvents(ev)
@@ -2530,7 +2530,7 @@ function UniReader:inputLoop()
 				Debug("command to execute:", tostring(command))
 				ret_code = command.func(self,keydef)
 				if ret_code == "break" then
-					break;
+					return "break"
 				end
 			else
 				Debug("command not found:", tostring(command))

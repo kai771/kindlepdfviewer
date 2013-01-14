@@ -233,8 +233,8 @@ end
 
 function FileChooser:choose(ypos, height, lf)
 	if lf ~= nil then 
-		openFile(lf)
-		ret_code = ""
+		ret_code = openFile(lf)
+		if ret_code == "break" and not keep_running then return "break" end
 	end
 	self.perpage = math.floor(G_height / self.spacing) - 2
 	self.pagedirty = true
