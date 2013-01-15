@@ -2530,6 +2530,7 @@ function UniReader:inputLoop()
 				Debug("command to execute:", tostring(command))
 				ret_code = command.func(self,keydef)
 				if ret_code == "break" then
+					if keep_running then break end
 					return "break"
 				end
 			else
